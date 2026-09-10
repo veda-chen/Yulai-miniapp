@@ -29,14 +29,14 @@
       "title": "微信开发者工具与真机主流程冒烟",
       "owner": "测试负责人",
       "status": "PENDING",
-      "evidence": ""
+      "evidence": "2026-09-10：微信开发者工具 CLI preview 通过，AppID wx78ffd807b5bceb77，包体 331.6 KB；仍待至少两台真机完成主流程。"
     },
     {
       "id": "performance",
       "title": "开发环境性能与并发验收",
       "owner": "开发负责人",
       "status": "PENDING",
-      "evidence": ""
+      "evidence": "2026-09-10：开发环境只读冒烟通过，health 5 ms（冷启动 630 ms）、venue.list 152 ms、activity.list 54 ms；仍待并发与 P95 压测。"
     },
     {
       "id": "backup-restore",
