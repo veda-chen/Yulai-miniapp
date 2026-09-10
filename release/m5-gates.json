@@ -42,8 +42,8 @@
       "id": "backup-restore",
       "title": "备份及隔离恢复演练",
       "owner": "运维负责人",
-      "status": "PENDING",
-      "evidence": ""
+      "status": "BLOCKED",
+      "evidence": "2026-09-10：备份 20260910T065214Z 完成，15 个集合中 3 个已导出、12 个为空；隔离恢复被 CloudBase OperationDenied 拒绝，当前套餐需升级到标准版或以上。"
     }
   ]
 }

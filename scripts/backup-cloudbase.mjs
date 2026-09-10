@@ -14,6 +14,7 @@ function parseEnv(text) {
       }),
   );
 }
+
 async function loadEnvironment() {
   let fileValues = {};
   try {
@@ -21,19 +22,30 @@ async function loadEnvironment() {
   } catch {}
   return { ...fileValues, ...process.env };
 }
+
+const tcbEntrypoint = resolve("node_modules/@cloudbase/cli/bin/tcb");
+
 function runTcb(args) {
   return new Promise((resolvePromise, reject) => {
-    const child = spawn("tcb", args, {
-      stdio: "inherit",
-      shell: process.platform === "win32",
+    const child = spawn(process.execPath, [tcbEntrypoint, ...args], {
+      stdio: ["ignore", "pipe", "pipe"],
       env: process.env,
     });
+    let output = "";
+    child.stdout.on("data", (chunk) => {
+      output += chunk;
+      process.stdout.write(chunk);
+    });
+    child.stderr.on("data", (chunk) => {
+      output += chunk;
+      process.stderr.write(chunk);
+    });
     child.once("error", reject);
-    child.once("exit", (code) =>
-      code === 0
-        ? resolvePromise()
-        : reject(new Error(`CloudBase CLI exited with code ${code ?? "unknown"}`)),
-    );
+    child.once("exit", (code) => {
+      if (code === 0) resolvePromise({ empty: false });
+      else if (/记录条数为0|zero records/i.test(output)) resolvePromise({ empty: true });
+      else reject(new Error(`CloudBase CLI exited with code ${code ?? "unknown"}`));
+    });
   });
 }
 
@@ -45,8 +57,11 @@ if (!envId || envId.startsWith("replace-"))
   throw new Error("缺少有效的 CLOUDBASE_ENV_ID，请先配置 .env 或当前环境变量");
 
 const definition = JSON.parse(await readFile("cloudbase/collections.json", "utf8"));
-const collections = definition.collections.map((item) => item.name);
-if (!collections.length || collections.some((name) => !/^[A-Za-z][A-Za-z0-9_]*$/.test(name)))
+const collectionNames = definition.collections.map((item) => item.name);
+if (
+  !collectionNames.length ||
+  collectionNames.some((name) => !/^[A-Za-z][A-Za-z0-9_]*$/.test(name))
+)
   throw new Error("集合定义无效");
 
 const backupId = new Date()
@@ -56,16 +71,17 @@ const backupId = new Date()
 const outputDir = resolve(
   outputIndex >= 0 && options[outputIndex + 1] ? options[outputIndex + 1] : `.backups/${backupId}`,
 );
-console.log(`CloudBase backup plan: ${collections.length} collections -> ${outputDir}`);
+console.log(`CloudBase backup plan: ${collectionNames.length} collections -> ${outputDir}`);
 if (dryRun) {
-  for (const collection of collections) console.log(`- ${collection}`);
+  for (const collection of collectionNames) console.log(`- ${collection}`);
   process.exit(0);
 }
 
 await mkdir(outputDir, { recursive: true });
-for (const collection of collections) {
+const collections = [];
+for (const collection of collectionNames) {
   console.log(`Exporting ${collection}...`);
-  await runTcb([
+  const result = await runTcb([
     "db",
     "nosql",
     "dump",
@@ -77,6 +93,18 @@ for (const collection of collections) {
     "-e",
     envId,
   ]);
+  if (result.empty) {
+    const marker = { collection, recordCount: 0, exportedAt: new Date().toISOString() };
+    await writeFile(
+      resolve(outputDir, `EMPTY-${collection}.json`),
+      `${JSON.stringify(marker, null, 2)}\n`,
+      "utf8",
+    );
+    collections.push({ name: collection, status: "EMPTY" });
+    console.log(`Collection ${collection} is empty; marker created`);
+  } else {
+    collections.push({ name: collection, status: "EXPORTED" });
+  }
 }
 const manifest = {
   version: 1,

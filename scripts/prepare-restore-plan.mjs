@@ -23,9 +23,11 @@ const mappings = collections.map((name) => ({
   NewTableName: `${name}_restored_${suffix}`,
 }));
 console.log("恢复演练始终写入新集合，核验完成前不要覆盖原集合。");
-console.log("1. tcb db nosql restore-time -e <env-id>");
-console.log(`2. tcb db nosql restore-tables --time "${restoreTime}" -e <env-id>`);
+console.log("1. tcb -e <env-id> db nosql backup time");
 console.log(
-  `3. tcb db nosql restore --time "${restoreTime}" --tables '${JSON.stringify(mappings)}' -e <env-id>`,
+  `2. tcb -e <env-id> db nosql backup collection --time "${restoreTime}" --filters ${collections.join(",")}`,
 );
-console.log("4. tcb db nosql restore-task -e <env-id>");
+console.log(
+  `3. tcb -e <env-id> db nosql backup restore --time "${restoreTime}" --tables '${JSON.stringify(mappings)}'`,
+);
+console.log("4. tcb -e <env-id> db nosql backup task");

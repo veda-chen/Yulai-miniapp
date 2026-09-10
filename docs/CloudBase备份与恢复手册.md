@@ -44,6 +44,8 @@ pnpm restore:plan -- --time "2026-09-10 14:00:00" --collections "users,activitie
 
 恢复演练不得使用现有业务集合名。正式环境覆盖恢复前，必须停止写入、创建新的全量备份，并制定逐集合切换和回滚步骤。
 
+当前开发环境于 2026-09-10 完成全量导出，但隔离回档返回 OperationDenied；CloudBase 提示该能力需要标准版或以上套餐。升级套餐或建立支持回档的生产环境后，必须重新执行恢复演练。
+
 ## 验收口径
 
 - 最近一次完整备份不超过 24 小时。
@@ -52,4 +54,4 @@ pnpm restore:plan -- --time "2026-09-10 14:00:00" --collections "users,activitie
 - 从开始恢复到完成核验不超过 4 小时。
 - 备份文件只保存在受控位置。
 
-命令依据 CloudBase CLI 文档：<https://docs.cloudbase.net/cli-v1/db/nosql/management>。
+本项目当前使用 CloudBase CLI 3.8.1，其回档命令位于 `tcb db nosql backup` 下。能力说明依据 CloudBase CLI 文档：<https://docs.cloudbase.net/cli-v1/db/nosql/management>。
