@@ -36,7 +36,7 @@
       "title": "开发环境性能与并发验收",
       "owner": "开发负责人",
       "status": "PENDING",
-      "evidence": "2026-09-10：开发环境只读冒烟通过，health 5 ms（冷启动 630 ms）、venue.list 152 ms、activity.list 54 ms；仍待并发与 P95 压测。"
+      "evidence": "2026-09-10：开发环境只读并发测试各 20 次、并发度 5、错误率 0；health.get P95 4 ms，activity.list P95 183 ms，均低于 500 ms，见 release/m5-performance.json。本地事务测试 100 个并发报名保持 1 个正式名额、99 个候补；仍待开发环境认证写接口 P95 与真实数据库竞争验证。"
     },
     {
       "id": "backup-restore",

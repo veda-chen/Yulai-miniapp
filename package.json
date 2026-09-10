@@ -24,7 +24,8 @@
     "restore:plan": "node scripts/prepare-restore-plan.mjs",
     "m5:verify": "node scripts/verify-m5.mjs",
     "release:gate": "node scripts/check-release-gates.mjs",
-    "release:check": "pnpm check && pnpm build && pnpm release:gate"
+    "release:check": "pnpm check && pnpm build && pnpm release:gate",
+    "performance:cloud": "node scripts/check-cloud-performance.mjs"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.2.4",

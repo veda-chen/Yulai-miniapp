@@ -11,6 +11,8 @@ for (const path of [
   "scripts/prepare-restore-plan.mjs",
   "scripts/check-release-gates.mjs",
   "cloudbase/m5-retention-index.json",
+  "scripts/check-cloud-performance.mjs",
+  "release/m5-performance.json",
 ])
   await stat(path);
 
@@ -34,9 +36,19 @@ if (!functionConfig.triggers?.some((trigger) => trigger.name === "purge-deleted-
   throw new Error("缺少注销账号留存清理定时任务");
 
 const pkg = JSON.parse(await readFile("package.json", "utf8"));
-for (const script of ["backup:cloud", "restore:plan", "m5:verify", "release:gate", "release:check"])
+for (const script of [
+  "backup:cloud",
+  "restore:plan",
+  "performance:cloud",
+  "m5:verify",
+  "release:gate",
+  "release:check",
+])
   if (!pkg.scripts[script]) throw new Error(`缺少M5命令: ${script}`);
 if (!pkg.scripts.check.includes("m5:verify")) throw new Error("pnpm check 必须包含 M5 自动校验");
+const performanceReport = JSON.parse(await readFile("release/m5-performance.json", "utf8"));
+if (!performanceReport.passed || performanceReport.actions?.["activity.list"]?.p95Ms >= 500)
+  throw new Error("开发环境只读性能未达到 M5 目标");
 if (!(await readFile(".gitignore", "utf8")).split(/\r?\n/).includes(".backups/"))
   throw new Error("备份目录必须被 Git 忽略");
 

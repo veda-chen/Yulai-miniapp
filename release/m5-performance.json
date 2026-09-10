@@ -1,0 +1,26 @@
+{
+  "environmentId": "cloud1-d1g8z3590d3768cbb",
+  "measuredAt": "2026-09-10T14:25:08.525Z",
+  "sampleCount": 20,
+  "concurrency": 5,
+  "thresholdMs": 500,
+  "actions": {
+    "health.get": {
+      "successes": 20,
+      "errors": 0,
+      "p50Ms": 1,
+      "p95Ms": 4,
+      "maxMs": 4,
+      "wallP95Ms": 3538
+    },
+    "activity.list": {
+      "successes": 20,
+      "errors": 0,
+      "p50Ms": 52,
+      "p95Ms": 183,
+      "maxMs": 299,
+      "wallP95Ms": 2290
+    }
+  },
+  "passed": true
+}
