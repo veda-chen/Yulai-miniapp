@@ -14,7 +14,14 @@
       "installDependency": true,
       "envVariables": {
         "OPENID_HASH_SECRET": "{{env.OPENID_HASH_SECRET}}"
-      }
+      },
+      "triggers": [
+        {
+          "name": "purge-deleted-users-daily",
+          "type": "timer",
+          "config": "0 30 3 * * * *"
+        }
+      ]
     }
   ]
 }

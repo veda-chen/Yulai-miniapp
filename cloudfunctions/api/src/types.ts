@@ -2,6 +2,9 @@ export type CloudEvent = {
   action?: unknown;
   requestId?: unknown;
   payload?: unknown;
+  Type?: unknown;
+  TriggerName?: unknown;
+  Time?: unknown;
 };
 
 export type WxContext = {

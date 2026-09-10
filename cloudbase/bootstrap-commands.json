@@ -42,7 +42,7 @@
   {
     "TableName": "users",
     "CommandType": "COMMAND",
-    "Command": "{\"createIndexes\":\"users\",\"indexes\":[{\"name\":\"openidHash_unique\",\"key\":{\"openidHash\":1},\"unique\":true}]}"
+    "Command": "{\"createIndexes\":\"users\",\"indexes\":[{\"name\":\"openidHash_unique\",\"key\":{\"openidHash\":1},\"unique\":true},{\"name\":\"status_deletedAt\",\"key\":{\"status\":1,\"deletedAt\":1}}]}"
   },
   {
     "TableName": "schools",

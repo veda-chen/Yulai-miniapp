@@ -10,6 +10,14 @@
           "name": "openidHash_unique",
           "unique": true,
           "fields": [{ "field": "openidHash", "order": "asc" }]
+        },
+        {
+          "name": "status_deletedAt",
+          "unique": false,
+          "fields": [
+            { "field": "status", "order": "asc" },
+            { "field": "deletedAt", "order": "asc" }
+          ]
         }
       ]
     },

@@ -1,6 +1,7 @@
 import { cloud } from "./db.js";
 import { AppError, errorMessage } from "./errors.js";
 import { createRequestContext } from "./request-context.js";
+import { isRetentionTimerEvent, purgeExpiredDeletedUsers } from "./modules/retention.js";
 import { resolveRoute } from "./router.js";
 import type { CloudEvent, WxContext } from "./types.js";
 
@@ -9,6 +10,12 @@ export function createMain(getWxContext: () => WxContext) {
     let requestId = typeof event.requestId === "string" ? event.requestId.slice(0, 64) : "unknown";
 
     try {
+      if (isRetentionTimerEvent(event)) {
+        requestId = "retention-timer";
+        const data = await purgeExpiredDeletedUsers();
+        return { ok: true, requestId, data };
+      }
+
       const route = resolveRoute(event.action);
       const context = createRequestContext(event, getWxContext(), route.requiresAuth);
       requestId = context.requestId;

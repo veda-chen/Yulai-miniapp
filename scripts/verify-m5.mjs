@@ -10,6 +10,7 @@ for (const path of [
   "scripts/backup-cloudbase.mjs",
   "scripts/prepare-restore-plan.mjs",
   "scripts/check-release-gates.mjs",
+  "cloudbase/m5-retention-index.json",
 ])
   await stat(path);
 
@@ -19,9 +20,18 @@ const profilePage = await readFile("apps/miniprogram/pages/profile/index.wxml", 
 if (!profilePage.includes('bindtap="deleteAccount"')) throw new Error("缺少账号注销入口");
 if (!profilePage.includes("/pages/privacy/index")) throw new Error("缺少隐私与数据入口");
 const privacyPage = await readFile("apps/miniprogram/pages/privacy/index.wxml", "utf8");
-for (const requiredText of ["陈政昊", "2724309224@qq.com", "学校和自评水平均可不填", "已注销球友"])
+for (const requiredText of [
+  "陈政昊",
+  "2724309224@qq.com",
+  "学校和自评水平均可不填",
+  "已注销球友",
+  "最长保存180天",
+])
   if (!privacyPage.includes(requiredText))
     throw new Error(`隐私与数据页面缺少内容: ${requiredText}`);
+const functionConfig = JSON.parse(await readFile("cloudfunctions/api/config.json", "utf8"));
+if (!functionConfig.triggers?.some((trigger) => trigger.name === "purge-deleted-users-daily"))
+  throw new Error("缺少注销账号留存清理定时任务");
 
 const pkg = JSON.parse(await readFile("package.json", "utf8"));
 for (const script of ["backup:cloud", "restore:plan", "m5:verify", "release:gate", "release:check"])
