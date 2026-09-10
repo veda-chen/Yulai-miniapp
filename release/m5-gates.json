@@ -22,7 +22,7 @@
       "title": "试点场馆现场数据核验",
       "owner": "场馆核验人",
       "status": "PENDING",
-      "evidence": ""
+      "evidence": "官方地址及羽毛球用途已核实并同步开发环境，见 docs/试点场馆核验表.md；入口、场地编号、开放时间和授权仍待现场确认。"
     },
     {
       "id": "device-smoke",

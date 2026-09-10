@@ -69,4 +69,13 @@ for (const requiredRule of [
   }
 }
 
+const venueSeeds = JSON.parse(await readFile("cloudbase/seeds/venues.json", "utf8"));
+if (!Array.isArray(venueSeeds) || venueSeeds.length < 1) {
+  throw new Error("场馆种子数据必须是非空数组");
+}
+const seedCommands = JSON.parse(await readFile("cloudbase/seed-commands.json", "utf8"));
+if (!Array.isArray(seedCommands) || seedCommands.length < 1) {
+  throw new Error("场馆种子命令必须是非空数组");
+}
+
 console.log("M2 complete scope verified");
