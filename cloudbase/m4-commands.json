@@ -1,0 +1,34 @@
+[
+  { "TableName": "rounds", "CommandType": "COMMAND", "Command": "{\"create\":\"rounds\"}" },
+  {
+    "TableName": "rounds",
+    "CommandType": "COMMAND",
+    "Command": "{\"createIndexes\":\"rounds\",\"indexes\":[{\"name\":\"activityId_roundNo_unique\",\"key\":{\"activityId\":1,\"roundNo\":-1},\"unique\":true},{\"name\":\"activityId_status\",\"key\":{\"activityId\":1,\"status\":1}}]}"
+  },
+  { "TableName": "matches", "CommandType": "COMMAND", "Command": "{\"create\":\"matches\"}" },
+  {
+    "TableName": "matches",
+    "CommandType": "COMMAND",
+    "Command": "{\"createIndexes\":\"matches\",\"indexes\":[{\"name\":\"activityId_createdAt\",\"key\":{\"activityId\":1,\"createdAt\":1}},{\"name\":\"roundId\",\"key\":{\"roundId\":1}}]}"
+  },
+  {
+    "TableName": "matchPlayers",
+    "CommandType": "COMMAND",
+    "Command": "{\"create\":\"matchPlayers\"}"
+  },
+  {
+    "TableName": "matchPlayers",
+    "CommandType": "COMMAND",
+    "Command": "{\"createIndexes\":\"matchPlayers\",\"indexes\":[{\"name\":\"matchId_userId_unique\",\"key\":{\"matchId\":1,\"userId\":1},\"unique\":true},{\"name\":\"userId_result\",\"key\":{\"userId\":1,\"result\":1}},{\"name\":\"activityId\",\"key\":{\"activityId\":1}}]}"
+  },
+  {
+    "TableName": "scoreRevisions",
+    "CommandType": "COMMAND",
+    "Command": "{\"create\":\"scoreRevisions\"}"
+  },
+  {
+    "TableName": "scoreRevisions",
+    "CommandType": "COMMAND",
+    "Command": "{\"createIndexes\":\"scoreRevisions\",\"indexes\":[{\"name\":\"matchId_createdAt\",\"key\":{\"matchId\":1,\"createdAt\":-1}},{\"name\":\"activityId_status\",\"key\":{\"activityId\":1,\"status\":1}}]}"
+  }
+]

@@ -1,0 +1,12 @@
+[
+  {
+    "TableName": "schools",
+    "CommandType": "COMMAND",
+    "Command": "{\"createIndexes\":\"schools\",\"indexes\":[{\"name\":\"status_name\",\"key\":{\"status\":1,\"name\":1}}]}"
+  },
+  {
+    "TableName": "schools",
+    "CommandType": "UPDATE",
+    "Command": "{\"update\":\"schools\",\"updates\":[{\"q\":{\"seedKey\":\"gdut\"},\"u\":{\"$set\":{\"seedKey\":\"gdut\",\"name\":\"广东工业大学\",\"normalizedName\":\"广东工业大学\",\"status\":\"ACTIVE\",\"createdAt\":\"2026-09-09T00:00:00.000Z\",\"updatedAt\":\"2026-09-09T00:00:00.000Z\"}},\"upsert\":true}]}"
+  }
+]

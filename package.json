@@ -1,0 +1,29 @@
+{
+  "name": "yulai",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@11.19.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "pnpm -r --if-present build",
+    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm m1:verify && pnpm m2:verify && pnpm m3:verify && pnpm m4:verify",
+    "cloud:check": "node scripts/check-cloud-env.mjs",
+    "cloud:deploy": "pnpm build && tcb fn deploy api --force",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "lint": "biome lint .",
+    "m1:verify": "node scripts/verify-m1.mjs",
+    "m2:verify": "node scripts/verify-m2.mjs",
+    "m3:verify": "node scripts/verify-m3.mjs",
+    "m4:verify": "node scripts/verify-m4.mjs",
+    "test": "pnpm -r --if-present test",
+    "typecheck": "pnpm -r --if-present typecheck"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.2.4",
+    "@cloudbase/cli": "^3.8.1",
+    "typescript": "^5.9.2"
+  }
+}

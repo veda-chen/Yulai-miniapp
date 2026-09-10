@@ -1,0 +1,5 @@
+.page { padding: 32rpx; }
+.item, .empty { display:flex; flex-direction:column; margin-bottom:20rpx; padding:28rpx; border-radius:20rpx; background:#fff; border:1rpx solid #d9e5e0; }
+.item:not(.read) { border-left:8rpx solid #2d755e; }
+.title { font-size:30rpx; font-weight:600; }
+.body, .time, .empty { margin-top:10rpx; color:#66736e; font-size:25rpx; }

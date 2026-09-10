@@ -1,0 +1,32 @@
+[
+  {
+    "TableName": "users",
+    "CommandType": "QUERY",
+    "Command": "{\"find\":\"users\",\"filter\":{},\"projection\":{\"_id\":1,\"status\":1},\"limit\":2}"
+  },
+  {
+    "TableName": "venues",
+    "CommandType": "QUERY",
+    "Command": "{\"find\":\"venues\",\"filter\":{\"seedKey\":\"gdut-university-town-gymnasium\"},\"limit\":2}"
+  },
+  {
+    "TableName": "users",
+    "CommandType": "COMMAND",
+    "Command": "{\"listIndexes\":\"users\"}"
+  },
+  {
+    "TableName": "activities",
+    "CommandType": "COMMAND",
+    "Command": "{\"listIndexes\":\"activities\"}"
+  },
+  {
+    "TableName": "registrations",
+    "CommandType": "COMMAND",
+    "Command": "{\"listIndexes\":\"registrations\"}"
+  },
+  {
+    "TableName": "participants",
+    "CommandType": "COMMAND",
+    "Command": "{\"listIndexes\":\"participants\"}"
+  }
+]

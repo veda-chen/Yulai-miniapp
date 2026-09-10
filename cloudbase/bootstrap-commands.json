@@ -1,0 +1,82 @@
+[
+  {
+    "TableName": "users",
+    "CommandType": "COMMAND",
+    "Command": "{\"create\":\"users\"}"
+  },
+  {
+    "TableName": "schools",
+    "CommandType": "COMMAND",
+    "Command": "{\"create\":\"schools\"}"
+  },
+  {
+    "TableName": "venues",
+    "CommandType": "COMMAND",
+    "Command": "{\"create\":\"venues\"}"
+  },
+  {
+    "TableName": "courts",
+    "CommandType": "COMMAND",
+    "Command": "{\"create\":\"courts\"}"
+  },
+  {
+    "TableName": "activities",
+    "CommandType": "COMMAND",
+    "Command": "{\"create\":\"activities\"}"
+  },
+  {
+    "TableName": "registrations",
+    "CommandType": "COMMAND",
+    "Command": "{\"create\":\"registrations\"}"
+  },
+  {
+    "TableName": "participants",
+    "CommandType": "COMMAND",
+    "Command": "{\"create\":\"participants\"}"
+  },
+  {
+    "TableName": "auditLogs",
+    "CommandType": "COMMAND",
+    "Command": "{\"create\":\"auditLogs\"}"
+  },
+  {
+    "TableName": "users",
+    "CommandType": "COMMAND",
+    "Command": "{\"createIndexes\":\"users\",\"indexes\":[{\"name\":\"openidHash_unique\",\"key\":{\"openidHash\":1},\"unique\":true}]}"
+  },
+  {
+    "TableName": "schools",
+    "CommandType": "COMMAND",
+    "Command": "{\"createIndexes\":\"schools\",\"indexes\":[{\"name\":\"normalizedName_unique\",\"key\":{\"normalizedName\":1},\"unique\":true},{\"name\":\"status_name\",\"key\":{\"status\":1,\"name\":1}}]}"
+  },
+  {
+    "TableName": "venues",
+    "CommandType": "COMMAND",
+    "Command": "{\"createIndexes\":\"venues\",\"indexes\":[{\"name\":\"status_name\",\"key\":{\"status\":1,\"name\":1}}]}"
+  },
+  {
+    "TableName": "courts",
+    "CommandType": "COMMAND",
+    "Command": "{\"createIndexes\":\"courts\",\"indexes\":[{\"name\":\"venueId_name_unique\",\"key\":{\"venueId\":1,\"name\":1},\"unique\":true}]}"
+  },
+  {
+    "TableName": "activities",
+    "CommandType": "COMMAND",
+    "Command": "{\"createIndexes\":\"activities\",\"indexes\":[{\"name\":\"public_startAt\",\"key\":{\"status\":1,\"visibility\":1,\"startAt\":1}},{\"name\":\"venueId_startAt\",\"key\":{\"venueId\":1,\"startAt\":1}},{\"name\":\"organizerId_idempotencyKey_unique\",\"key\":{\"organizerId\":1,\"idempotencyKey\":1},\"unique\":true}]}"
+  },
+  {
+    "TableName": "registrations",
+    "CommandType": "COMMAND",
+    "Command": "{\"createIndexes\":\"registrations\",\"indexes\":[{\"name\":\"activityId_userId_unique\",\"key\":{\"activityId\":1,\"userId\":1},\"unique\":true},{\"name\":\"activityId_status_queueNo\",\"key\":{\"activityId\":1,\"status\":1,\"queueNo\":1}}]}"
+  },
+  {
+    "TableName": "participants",
+    "CommandType": "COMMAND",
+    "Command": "{\"createIndexes\":\"participants\",\"indexes\":[{\"name\":\"activityId_userId_unique\",\"key\":{\"activityId\":1,\"userId\":1},\"unique\":true}]}"
+  },
+  {
+    "TableName": "auditLogs",
+    "CommandType": "COMMAND",
+    "Command": "{\"createIndexes\":\"auditLogs\",\"indexes\":[{\"name\":\"object_createdAt\",\"key\":{\"objectType\":1,\"objectId\":1,\"createdAt\":-1}}]}"
+  }
+]

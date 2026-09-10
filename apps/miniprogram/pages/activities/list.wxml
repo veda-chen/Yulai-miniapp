@@ -1,0 +1,16 @@
+<view class="list-page">
+  <view class="title-row"><text class="page-title">球局</text><navigator class="create-round" url="/pages/activities/form">＋</navigator></view>
+  <view class="search-wrap"><text class="search-icon">⌕</text><input value="{{keyword}}" placeholder="搜索球局、场馆、学校" bindinput="onSearchInput" /></view>
+  <scroll-view class="chips" scroll-x show-scrollbar="{{false}}"><view class="chip-track"><text class="chip active">全部</text><text class="chip">今天</text><text class="chip">明天</text><text class="chip">广工</text><text class="chip">进阶</text><text class="chip">娱乐</text></view></scroll-view>
+  <view wx:if="{{loading}}" class="empty surface">正在加载球局</view>
+  <view wx:elif="{{message}}" class="empty surface">{{message}}</view>
+  <view wx:elif="{{viewActivities.length === 0}}" class="empty surface">没有找到符合条件的公开球局</view>
+  <view wx:else class="activity-list">
+    <navigator wx:for="{{viewActivities}}" wx:key="id" class="activity-row surface" url="/pages/activities/detail?id={{item.id}}">
+      <view class="time-col"><text class="day">{{item.shortDay}}</text><text class="clock">{{item.shortClock}}</text></view>
+      <view class="info-col"><text class="row-title">{{item.title}}</text><text class="venue">⌖ {{item.venue.name}}</text>
+        <view class="row-footer"><view><text class="badge">{{item.levelText}}</text><text wx:if="{{item.registrationText}}" class="mine">{{item.registrationText}}</text></view><text class="count">{{item.registeredCount}}/{{item.capacity}} 人 ›</text></view>
+      </view>
+    </navigator>
+  </view>
+</view>

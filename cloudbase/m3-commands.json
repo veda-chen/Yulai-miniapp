@@ -1,0 +1,32 @@
+[
+  {
+    "TableName": "activityChanges",
+    "CommandType": "COMMAND",
+    "Command": "{\"create\":\"activityChanges\"}"
+  },
+  {
+    "TableName": "activityChanges",
+    "CommandType": "COMMAND",
+    "Command": "{\"createIndexes\":\"activityChanges\",\"indexes\":[{\"name\":\"activityId_version_unique\",\"key\":{\"activityId\":1,\"version\":-1},\"unique\":true}]}"
+  },
+  {
+    "TableName": "notificationJobs",
+    "CommandType": "COMMAND",
+    "Command": "{\"create\":\"notificationJobs\"}"
+  },
+  {
+    "TableName": "notificationJobs",
+    "CommandType": "COMMAND",
+    "Command": "{\"createIndexes\":\"notificationJobs\",\"indexes\":[{\"name\":\"dedupeKey_unique\",\"key\":{\"dedupeKey\":1},\"unique\":true},{\"name\":\"userId_status_createdAt\",\"key\":{\"userId\":1,\"status\":1,\"createdAt\":-1}}]}"
+  },
+  {
+    "TableName": "reports",
+    "CommandType": "COMMAND",
+    "Command": "{\"create\":\"reports\"}"
+  },
+  {
+    "TableName": "reports",
+    "CommandType": "COMMAND",
+    "Command": "{\"createIndexes\":\"reports\",\"indexes\":[{\"name\":\"reporter_target_status\",\"key\":{\"reporterId\":1,\"targetType\":1,\"targetId\":1,\"status\":1}},{\"name\":\"status_createdAt\",\"key\":{\"status\":1,\"createdAt\":-1}}]}"
+  }
+]

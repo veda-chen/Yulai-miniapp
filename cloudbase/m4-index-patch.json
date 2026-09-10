@@ -1,0 +1,12 @@
+[
+  {
+    "TableName": "participants",
+    "CommandType": "COMMAND",
+    "Command": "{\"createIndexes\":\"participants\",\"indexes\":[{\"name\":\"activityId_status_attendanceStatus\",\"key\":{\"activityId\":1,\"status\":1,\"attendanceStatus\":1}}]}"
+  },
+  {
+    "TableName": "matchPlayers",
+    "CommandType": "COMMAND",
+    "Command": "{\"createIndexes\":\"matchPlayers\",\"indexes\":[{\"name\":\"matchId_team\",\"key\":{\"matchId\":1,\"team\":1}}]}"
+  }
+]

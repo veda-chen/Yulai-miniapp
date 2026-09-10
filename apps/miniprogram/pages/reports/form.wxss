@@ -1,0 +1,6 @@
+.page { padding:32rpx; }
+.card { padding:30rpx; border-radius:22rpx; background:#fff; }
+.label { display:block; margin:20rpx 0 12rpx; font-size:27rpx; font-weight:600; }
+.picker, textarea { box-sizing:border-box; width:100%; padding:20rpx; border:1rpx solid #ccd9d4; border-radius:14rpx; }
+textarea { min-height:220rpx; }
+.submit { margin-top:28rpx; background:#234e43; color:#fff; }

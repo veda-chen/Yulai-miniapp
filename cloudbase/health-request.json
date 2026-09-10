@@ -1,0 +1,4 @@
+{
+  "action": "health.get",
+  "requestId": "cli-health-check"
+}

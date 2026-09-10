@@ -1,0 +1,12 @@
+<view class="page">
+  <view wx:if="{{loading}}" class="empty">正在加载场馆</view>
+  <view wx:elif="{{message}}" class="empty">{{message}}</view>
+  <view wx:elif="{{venues.length === 0}}" class="empty">暂无场馆资料</view>
+  <navigator wx:for="{{venues}}" wx:key="id" class="venue" url="/pages/venues/detail?id={{item.id}}">
+    <view class="venue-head">
+      <text class="venue-name">{{item.name}}</text>
+      <text wx:if="{{item.verificationStatus === 'PENDING_VERIFICATION'}}" class="badge">待核验</text>
+    </view>
+    <text class="venue-address">{{item.address || '暂无地址资料'}}</text>
+  </navigator>
+</view>

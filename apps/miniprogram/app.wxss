@@ -1,0 +1,42 @@
+page {
+  background: #f2f2f7;
+  color: #1d1d1f;
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+button {
+  font-family: inherit;
+}
+
+.safe-page {
+  box-sizing: border-box;
+  min-height: 100vh;
+  padding: 32rpx 40rpx 56rpx;
+}
+
+.surface {
+  background: #ffffff;
+  border: 1rpx solid #e5e5ea;
+  border-radius: 36rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.04);
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999rpx;
+}
+
+.primary-button {
+  border: 0;
+  border-radius: 999rpx;
+  background: #007aff;
+  color: #ffffff;
+  font-size: 30rpx;
+  font-weight: 600;
+}
+
+.primary-button::after {
+  border: 0;
+}

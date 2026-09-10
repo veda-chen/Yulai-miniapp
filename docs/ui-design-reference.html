@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>羽来 UI 设计系统参考</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: #F2F7F5;
+      color: #3D4A46;
+      line-height: 1.6;
+      padding: 40px 24px;
+    }
+    .container { max-width: 720px; margin: 0 auto; }
+    h1 { font-size: 40px; font-weight: 700; color: #1A211F; margin-bottom: 8px; }
+    h2 { font-size: 28px; font-weight: 600; color: #1A211F; margin: 48px 0 20px; }
+    h3 { font-size: 22px; font-weight: 600; color: #1A211F; margin: 32px 0 12px; }
+    .subtitle { color: #6B7B76; margin-bottom: 32px; }
+
+    .card {
+      background: #FFFFFF;
+      border-radius: 28px;
+      padding: 32px;
+      box-shadow: 0 4px 16px rgba(15, 90, 76, 0.06);
+      margin-bottom: 24px;
+    }
+
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 16px;
+    }
+    .color-item { text-align: center; }
+    .color-block {
+      height: 80px;
+      border-radius: 16px;
+      margin-bottom: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .color-name { font-size: 13px; color: #6B7B76; }
+    .color-value { font-size: 14px; font-weight: 600; color: #1A211F; }
+
+    .type-row { display: flex; align-items: baseline; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #E8EFEC; }
+    .type-row:last-child { border-bottom: none; }
+    .type-label { font-size: 14px; color: #6B7B76; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 48px;
+      padding: 0 24px;
+      border-radius: 24px;
+      font-size: 16px;
+      font-weight: 600;
+      margin-right: 12px;
+      margin-bottom: 12px;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #0F5A4C 0%, #1A9C7E 100%);
+      color: #FFFFFF;
+      box-shadow: 0 8px 24px rgba(15, 90, 76, 0.18);
+    }
+    .btn-secondary {
+      background: #FFFFFF;
+      color: #3D4A46;
+      border: 1px solid #DDE8E4;
+    }
+    .btn-danger {
+      background: #FEF2F2;
+      color: #D9534F;
+    }
+    .btn-text { background: transparent; color: #1A9C7E; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 500;
+      margin-right: 8px;
+      margin-bottom: 8px;
+    }
+    .badge-success { background: #E8F5F1; color: #0D8A66; }
+    .badge-warning { background: #FFF8E6; color: #B77903; }
+    .badge-danger { background: #FEF2F2; color: #D9534F; }
+    .badge-info { background: #EFF6FF; color: #3B82F6; }
+    .badge-muted { background: #F2F4F3; color: #6B7B76; }
+
+    .input {
+      width: 100%;
+      height: 56px;
+      padding: 0 20px;
+      border: 1px solid #E8EFEC;
+      border-radius: 20px;
+      background: #FAFCFB;
+      font-size: 16px;
+      margin-bottom: 12px;
+    }
+
+    .activity-card {
+      background: #FFFFFF;
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 4px 16px rgba(15, 90, 76, 0.06);
+    }
+    .activity-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+    .activity-title { font-size: 18px; font-weight: 700; color: #1A211F; }
+    .activity-time { font-size: 24px; font-weight: 700; color: #1A9C7E; margin-bottom: 4px; }
+    .activity-meta { font-size: 14px; color: #6B7B76; margin-top: 4px; }
+    .activity-footer { display: flex; gap: 8px; margin-top: 16px; align-items: center; }
+
+    .hero {
+      background: linear-gradient(135deg, #0F5A4C 0%, #1A9C7E 100%);
+      color: #FFFFFF;
+      border-radius: 28px;
+      padding: 40px;
+      margin-bottom: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero h2 { color: #FFFFFF; margin: 0 0 8px; font-size: 36px; }
+    .hero p { opacity: 0.9; font-size: 16px; }
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -40px;
+      top: -40px;
+      width: 180px;
+      height: 180px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 50%;
+    }
+
+    .section { margin-bottom: 16px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>羽来 UI 设计系统</h1>
+    <p class="subtitle">羽毛球组局小程序视觉升级参考</p>
+
+    <div class="hero">
+      <h2>早安，球友</h2>
+      <p>今天有约球计划吗？</p>
+    </div>
+
+    <h2>1. 色彩系统</h2>
+    <div class="card">
+      <h3>主色调</h3>
+      <div class="color-grid">
+        <div class="color-item"><div class="color-block" style="background:#0F5A4C"></div><div class="color-name">主色深绿</div><div class="color-value">#0F5A4C</div></div>
+        <div class="color-item"><div class="color-block" style="background:#1A9C7E"></div><div class="color-name">主色翠绿</div><div class="color-value">#1A9C7E</div></div>
+        <div class="color-item"><div class="color-block" style="background:#E8F5F1"></div><div class="color-name">主色浅绿</div><div class="color-value">#E8F5F1</div></div>
+        <div class="color-item"><div class="color-block" style="background:#F3FAF8"></div><div class="color-name">主色淡绿</div><div class="color-value">#F3FAF8</div></div>
+      </div>
+
+      <h3>功能色</h3>
+      <div class="color-grid">
+        <div class="color-item"><div class="color-block" style="background:#0D8A66"></div><div class="color-name">成功绿</div><div class="color-value">#0D8A66</div></div>
+        <div class="color-item"><div class="color-block" style="background:#D4940A"></div><div class="color-name">警告琥珀</div><div class="color-value">#D4940A</div></div>
+        <div class="color-item"><div class="color-block" style="background:#D9534F"></div><div class="color-name">错误珊瑚</div><div class="color-value">#D9534F</div></div>
+        <div class="color-item"><div class="color-block" style="background:#3B82F6"></div><div class="color-name">信息蓝</div><div class="color-value">#3B82F6</div></div>
+      </div>
+
+      <h3>中性色</h3>
+      <div class="color-grid">
+        <div class="color-item"><div class="color-block" style="background:#1A211F"></div><div class="color-name">标题黑</div><div class="color-value">#1A211F</div></div>
+        <div class="color-item"><div class="color-block" style="background:#3D4A46"></div><div class="color-name">正文深灰</div><div class="color-value">#3D4A46</div></div>
+        <div class="color-item"><div class="color-block" style="background:#6B7B76"></div><div class="color-name">次要灰</div><div class="color-value">#6B7B76</div></div>
+        <div class="color-item"><div class="color-block" style="background:#DDE8E4;border:1px solid #eee"></div><div class="color-name">边框灰</div><div class="color-value">#DDE8E4</div></div>
+      </div>
+    </div>
+
+    <h2>2. 字体规范</h2>
+    <div class="card">
+      <div class="type-row"><span class="type-label">H1 大标题</span><span style="font-size:32px;font-weight:700;color:#1A211F">羽来</span></div>
+      <div class="type-row"><span class="type-label">H2 页面标题</span><span style="font-size:26px;font-weight:700;color:#1A211F">球局详情</span></div>
+      <div class="type-row"><span class="type-label">H3 区块标题</span><span style="font-size:21px;font-weight:600;color:#1A211F">活动说明</span></div>
+      <div class="type-row"><span class="type-label">正文</span><span style="font-size:19px;color:#3D4A46">广东工业大学大学城校区体育馆</span></div>
+      <div class="type-row"><span class="type-label">辅助文字</span><span style="font-size:16px;color:#6B7B76">2026年9月12日 14:00-16:00</span></div>
+      <div class="type-row"><span class="type-label">标签文字</span><span style="font-size:14px;color:#6B7B76">已报名 8/12</span></div>
+    </div>
+
+    <h2>3. 按钮</h2>
+    <div class="card">
+      <button class="btn btn-primary">主按钮</button>
+      <button class="btn btn-secondary">次要按钮</button>
+      <button class="btn btn-danger">危险按钮</button>
+      <button class="btn btn-text">文字按钮</button>
+    </div>
+
+    <h2>4. 徽章与状态</h2>
+    <div class="card">
+      <span class="badge badge-success">已报名</span>
+      <span class="badge badge-warning">候补第 2 位</span>
+      <span class="badge badge-danger">已取消</span>
+      <span class="badge badge-info">进行中</span>
+      <span class="badge badge-muted">仅链接可见</span>
+    </div>
+
+    <h2>5. 输入框</h2>
+    <div class="card">
+      <input class="input" placeholder="请输入球局标题" value="周六下午广工羽毛球局">
+      <input class="input" placeholder="请选择场馆">
+    </div>
+
+    <h2>6. 球局卡片示例</h2>
+    <div class="activity-card">
+      <div class="activity-header">
+        <div>
+          <div class="activity-time">14:00</div>
+          <div class="activity-title">周六下午广工羽毛球局</div>
+        </div>
+        <span class="badge badge-success">报名中</span>
+      </div>
+      <div class="activity-meta">广东工业大学大学城校区体育馆 · 场地待确认</div>
+      <div class="activity-meta">水平要求：进阶</div>
+      <div class="activity-footer">
+        <span class="badge badge-muted">已报名 8/12</span>
+        <span class="badge badge-warning">候补 2 人</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

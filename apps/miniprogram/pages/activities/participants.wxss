@@ -1,0 +1,5 @@
+.page { padding:32rpx; }
+.member, .empty { display:flex; justify-content:space-between; margin-bottom:16rpx; padding:26rpx; border-radius:18rpx; background:#fff; }
+.status { color:#2d755e; }
+.tip { color:#66736e; font-size:24rpx; }
+.section-title { margin:30rpx 0 16rpx; font-size:30rpx; font-weight:600; }

@@ -1,0 +1,305 @@
+{
+  "version": 1,
+  "collections": [
+    {
+      "name": "users",
+      "description": "用户资料，学校字段允许为 null",
+      "clientPermission": "ADMINONLY",
+      "indexes": [
+        {
+          "name": "openidHash_unique",
+          "unique": true,
+          "fields": [{ "field": "openidHash", "order": "asc" }]
+        }
+      ]
+    },
+    {
+      "name": "schools",
+      "description": "可选学校字典",
+      "clientPermission": "ADMINONLY",
+      "indexes": [
+        {
+          "name": "normalizedName_unique",
+          "unique": true,
+          "fields": [{ "field": "normalizedName", "order": "asc" }]
+        },
+        {
+          "name": "status_name",
+          "unique": false,
+          "fields": [{ "field": "status", "order": "asc" }, { "field": "name", "order": "asc" }]
+        }
+      ]
+    },
+    {
+      "name": "venues",
+      "description": "场馆资料",
+      "clientPermission": "ADMINONLY",
+      "indexes": [
+        {
+          "name": "status_name",
+          "unique": false,
+          "fields": [{ "field": "status", "order": "asc" }, { "field": "name", "order": "asc" }]
+        }
+      ]
+    },
+    {
+      "name": "courts",
+      "description": "场馆内场地",
+      "clientPermission": "ADMINONLY",
+      "indexes": [
+        {
+          "name": "venueId_name_unique",
+          "unique": true,
+          "fields": [{ "field": "venueId", "order": "asc" }, { "field": "name", "order": "asc" }]
+        }
+      ]
+    },
+    {
+      "name": "activities",
+      "description": "球局",
+      "clientPermission": "ADMINONLY",
+      "indexes": [
+        {
+          "name": "public_startAt",
+          "unique": false,
+          "fields": [
+            { "field": "status", "order": "asc" },
+            { "field": "visibility", "order": "asc" },
+            { "field": "startAt", "order": "asc" }
+          ]
+        },
+        {
+          "name": "venueId_startAt",
+          "unique": false,
+          "fields": [{ "field": "venueId", "order": "asc" }, { "field": "startAt", "order": "asc" }]
+        },
+        {
+          "name": "organizerId_idempotencyKey_unique",
+          "unique": true,
+          "fields": [
+            { "field": "organizerId", "order": "asc" },
+            { "field": "idempotencyKey", "order": "asc" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "registrations",
+      "description": "报名与候补",
+      "clientPermission": "ADMINONLY",
+      "indexes": [
+        {
+          "name": "activityId_userId_unique",
+          "unique": true,
+          "fields": [
+            { "field": "activityId", "order": "asc" },
+            { "field": "userId", "order": "asc" }
+          ]
+        },
+        {
+          "name": "activityId_status_queueNo",
+          "unique": false,
+          "fields": [
+            { "field": "activityId", "order": "asc" },
+            { "field": "status", "order": "asc" },
+            { "field": "queueNo", "order": "asc" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "participants",
+      "description": "正式参与者权限事实表",
+      "clientPermission": "ADMINONLY",
+      "indexes": [
+        {
+          "name": "activityId_userId_unique",
+          "unique": true,
+          "fields": [
+            { "field": "activityId", "order": "asc" },
+            { "field": "userId", "order": "asc" }
+          ]
+        },
+        {
+          "name": "activityId_status_attendanceStatus",
+          "unique": false,
+          "fields": [
+            { "field": "activityId", "order": "asc" },
+            { "field": "status", "order": "asc" },
+            { "field": "attendanceStatus", "order": "asc" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "auditLogs",
+      "description": "仅追加审计日志",
+      "clientPermission": "ADMINONLY",
+      "indexes": [
+        {
+          "name": "object_createdAt",
+          "unique": false,
+          "fields": [
+            { "field": "objectType", "order": "asc" },
+            { "field": "objectId", "order": "asc" },
+            { "field": "createdAt", "order": "desc" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "activityChanges",
+      "description": "球局关键变更及确认版本",
+      "clientPermission": "ADMINONLY",
+      "indexes": [
+        {
+          "name": "activityId_version_unique",
+          "unique": true,
+          "fields": [
+            { "field": "activityId", "order": "asc" },
+            { "field": "version", "order": "desc" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "notificationJobs",
+      "description": "站内及订阅消息通知任务",
+      "clientPermission": "ADMINONLY",
+      "indexes": [
+        {
+          "name": "dedupeKey_unique",
+          "unique": true,
+          "fields": [{ "field": "dedupeKey", "order": "asc" }]
+        },
+        {
+          "name": "userId_status_createdAt",
+          "unique": false,
+          "fields": [
+            { "field": "userId", "order": "asc" },
+            { "field": "status", "order": "asc" },
+            { "field": "createdAt", "order": "desc" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "reports",
+      "description": "用户举报及运营处置",
+      "clientPermission": "ADMINONLY",
+      "indexes": [
+        {
+          "name": "reporter_target_status",
+          "unique": false,
+          "fields": [
+            { "field": "reporterId", "order": "asc" },
+            { "field": "targetType", "order": "asc" },
+            { "field": "targetId", "order": "asc" },
+            { "field": "status", "order": "asc" }
+          ]
+        },
+        {
+          "name": "status_createdAt",
+          "unique": false,
+          "fields": [
+            { "field": "status", "order": "asc" },
+            { "field": "createdAt", "order": "desc" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "rounds",
+      "description": "可选整轮分组与发布状态",
+      "clientPermission": "ADMINONLY",
+      "indexes": [
+        {
+          "name": "activityId_roundNo_unique",
+          "unique": true,
+          "fields": [
+            { "field": "activityId", "order": "asc" },
+            { "field": "roundNo", "order": "desc" }
+          ]
+        },
+        {
+          "name": "activityId_status",
+          "unique": false,
+          "fields": [
+            { "field": "activityId", "order": "asc" },
+            { "field": "status", "order": "asc" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "matches",
+      "description": "分组或手工创建的双打对局与当前比分",
+      "clientPermission": "ADMINONLY",
+      "indexes": [
+        {
+          "name": "activityId_createdAt",
+          "unique": false,
+          "fields": [
+            { "field": "activityId", "order": "asc" },
+            { "field": "createdAt", "order": "asc" }
+          ]
+        },
+        {
+          "name": "roundId",
+          "unique": false,
+          "fields": [{ "field": "roundId", "order": "asc" }]
+        }
+      ]
+    },
+    {
+      "name": "matchPlayers",
+      "description": "对局参赛关系与锁定后的胜负事实",
+      "clientPermission": "ADMINONLY",
+      "indexes": [
+        {
+          "name": "matchId_userId_unique",
+          "unique": true,
+          "fields": [{ "field": "matchId", "order": "asc" }, { "field": "userId", "order": "asc" }]
+        },
+        {
+          "name": "userId_result",
+          "unique": false,
+          "fields": [{ "field": "userId", "order": "asc" }, { "field": "result", "order": "asc" }]
+        },
+        {
+          "name": "activityId",
+          "unique": false,
+          "fields": [{ "field": "activityId", "order": "asc" }]
+        },
+        {
+          "name": "matchId_team",
+          "unique": false,
+          "fields": [{ "field": "matchId", "order": "asc" }, { "field": "team", "order": "asc" }]
+        }
+      ]
+    },
+    {
+      "name": "scoreRevisions",
+      "description": "比分提交、冲突、确认、锁定及解锁历史",
+      "clientPermission": "ADMINONLY",
+      "indexes": [
+        {
+          "name": "matchId_createdAt",
+          "unique": false,
+          "fields": [
+            { "field": "matchId", "order": "asc" },
+            { "field": "createdAt", "order": "desc" }
+          ]
+        },
+        {
+          "name": "activityId_status",
+          "unique": false,
+          "fields": [
+            { "field": "activityId", "order": "asc" },
+            { "field": "status", "order": "asc" }
+          ]
+        }
+      ]
+    }
+  ]
+}

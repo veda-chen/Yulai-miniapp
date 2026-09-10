@@ -1,0 +1,249 @@
+{
+  "project": {
+    "name": "yulai-ui-redesign",
+    "resolvedLane": "library_bound",
+    "path": "d:\\desk\\Yulai\\yulai-ui-redesign.design",
+    "contextRequirementsLoaded": [
+      {
+        "path": "shared-runtime/runtime-boundaries/lane-runtime-contracts.md",
+        "readStatus": "loaded",
+        "bodyRead": true
+      },
+      {
+        "path": "shared-runtime/agent-dispatch-runtime/lane-dispatch-index.md",
+        "readStatus": "loaded",
+        "bodyRead": true
+      },
+      {
+        "path": "delivery-quality/page-rendering-quality-gate.md",
+        "readStatus": "not_loaded",
+        "bodyRead": false
+      },
+      {
+        "path": "delivery-quality/design-artifact-validation.md",
+        "readStatus": "not_loaded",
+        "bodyRead": false
+      },
+      {
+        "path": "delivery-quality/delivery-evidence-contract.md",
+        "readStatus": "not_loaded",
+        "bodyRead": false
+      }
+    ],
+    "designSource": {
+      "libraryIdentity": {
+        "name": "苹果",
+        "id": "dl_builtin_apple",
+        "path": "c:\\Users\\chenz\\.trae-cn\\design_libraries\\dl_builtin_apple",
+        "version": null,
+        "scope": "built-in-global",
+        "versionSource": "selected-context"
+      },
+      "actualTokenNameReference": [
+        "--apple-background",
+        "--apple-foreground",
+        "--apple-card",
+        "--apple-primary",
+        "--apple-primary-foreground",
+        "--apple-secondary",
+        "--apple-muted",
+        "--apple-muted-foreground",
+        "--apple-border",
+        "--apple-ring",
+        "--apple-destructive",
+        "--brand-500",
+        "--brand-600",
+        "--state-success",
+        "--state-error",
+        "--background-200",
+        "--text-500",
+        "--text-800",
+        "--radius",
+        "--shadow-sm",
+        "--shadow-md",
+        "--shadow-lg",
+        "--font-sans"
+      ],
+      "tokenFidelity": "strict",
+      "componentPlan": [
+        {
+          "slug": "button",
+          "contractKind": "legacy-json",
+          "contractFile": "c:\\Users\\chenz\\.trae-cn\\design_libraries\\dl_builtin_apple\\components\\button.json",
+          "previewFile": "c:\\Users\\chenz\\.trae-cn\\design_libraries\\dl_builtin_apple\\preview\\component-button.html"
+        },
+        {
+          "slug": "card",
+          "contractKind": "legacy-json",
+          "contractFile": "c:\\Users\\chenz\\.trae-cn\\design_libraries\\dl_builtin_apple\\components\\card.json",
+          "previewFile": "c:\\Users\\chenz\\.trae-cn\\design_libraries\\dl_builtin_apple\\preview\\component-card.html"
+        },
+        {
+          "slug": "input",
+          "contractKind": "legacy-json",
+          "contractFile": "c:\\Users\\chenz\\.trae-cn\\design_libraries\\dl_builtin_apple\\components\\input.json",
+          "previewFile": "c:\\Users\\chenz\\.trae-cn\\design_libraries\\dl_builtin_apple\\preview\\component-input.html"
+        }
+      ]
+    },
+    "dispatchPreflightManifest": [
+      {
+        "nodeId": "page-home",
+        "htmlSrc": "pages/index.html",
+        "title": "首页",
+        "deviceType": "mobile",
+        "viewportMode": "app-shell",
+        "pageType": "showcase",
+        "allowedWritePaths": ["pages/index.html"],
+        "toolPolicy": {
+          "todoWriteAllowed": false,
+          "validationScriptsAllowed": false,
+          "previewAllowed": false,
+          "helperScriptsAllowed": false,
+          "designFileWriteAllowed": false,
+          "allowedWritePaths": ["pages/index.html"]
+        }
+      },
+      {
+        "nodeId": "page-activities",
+        "htmlSrc": "pages/activities.html",
+        "title": "球局列表",
+        "deviceType": "mobile",
+        "viewportMode": "app-shell",
+        "pageType": "task-driven",
+        "allowedWritePaths": ["pages/activities.html"],
+        "toolPolicy": {
+          "todoWriteAllowed": false,
+          "validationScriptsAllowed": false,
+          "previewAllowed": false,
+          "helperScriptsAllowed": false,
+          "designFileWriteAllowed": false,
+          "allowedWritePaths": ["pages/activities.html"]
+        }
+      },
+      {
+        "nodeId": "page-detail",
+        "htmlSrc": "pages/detail.html",
+        "title": "球局详情",
+        "deviceType": "mobile",
+        "viewportMode": "app-shell",
+        "pageType": "task-driven",
+        "allowedWritePaths": ["pages/detail.html"],
+        "toolPolicy": {
+          "todoWriteAllowed": false,
+          "validationScriptsAllowed": false,
+          "previewAllowed": false,
+          "helperScriptsAllowed": false,
+          "designFileWriteAllowed": false,
+          "allowedWritePaths": ["pages/detail.html"]
+        }
+      },
+      {
+        "nodeId": "page-form",
+        "htmlSrc": "pages/form.html",
+        "title": "创建球局",
+        "deviceType": "mobile",
+        "viewportMode": "app-shell",
+        "pageType": "task-driven",
+        "allowedWritePaths": ["pages/form.html"],
+        "toolPolicy": {
+          "todoWriteAllowed": false,
+          "validationScriptsAllowed": false,
+          "previewAllowed": false,
+          "helperScriptsAllowed": false,
+          "designFileWriteAllowed": false,
+          "allowedWritePaths": ["pages/form.html"]
+        }
+      },
+      {
+        "nodeId": "page-profile",
+        "htmlSrc": "pages/profile.html",
+        "title": "我的",
+        "deviceType": "mobile",
+        "viewportMode": "app-shell",
+        "pageType": "showcase",
+        "allowedWritePaths": ["pages/profile.html"],
+        "toolPolicy": {
+          "todoWriteAllowed": false,
+          "validationScriptsAllowed": false,
+          "previewAllowed": false,
+          "helperScriptsAllowed": false,
+          "designFileWriteAllowed": false,
+          "allowedWritePaths": ["pages/profile.html"]
+        }
+      }
+    ],
+    "expectedDispatches": [
+      {
+        "nodeId": "page-home",
+        "packetType": "LibraryBoundPagePacket",
+        "status": "completed",
+        "changedFiles": ["pages/index.html"],
+        "toolCallLedger": {
+          "source": "main-agent-runtime-trace",
+          "traceDigest": "sub-agent-page-generation",
+          "todoWriteCalls": 0,
+          "previewCalls": 0,
+          "validationScriptCalls": 0,
+          "helperScriptWrites": 0
+        }
+      },
+      {
+        "nodeId": "page-activities",
+        "packetType": "LibraryBoundPagePacket",
+        "status": "completed",
+        "changedFiles": ["pages/activities.html"],
+        "toolCallLedger": {
+          "source": "main-agent-runtime-trace",
+          "traceDigest": "sub-agent-page-generation",
+          "todoWriteCalls": 0,
+          "previewCalls": 0,
+          "validationScriptCalls": 0,
+          "helperScriptWrites": 0
+        }
+      },
+      {
+        "nodeId": "page-detail",
+        "packetType": "LibraryBoundPagePacket",
+        "status": "completed",
+        "changedFiles": ["pages/detail.html"],
+        "toolCallLedger": {
+          "source": "main-agent-runtime-trace",
+          "traceDigest": "sub-agent-page-generation",
+          "todoWriteCalls": 0,
+          "previewCalls": 0,
+          "validationScriptCalls": 0,
+          "helperScriptWrites": 0
+        }
+      },
+      {
+        "nodeId": "page-form",
+        "packetType": "LibraryBoundPagePacket",
+        "status": "completed",
+        "changedFiles": ["pages/form.html"],
+        "toolCallLedger": {
+          "source": "main-agent-runtime-trace",
+          "traceDigest": "sub-agent-page-generation",
+          "todoWriteCalls": 0,
+          "previewCalls": 0,
+          "validationScriptCalls": 0,
+          "helperScriptWrites": 0
+        }
+      },
+      {
+        "nodeId": "page-profile",
+        "packetType": "LibraryBoundPagePacket",
+        "status": "completed",
+        "changedFiles": ["pages/profile.html"],
+        "toolCallLedger": {
+          "source": "main-agent-runtime-trace",
+          "traceDigest": "sub-agent-page-generation",
+          "todoWriteCalls": 0,
+          "previewCalls": 0,
+          "validationScriptCalls": 0,
+          "helperScriptWrites": 0
+        }
+      }
+    ]
+  }
+}

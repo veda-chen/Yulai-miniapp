@@ -1,0 +1,23 @@
+<view class="page">
+  <view wx:if="{{loading}}" class="card">正在加载资料</view>
+  <view wx:else class="card form">
+    <label class="field">
+      <text class="label">昵称</text>
+      <input maxlength="24" value="{{nickname}}" placeholder="请输入昵称" bindinput="onNicknameInput" />
+    </label>
+    <label class="field">
+      <text class="label">学校（可选）</text>
+      <picker range="{{schools}}" range-key="name" value="{{schoolIndex}}" bindchange="onSchoolChange">
+        <view class="picker-value">{{schools[schoolIndex].name}}</view>
+      </picker>
+    </label>
+    <label class="field">
+      <text class="label">水平</text>
+      <picker range="{{levels}}" range-key="label" value="{{levelIndex}}" bindchange="onLevelChange">
+        <view class="picker-value">{{levels[levelIndex].label}}</view>
+      </picker>
+    </label>
+    <button class="save" loading="{{saving}}" bindtap="onSave">保存资料</button>
+    <text class="message">{{message}}</text>
+  </view>
+</view>

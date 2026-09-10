@@ -1,0 +1,4 @@
+{
+  "desc": "羽来小程序页面索引规则",
+  "rules": [{ "action": "allow", "page": "*" }]
+}

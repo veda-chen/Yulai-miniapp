@@ -1,0 +1,9 @@
+<view class="page">
+  <view wx:if="{{loading}}" class="empty">正在加载消息</view>
+  <view wx:elif="{{notifications.length === 0}}" class="empty">暂无消息</view>
+  <view wx:for="{{notifications}}" wx:key="id" class="item {{item.isRead ? 'read' : ''}}" data-id="{{item.id}}" data-activity-id="{{item.activityId}}" bindtap="openNotification">
+    <text class="title">{{item.title}}</text>
+    <text class="body">{{item.body}}</text>
+    <text class="time">{{item.timeText}}</text>
+  </view>
+</view>

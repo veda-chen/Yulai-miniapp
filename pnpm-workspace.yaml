@@ -1,0 +1,10 @@
+packages:
+  - apps/*
+  - cloudfunctions/*
+  - packages/*
+
+confirmModulesPurge: false
+allowBuilds:
+  core-js-pure: true
+  esbuild: true
+  protobufjs: true

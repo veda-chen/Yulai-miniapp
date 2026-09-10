@@ -1,0 +1,149 @@
+{
+  "data": [
+    {
+      "id": "image-001",
+      "type": "image",
+      "title": "首页 Hero 羽毛球场景背景",
+      "version": 1,
+      "createdAt": 1757482800005,
+      "canvasData": {
+        "x": 0,
+        "y": 373,
+        "naturalSize": {
+          "width": 2560,
+          "height": 1440
+        }
+      },
+      "devMetadata": {
+        "imageSrc": "assets/hero-badminton-bg.jpg"
+      }
+    },
+    {
+      "id": "page-index",
+      "type": "page",
+      "title": "首页",
+      "version": 1,
+      "createdAt": 1757482800000,
+      "canvasData": {
+        "x": 0,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 900,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-e74563ac",
+          "measuredAt": 1788938667238
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/index.html"
+      }
+    },
+    {
+      "id": "page-activities",
+      "type": "page",
+      "title": "球局列表",
+      "version": 1,
+      "createdAt": 1757482800001,
+      "canvasData": {
+        "x": 480,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 900,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-6b9d7d26",
+          "measuredAt": 1788939138819
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/activities.html"
+      }
+    },
+    {
+      "id": "page-detail",
+      "type": "page",
+      "title": "球局详情",
+      "version": 1,
+      "createdAt": 1757482800002,
+      "canvasData": {
+        "x": 960,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 900,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-8a2548b6",
+          "measuredAt": 1788960496988
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/detail.html"
+      }
+    },
+    {
+      "id": "page-form",
+      "type": "page",
+      "title": "创建球局",
+      "version": 1,
+      "createdAt": 1757482800003,
+      "canvasData": {
+        "x": 1440,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 900,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-8f818004",
+          "measuredAt": 1788939138819
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/form.html"
+      }
+    },
+    {
+      "id": "page-profile",
+      "type": "page",
+      "title": "我的",
+      "version": 1,
+      "createdAt": 1757482800004,
+      "canvasData": {
+        "x": 1920,
+        "y": 0,
+        "group": 0,
+        "layoutSnapshot": {
+          "version": 1,
+          "contentHeight": 900,
+          "viewportWidth": 1440,
+          "sourceHash": "fnv1a-bd847db3",
+          "measuredAt": 1788938667238
+        }
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/profile.html"
+      }
+    }
+  ],
+  "config": {
+    "autoLayout": true,
+    "deviceType": "desktop",
+    "designLibrary": {
+      "name": "苹果",
+      "id": "dl_builtin_apple",
+      "path": "c:\\Users\\chenz\\.trae-cn\\design_libraries\\dl_builtin_apple",
+      "version": null,
+      "scope": "built-in-global",
+      "versionSource": "selected-context"
+    },
+    "projectType": "mobile-app",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    }
+  }
+}

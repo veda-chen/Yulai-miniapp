@@ -1,0 +1,48 @@
+.page {
+  padding: 32rpx;
+}
+
+.card {
+  padding: 32rpx;
+  border-radius: 24rpx;
+  background: #ffffff;
+}
+
+.form,
+.field {
+  display: flex;
+  flex-direction: column;
+}
+
+.field + .field {
+  margin-top: 30rpx;
+}
+
+.label {
+  margin-bottom: 12rpx;
+  color: #53615c;
+  font-size: 26rpx;
+}
+
+input,
+.picker-value {
+  min-height: 56rpx;
+  padding: 18rpx 20rpx;
+  border: 1rpx solid #cad8d2;
+  border-radius: 14rpx;
+  background: #f8fbfa;
+  font-size: 30rpx;
+}
+
+.save {
+  margin-top: 40rpx;
+  background: #234e43;
+  color: #ffffff;
+}
+
+.message {
+  margin-top: 18rpx;
+  color: #66736e;
+  font-size: 24rpx;
+  text-align: center;
+}

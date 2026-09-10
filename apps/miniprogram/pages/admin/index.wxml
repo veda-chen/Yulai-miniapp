@@ -1,0 +1,18 @@
+<view class="page">
+  <view class="metrics">
+    <view class="metric"><text class="number">{{metrics.openReports}}</text><text>待处理举报</text></view>
+    <view class="metric"><text class="number">{{metrics.openActivities}}</text><text>开放球局</text></view>
+    <view class="metric"><text class="number">{{metrics.activeUsers}}</text><text>可用账号</text></view>
+  </view>
+  <view wx:if="{{loading}}" class="empty">正在加载</view>
+  <view wx:elif="{{reports.length === 0}}" class="empty">暂无待处理举报</view>
+  <view wx:for="{{reports}}" wx:key="_id" class="report">
+    <text class="title">{{item.targetType}} · {{item.reason}}</text>
+    <text class="copy">{{item.details}}</text>
+    <text class="copy">对象：{{item.targetId}}</text>
+    <view class="buttons">
+      <button wx:if="{{item.targetType === 'ACTIVITY' || item.targetType === 'USER'}}" size="mini" data-target-type="{{item.targetType}}" data-target-id="{{item.targetId}}" bindtap="moderateTarget">{{item.targetType === 'ACTIVITY' ? '下架对象' : '限制账号'}}</button>
+      <button size="mini" data-id="{{item._id}}" data-outcome="RESOLVED" bindtap="resolve">已处理</button><button size="mini" data-id="{{item._id}}" data-outcome="DISMISSED" bindtap="resolve">驳回</button>
+    </view>
+  </view>
+</view>

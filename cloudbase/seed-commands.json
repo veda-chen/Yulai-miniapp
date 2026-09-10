@@ -1,0 +1,7 @@
+[
+  {
+    "TableName": "venues",
+    "CommandType": "UPDATE",
+    "Command": "{\"update\":\"venues\",\"updates\":[{\"q\":{\"seedKey\":\"gdut-university-town-gymnasium\"},\"u\":{\"$set\":{\"seedKey\":\"gdut-university-town-gymnasium\",\"name\":\"广东工业大学大学城校区体育馆\",\"address\":\"待现场核验\",\"status\":\"PENDING_VERIFICATION\",\"createdAt\":\"2026-09-08T15:25:00.000Z\",\"updatedAt\":\"2026-09-08T15:25:00.000Z\"}},\"upsert\":true}]}"
+  }
+]

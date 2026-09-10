@@ -1,0 +1,35 @@
+<view class="detail-page">
+  <view wx:if="{{loading}}" class="state-card surface">正在加载球局</view>
+  <view wx:elif="{{message}}" class="state-card surface">{{message}}</view>
+  <block wx:else>
+    <view class="headline">
+      <view class="headline-top"><text class="level-pill">{{activity.levelText}}</text><button class="share" open-type="share">分享</button></view>
+      <text class="title">{{activity.title}}</text>
+      <view class="organizer"><view class="avatar">{{activity.organizerInitial}}</view><text>{{activity.organizer.nickname}} 发起</text></view>
+    </view>
+    <view wx:if="{{activity.status === 'CANCELLED'}}" class="notice danger">球局已取消：{{activity.cancelReason}}</view>
+    <view wx:elif="{{activity.status === 'IN_PROGRESS'}}" class="notice success">球局进行中</view>
+    <view wx:elif="{{activity.status === 'ENDED'}}" class="notice muted">球局已结束</view>
+    <view wx:if="{{currentRegistration && currentRegistration.hasPendingChange}}" class="change-alert surface"><text class="section-title">球局信息有重要变更</text><text class="secondary">请查看变更记录并确认是否继续参加。</text><button class="primary-button compact" bindtap="acknowledgeChange">确认继续参加</button></view>
+    <view class="info-card surface">
+      <view class="info-row"><view class="info-icon blue">日</view><view><text class="info-title">{{activity.startText}}</text><text class="secondary">结束于 {{activity.endText}}</text></view></view>
+      <view class="info-row"><view class="info-icon green">⌖</view><view class="grow"><text class="info-title">{{activity.venue.name}}</text><text class="secondary">{{activity.locationHint || '场地待确认'}}</text></view><navigator open-type="switchTab" class="link" url="/pages/venues/list">查看 ›</navigator></view>
+      <view class="info-row"><view class="info-icon orange">人</view><view><text class="info-title">{{activity.registeredCount}} / {{activity.capacity}} 人</text><text wx:if="{{activity.waitlistCount > 0}}" class="secondary">另有候补 {{activity.waitlistCount}} 人</text><text wx:else class="secondary">仍可报名</text></view></view>
+      <view class="info-row"><view class="info-icon purple">止</view><view><text class="info-title">报名截止</text><text class="secondary">{{activity.deadlineText}}</text></view></view>
+    </view>
+    <view class="section"><view class="section-head"><text class="section-title">参与球友</text><text class="secondary">{{activity.registeredCount}} 人</text></view>
+      <view class="roster-card surface"><view wx:if="{{roster && roster.confirmed.length > 0}}" class="avatar-list"><view wx:for="{{roster.confirmed}}" wx:key="queueNo" class="member-avatar">{{item.initial}}</view></view><text wx:else class="secondary">还没有人报名，来做第一个吧</text>
+      <navigator wx:if="{{activity.isOrganizer}}" class="manage-link" url="/pages/activities/participants?id={{activity.id}}">管理名单 ›</navigator></view>
+    </view>
+    <navigator wx:if="{{activity.status === 'IN_PROGRESS' && (activity.groupingEnabled || activity.scoringEnabled)}}" class="live-entry" url="/pages/activities/live?id={{activity.id}}"><view><text class="live-title">进入现场模式</text><text class="secondary">{{activity.groupingEnabled ? '组队排场' : ''}}{{activity.groupingEnabled && activity.scoringEnabled ? ' · ' : ''}}{{activity.scoringEnabled ? '多人计分' : ''}}</text></view><text>›</text></navigator>
+    <view class="section surface content-card"><text class="section-title">活动说明</text><view class="tag-row"><text class="tag">{{activity.levelText}}</text><text wx:if="{{activity.groupingEnabled}}" class="tag">可选组队</text><text wx:if="{{activity.scoringEnabled}}" class="tag">参与者可计分</text><text wx:if="{{activity.visibility === 'LINK_ONLY'}}" class="tag">仅链接可见</text></view><text class="body-copy">{{activity.details || '暂无其他说明'}}</text><text class="body-copy">费用：{{activity.feeNote || '暂无说明，线下沟通'}}</text><text class="body-copy">联系：{{activity.contact || (activity.contactVisibility === 'PARTICIPANTS' ? '报名后可见' : '不展示')}}</text></view>
+    <view wx:if="{{changes.length > 0}}" class="section surface content-card"><text class="section-title">变更记录</text><text wx:if="{{activity.isOrganizer && changeConfirmation}}" class="secondary">已确认 {{changeConfirmation.acknowledged}} 人 · 待确认 {{changeConfirmation.pending}} 人</text><view wx:for="{{changes}}" wx:key="id" class="change-row"><text>{{item.summary}}</text><text class="secondary">{{item.timeText}}</text></view></view>
+    <view wx:if="{{activity.isOrganizer}}" class="organizer-actions surface"><text class="section-title">组织者操作</text><navigator wx:if="{{activity.status === 'OPEN'}}" class="outline" url="/pages/activities/form?id={{activity.id}}">编辑球局</navigator><navigator wx:if="{{activity.status !== 'CANCELLED' && activity.status !== 'HIDDEN'}}" class="outline" url="/pages/activities/participants?id={{activity.id}}">{{activity.status === 'ENDED' ? '参与记录' : '到场管理'}}</navigator><button wx:if="{{activity.status === 'OPEN'}}" class="outline" bindtap="startActivity">开始球局</button><button wx:if="{{activity.status === 'OPEN' || activity.status === 'IN_PROGRESS'}}" class="outline" bindtap="finishActivity">结束球局</button><button wx:if="{{activity.status === 'OPEN' || activity.status === 'IN_PROGRESS'}}" class="outline destructive" bindtap="cancelActivity">取消球局</button></view>
+    <navigator class="report-link" url="/pages/reports/form?type=ACTIVITY&id={{activity.id}}">举报此球局</navigator>
+    <view class="action-spacer"></view>
+    <view wx:if="{{!activity.isOrganizer && activity.status === 'OPEN'}}" class="action-bar">
+      <view><text wx:if="{{currentRegistration && currentRegistration.status === 'CONFIRMED'}}" class="action-state success-text">你已正式报名</text><text wx:elif="{{currentRegistration && currentRegistration.status === 'WAITLISTED'}}" class="action-state wait-text">候补第 {{currentRegistration.waitlistPosition}} 位</text><text wx:else class="action-state">{{activity.registeredCount}} / {{activity.capacity}} 人已报名</text></view>
+      <button wx:if="{{activity.registrationActionAvailable}}" class="{{activity.registrationAction === 'leave' ? 'leave-action' : 'primary-button join-action'}}" loading="{{submitting}}" disabled="{{submitting}}" bindtap="submitRegistration">{{activity.registrationText}}</button><text wx:else class="closed">报名已截止</text>
+    </view>
+  </block>
+</view>

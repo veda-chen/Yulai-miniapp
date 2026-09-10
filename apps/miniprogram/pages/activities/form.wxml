@@ -1,0 +1,37 @@
+<view class="form-page">
+  <view wx:if="{{loading}}" class="form-card surface loading">正在加载表单</view>
+  <block wx:else>
+    <text class="group-title">基本信息</text>
+    <view class="form-card surface">
+      <label class="field"><text class="label">标题</text><input class="control" data-field="title" maxlength="60" value="{{title}}" placeholder="留空自动生成" bindinput="onTextInput" /></label>
+      <label class="field"><text class="label">场馆</text><picker class="control" range="{{venues}}" range-key="name" value="{{venueIndex}}" bindchange="onVenueChange"><view>{{venues[venueIndex].name}} ›</view></picker></label>
+      <label class="field"><text class="label">场号或位置</text><input class="control" data-field="locationHint" maxlength="100" value="{{locationHint}}" placeholder="可不填" bindinput="onTextInput" /></label>
+    </view>
+    <text class="group-title">时间安排</text>
+    <view class="form-card surface">
+      <view class="field"><text class="label">开始时间</text><view class="date-control"><picker mode="date" value="{{startDate}}" data-field="startDate" bindchange="onTextInput"><view>{{startDate}}</view></picker><picker mode="time" value="{{startTime}}" data-field="startTime" bindchange="onTextInput"><view>{{startTime}}</view></picker></view></view>
+      <view class="field"><text class="label">结束时间</text><view class="date-control"><picker mode="date" value="{{endDate}}" data-field="endDate" bindchange="onTextInput"><view>{{endDate}}</view></picker><picker mode="time" value="{{endTime}}" data-field="endTime" bindchange="onTextInput"><view>{{endTime}}</view></picker></view></view>
+      <view class="field"><text class="label">报名截止</text><view class="date-control"><picker mode="date" value="{{deadlineDate}}" data-field="deadlineDate" bindchange="onTextInput"><view>{{deadlineDate}}</view></picker><picker mode="time" value="{{deadlineTime}}" data-field="deadlineTime" bindchange="onTextInput"><view>{{deadlineTime}}</view></picker></view></view>
+    </view>
+    <text class="group-title">参与要求</text>
+    <view class="form-card surface">
+      <label class="field"><text class="label">人数上限</text><view class="number-control"><input data-field="capacity" type="number" value="{{capacity}}" bindinput="onTextInput" /><text>人</text></view></label>
+      <label class="field"><text class="label">水平要求</text><picker class="control" range="{{levels}}" range-key="label" value="{{levelIndex}}" bindchange="onLevelChange"><view>{{levels[levelIndex].label}} ›</view></picker></label>
+      <label class="field"><text class="label">球局可见范围</text><picker class="control" range="{{visibilities}}" range-key="label" value="{{visibilityIndex}}" bindchange="onVisibilityChange"><view>{{visibilities[visibilityIndex].label}} ›</view></picker></label>
+    </view>
+    <text class="group-title">说明与联系</text>
+    <view class="form-card surface">
+      <label class="field"><text class="label">费用说明</text><input class="control" data-field="feeNote" maxlength="200" value="{{feeNote}}" placeholder="线下沟通，可不填" bindinput="onTextInput" /></label>
+      <label class="field"><text class="label">联系方式</text><input class="control" data-field="contact" maxlength="100" value="{{contact}}" placeholder="可不填" bindinput="onTextInput" /></label>
+      <label class="field"><text class="label">联系方式可见范围</text><picker class="control" range="{{contactVisibilities}}" range-key="label" value="{{contactVisibilityIndex}}" bindchange="onContactVisibilityChange"><view>{{contactVisibilities[contactVisibilityIndex].label}} ›</view></picker></label>
+      <label class="textarea-field"><text class="label">详细说明</text><textarea data-field="details" maxlength="1000" value="{{details}}" placeholder="补充活动规则、用球等信息" bindinput="onTextInput" /></label>
+    </view>
+    <text class="group-title">现场工具（可选）</text>
+    <view class="form-card surface">
+      <view class="toggle-row"><view><text class="toggle-title">启用组队</text><text class="toggle-copy">到场后辅助分组</text></view><switch checked="{{groupingEnabled}}" color="#34c759" bindchange="onGroupingChange" /></view>
+      <view class="toggle-row"><view><text class="toggle-title">启用计分</text><text class="toggle-copy">参与者均可录入比分</text></view><switch checked="{{scoringEnabled}}" color="#34c759" bindchange="onScoringChange" /></view>
+    </view>
+    <text class="message">{{message}}</text>
+    <view class="save-bar"><button class="primary-button save" loading="{{saving}}" bindtap="onSave">{{activityId ? '保存修改' : '发布球局'}}</button></view>
+  </block>
+</view>

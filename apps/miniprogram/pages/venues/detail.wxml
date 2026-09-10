@@ -1,0 +1,22 @@
+<view class="page">
+  <view wx:if="{{loading}}" class="card">正在加载场馆</view>
+  <view wx:elif="{{message}}" class="card muted">{{message}}</view>
+  <block wx:else>
+    <view class="card">
+      <view class="head">
+        <text class="name">{{detail.venue.name}}</text>
+        <text wx:if="{{detail.venue.verificationStatus === 'PENDING_VERIFICATION'}}" class="badge">资料待现场核验</text>
+      </view>
+      <text class="copy">{{detail.venue.address || '暂无地址资料'}}</text>
+      <text class="copy">{{detail.venue.description || '暂无场馆说明'}}</text>
+    </view>
+    <view class="card">
+      <text class="section-title">场地</text>
+      <text wx:if="{{detail.courts.length === 0}}" class="copy">场号和位置仍待现场核验</text>
+      <view wx:for="{{detail.courts}}" wx:key="id" class="court">
+        <text>{{item.name}}</text>
+        <text class="copy">{{item.locationHint || '暂无位置说明'}}</text>
+      </view>
+    </view>
+  </block>
+</view>

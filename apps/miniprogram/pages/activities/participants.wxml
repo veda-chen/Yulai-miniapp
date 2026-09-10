@@ -1,0 +1,13 @@
+<view class="page">
+  <view wx:if="{{loading}}" class="empty">正在加载</view>
+  <view wx:elif="{{participants.length === 0}}" class="empty">暂无正式成员</view>
+  <view wx:for="{{participants}}" wx:key="userId" class="member" data-user-id="{{item.userId}}" bindtap="changeAttendance">
+    <text>{{item.nickname}}</text><text class="status">{{item.statusText}}</text>
+  </view>
+  <text wx:if="{{canManage}}" class="tip">点击成员可修改到场状态</text>
+  <view wx:if="{{waitlist.length > 0}}" class="section-title">候补名单</view>
+  <view wx:for="{{waitlist}}" wx:key="userId" class="member">
+    <text>第{{item.position}}位 · {{item.nickname}}</text>
+    <button wx:if="{{canManage}}" size="mini" data-user-id="{{item.userId}}" bindtap="promote">补入</button>
+  </view>
+</view>

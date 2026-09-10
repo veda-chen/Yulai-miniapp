@@ -1,0 +1,14 @@
+node_modules/
+.pnpm-store/
+.env
+.env.*
+!.env.example
+dist/
+coverage/
+*.log
+.DS_Store
+apps/miniprogram/miniprogram_npm/
+apps/miniprogram/.eslintrc.js
+docs/architecture_render/
+docs/*_a11y.json
+.cloudbase/

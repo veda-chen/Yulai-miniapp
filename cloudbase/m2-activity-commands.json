@@ -1,0 +1,7 @@
+[
+  {
+    "TableName": "activities",
+    "CommandType": "COMMAND",
+    "Command": "{\"createIndexes\":\"activities\",\"indexes\":[{\"name\":\"organizerId_idempotencyKey_unique\",\"key\":{\"organizerId\":1,\"idempotencyKey\":1},\"unique\":true}]}"
+  }
+]

@@ -1,0 +1,42 @@
+.page {
+  padding: 32rpx;
+}
+
+.venue,
+.empty {
+  margin-bottom: 20rpx;
+  padding: 30rpx;
+  border: 1rpx solid #d9e5e0;
+  border-radius: 22rpx;
+  background: #ffffff;
+}
+
+.venue-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.venue-name {
+  font-size: 32rpx;
+  font-weight: 600;
+}
+
+.badge {
+  padding: 6rpx 12rpx;
+  border-radius: 999rpx;
+  background: #fff4d6;
+  color: #835d0b;
+  font-size: 22rpx;
+}
+
+.venue-address,
+.empty {
+  color: #66736e;
+  font-size: 26rpx;
+}
+
+.venue-address {
+  display: block;
+  margin-top: 12rpx;
+}

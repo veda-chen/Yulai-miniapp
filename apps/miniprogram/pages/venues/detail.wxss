@@ -1,0 +1,49 @@
+.page {
+  padding: 32rpx;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 22rpx;
+  padding: 30rpx;
+  border: 1rpx solid #d9e5e0;
+  border-radius: 22rpx;
+  background: #ffffff;
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+}
+
+.name,
+.section-title {
+  font-size: 34rpx;
+  font-weight: 600;
+}
+
+.badge {
+  align-self: flex-start;
+  margin-top: 12rpx;
+  padding: 6rpx 12rpx;
+  border-radius: 999rpx;
+  background: #fff4d6;
+  color: #835d0b;
+  font-size: 22rpx;
+}
+
+.copy,
+.muted {
+  margin-top: 14rpx;
+  color: #66736e;
+  font-size: 26rpx;
+}
+
+.court {
+  display: flex;
+  flex-direction: column;
+  margin-top: 20rpx;
+  padding-top: 20rpx;
+  border-top: 1rpx solid #e4ece8;
+}

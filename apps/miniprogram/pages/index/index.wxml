@@ -1,0 +1,29 @@
+<view class="home-page">
+  <view class="home-header">
+    <view><text class="eyebrow">{{greeting}}</text><text class="home-name">{{userName}}</text><text class="home-date">{{dateText}}</text></view>
+    <navigator class="notify" url="/pages/notifications/list"><text class="notify-icon">◉</text><view class="notify-dot"></view></navigator>
+  </view>
+  <view class="hero"><view class="hero-shade"></view><view class="hero-content">
+    <text class="hero-title">今天有约球计划吗？</text>
+    <text class="hero-copy">大学城各高校球友在线组队，轻松找到志同道合的搭档。</text>
+    <navigator class="hero-button" url="/pages/activities/form"><text class="plus">＋</text> 创建球局</navigator>
+  </view></view>
+  <view class="section-head"><text class="section-title">我的球局</text><navigator open-type="switchTab" class="section-link" url="/pages/activities/list">全部 ›</navigator></view>
+  <scroll-view class="activity-scroll" scroll-x enhanced show-scrollbar="{{false}}"><view class="activity-track">
+    <navigator wx:for="{{activities}}" wx:key="id" class="activity-card surface" url="/pages/activities/detail?id={{item.id}}">
+      <view class="activity-top"><view><text class="activity-time">{{item.shortTime}}</text><text class="activity-date">{{item.shortDate}}</text></view><text class="status-pill {{item.waitlistCount > 0 ? 'waiting' : ''}}">{{item.registrationText || '报名中'}}</text></view>
+      <text class="activity-title">{{item.title}}</text><text class="activity-venue">⌖ {{item.venue.name}}</text>
+      <view class="activity-meta"><text>{{item.levelText}}</text><text>{{item.registeredCount}}/{{item.capacity}} 人</text></view>
+    </navigator>
+    <view wx:if="{{activities.length === 0}}" class="empty-card surface"><text class="activity-title">还没有参加的球局</text><text class="activity-venue">去看看最近有哪些活动</text></view>
+  </view></scroll-view>
+  <view class="section-head quick-head"><text class="section-title">快捷入口</text></view>
+  <view class="quick-grid">
+    <navigator open-type="switchTab" class="quick-item" url="/pages/activities/list"><view class="quick-icon">⌕</view><text>找球局</text></navigator>
+    <navigator open-type="switchTab" class="quick-item" url="/pages/venues/list"><view class="quick-icon">⌖</view><text>看场馆</text></navigator>
+    <navigator open-type="switchTab" class="quick-item" url="/pages/profile/index"><view class="quick-icon">◯</view><text>个人资料</text></navigator>
+    <navigator class="quick-item" url="/pages/notifications/list"><view class="quick-icon">◉</view><text>消息</text></navigator>
+    <navigator wx:if="{{isAdmin}}" class="quick-item" url="/pages/admin/index"><view class="quick-icon">◇</view><text>运营管理</text></navigator>
+  </view>
+  <text class="connection">{{status}}</text>
+</view>
