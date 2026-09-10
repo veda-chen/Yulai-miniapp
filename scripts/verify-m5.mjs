@@ -5,6 +5,7 @@ for (const path of [
   "docs/M5试点候选版.md",
   "docs/CloudBase备份与恢复手册.md",
   "docs/试点场馆核验表.md",
+  "docs/隐私与微信审核清单.md",
   "release/m5-gates.json",
   "scripts/backup-cloudbase.mjs",
   "scripts/prepare-restore-plan.mjs",
