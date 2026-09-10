@@ -91,6 +91,9 @@ pnpm cloud:deploy
 | `pnpm check` | 运行格式、静态检查、类型检查、测试和 M1–M4 校验 |
 | `pnpm cloud:check` | 检查本地云开发配置 |
 | `pnpm cloud:deploy` | 构建并部署 `api` 云函数 |
+| `pnpm backup:cloud` | 将 CloudBase 业务集合备份到本地忽略目录 |
+| `pnpm restore:plan` | 生成写入隔离集合的恢复演练计划 |
+| `pnpm release:check` | 执行候选版检查并验证人工发布门槛 |
 
 ## 项目文档
 
@@ -102,6 +105,8 @@ pnpm cloud:deploy
 - [M2 基础资料模块](docs/M2基础资料模块.md)
 - [M3 运营与通知模块](docs/M3运营与通知模块.md)
 - [M4 可选现场功能](docs/M4可选现场功能.md)
+- [M5 试点候选版](docs/M5试点候选版.md)
+- [CloudBase 备份与恢复手册](docs/CloudBase备份与恢复手册.md)
 
 ## 当前进度
 
@@ -109,6 +114,7 @@ pnpm cloud:deploy
 - [x] M2：用户、学校、场馆与球局基础流程
 - [x] M3：活动运营、通知、举报与管理能力
 - [x] M4：可选分组、计分、确认和战绩能力
+- [ ] M5：自动候选版基线已完成，等待人工发布门槛
 - [ ] 微信订阅消息模板接入
 - [ ] 运营管理端实现
 - [ ] 试点场馆真实用户验证

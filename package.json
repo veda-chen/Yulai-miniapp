@@ -8,7 +8,7 @@
   },
   "scripts": {
     "build": "pnpm -r --if-present build",
-    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm m1:verify && pnpm m2:verify && pnpm m3:verify && pnpm m4:verify",
+    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm m1:verify && pnpm m2:verify && pnpm m3:verify && pnpm m4:verify && pnpm m5:verify",
     "cloud:check": "node scripts/check-cloud-env.mjs",
     "cloud:deploy": "pnpm build && tcb fn deploy api --force",
     "format": "biome format --write .",
@@ -19,7 +19,12 @@
     "m3:verify": "node scripts/verify-m3.mjs",
     "m4:verify": "node scripts/verify-m4.mjs",
     "test": "pnpm -r --if-present test",
-    "typecheck": "pnpm -r --if-present typecheck"
+    "typecheck": "pnpm -r --if-present typecheck",
+    "backup:cloud": "node scripts/backup-cloudbase.mjs",
+    "restore:plan": "node scripts/prepare-restore-plan.mjs",
+    "m5:verify": "node scripts/verify-m5.mjs",
+    "release:gate": "node scripts/check-release-gates.mjs",
+    "release:check": "pnpm check && pnpm build && pnpm release:gate"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.2.4",

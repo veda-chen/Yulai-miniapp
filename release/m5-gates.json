@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "milestone": "M5",
+  "updatedAt": "2026-09-10",
+  "gates": [
+    {
+      "id": "wechat-platform",
+      "title": "微信公众平台与生产环境配置",
+      "owner": "项目负责人",
+      "status": "PENDING",
+      "evidence": ""
+    },
+    {
+      "id": "privacy",
+      "title": "隐私保护指引与权限清单",
+      "owner": "产品负责人",
+      "status": "PENDING",
+      "evidence": ""
+    },
+    {
+      "id": "venue-data",
+      "title": "试点场馆现场数据核验",
+      "owner": "场馆核验人",
+      "status": "PENDING",
+      "evidence": ""
+    },
+    {
+      "id": "device-smoke",
+      "title": "微信开发者工具与真机主流程冒烟",
+      "owner": "测试负责人",
+      "status": "PENDING",
+      "evidence": ""
+    },
+    {
+      "id": "performance",
+      "title": "开发环境性能与并发验收",
+      "owner": "开发负责人",
+      "status": "PENDING",
+      "evidence": ""
+    },
+    {
+      "id": "backup-restore",
+      "title": "备份及隔离恢复演练",
+      "owner": "运维负责人",
+      "status": "PENDING",
+      "evidence": ""
+    }
+  ]
+}

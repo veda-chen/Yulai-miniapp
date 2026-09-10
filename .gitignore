@@ -12,3 +12,4 @@ apps/miniprogram/.eslintrc.js
 docs/architecture_render/
 docs/*_a11y.json
 .cloudbase/
+.backups/
