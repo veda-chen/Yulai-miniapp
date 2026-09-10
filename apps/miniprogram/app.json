@@ -11,6 +11,7 @@
     "pages/admin/index",
     "pages/profile/index",
     "pages/profile/edit",
+    "pages/privacy/index",
     "pages/venues/list",
     "pages/venues/detail"
   ],

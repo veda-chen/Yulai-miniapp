@@ -17,6 +17,11 @@ const router = await readFile("cloudfunctions/api/src/router.ts", "utf8");
 if (!router.includes('"user.deleteMe"')) throw new Error("缺少账号注销动作");
 const profilePage = await readFile("apps/miniprogram/pages/profile/index.wxml", "utf8");
 if (!profilePage.includes('bindtap="deleteAccount"')) throw new Error("缺少账号注销入口");
+if (!profilePage.includes("/pages/privacy/index")) throw new Error("缺少隐私与数据入口");
+const privacyPage = await readFile("apps/miniprogram/pages/privacy/index.wxml", "utf8");
+for (const requiredText of ["陈政昊", "2724309224@qq.com", "学校和自评水平均可不填", "已注销球友"])
+  if (!privacyPage.includes(requiredText))
+    throw new Error(`隐私与数据页面缺少内容: ${requiredText}`);
 
 const pkg = JSON.parse(await readFile("package.json", "utf8"));
 for (const script of ["backup:cloud", "restore:plan", "m5:verify", "release:gate", "release:check"])
