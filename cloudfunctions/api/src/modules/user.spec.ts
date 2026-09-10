@@ -28,7 +28,7 @@ const database = vi.hoisted(() => {
 
 vi.mock("../db.js", () => ({ db: database.db }));
 
-import { parseProfileUpdate, updateMe } from "./user.js";
+import { parseAccountDeletion, parseProfileUpdate, updateMe } from "./user.js";
 
 beforeAll(() => {
   process.env.OPENID_HASH_SECRET = "test-secret-that-is-at-least-32-characters";
@@ -73,5 +73,12 @@ describe("parseProfileUpdate", () => {
       },
     });
     expect(result).toMatchObject({ user: { school: null, needsProfile: false } });
+  });
+});
+
+describe("parseAccountDeletion", () => {
+  it("requires the exact destructive confirmation token", () => {
+    expect(() => parseAccountDeletion({ confirmation: "DELETE" })).toThrow("请确认注销账号");
+    expect(parseAccountDeletion({ confirmation: "DELETE_MY_ACCOUNT" })).toBeUndefined();
   });
 });

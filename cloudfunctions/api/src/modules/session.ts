@@ -1,10 +1,12 @@
 import { db } from "../db.js";
+import { AppError } from "../errors.js";
 import { hashOpenId } from "../identity.js";
 import type { Handler } from "../types.js";
 
 type UserDocument = {
   _id: string;
   openidHash: string;
+  status: string;
 };
 
 export const getSession: Handler = async (_payload, context) => {
@@ -19,6 +21,7 @@ export const getSession: Handler = async (_payload, context) => {
   const user = existing.data[0];
 
   if (user) {
+    if (user.status === "DELETED") throw new AppError("ACCOUNT_DELETED", "账号已注销");
     return { user: { id: user._id, isNew: false } };
   }
 

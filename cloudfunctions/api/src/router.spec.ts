@@ -8,6 +8,7 @@ describe("resolveRoute", () => {
 
   it("marks profile writes as authenticated and venue reads as public", () => {
     expect(resolveRoute("user.updateMe")).toMatchObject({ requiresAuth: true });
+    expect(resolveRoute("user.deleteMe")).toMatchObject({ requiresAuth: true });
     expect(resolveRoute("venue.list")).toMatchObject({ requiresAuth: false });
   });
 

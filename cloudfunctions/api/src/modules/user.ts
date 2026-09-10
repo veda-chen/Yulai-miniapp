@@ -17,6 +17,8 @@ export type UserDocument = {
   role?: string;
 };
 
+type CloudTransaction = Pick<typeof db, "collection">;
+
 type SchoolDocument = {
   _id: string;
   name: string;
@@ -142,4 +144,70 @@ export const updateMe: Handler = async (payload, context) => {
     .doc(user._id)
     .update({ data: { ...update, updatedAt: db.serverDate() } });
   return { user: await mapProfile({ ...user, ...update }) };
+};
+
+export function parseAccountDeletion(payload: unknown): void {
+  if (!isRecord(payload) || payload.confirmation !== "DELETE_MY_ACCOUNT") {
+    throw new AppError("INVALID_ARGUMENT", "请确认注销账号");
+  }
+}
+
+export const deleteMe: Handler = async (payload, context) => {
+  parseAccountDeletion(payload);
+  const user = await findCurrentUser(context);
+  if (user.status !== "ACTIVE") throw new AppError("ACCOUNT_NOT_ACTIVE", "当前账号无法注销");
+  if (user.role === "ADMIN") throw new AppError("ADMIN_ACCOUNT", "管理员账号不能在小程序内注销");
+
+  const [organized, registrations] = (await Promise.all([
+    db.collection("activities").where({ organizerId: user._id, status: "OPEN" }).limit(1).get(),
+    db
+      .collection("registrations")
+      .where({
+        userId: user._id,
+        status: db.command.in(["CONFIRMED", "WAITLISTED", "PROMOTED"]),
+      })
+      .limit(1)
+      .get(),
+  ])) as unknown as [{ data: unknown[] }, { data: unknown[] }];
+  if (organized.data[0])
+    throw new AppError("ACTIVE_ACTIVITIES_EXIST", "请先取消或结束正在组织的球局");
+  if (registrations.data[0])
+    throw new AppError("ACTIVE_REGISTRATIONS_EXIST", "请先退出已报名或候补的球局");
+
+  await db.runTransaction(async (transaction: CloudTransaction) => {
+    const deletedAt = db.serverDate();
+    await transaction
+      .collection("users")
+      .doc(user._id)
+      .update({
+        data: {
+          nickname: null,
+          avatarFileId: null,
+          schoolId: null,
+          level: "UNKNOWN",
+          status: "DELETED",
+          deletedAt,
+          updatedAt: deletedAt,
+        },
+      });
+    await transaction
+      .collection("activities")
+      .where({ organizerId: user._id })
+      .update({ data: { organizerName: "已注销球友" } });
+    await transaction
+      .collection("registrations")
+      .where({ userId: user._id })
+      .update({ data: { nickname: "已注销球友" } });
+    await transaction.collection("auditLogs").add({
+      data: {
+        actorId: user._id,
+        action: "USER_DELETED",
+        objectType: "USER",
+        objectId: user._id,
+        metadata: { anonymized: true },
+        createdAt: deletedAt,
+      },
+    });
+  });
+  return { deleted: true };
 };

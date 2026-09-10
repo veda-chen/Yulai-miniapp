@@ -10,5 +10,6 @@
     <navigator class="menu-item" url="/pages/reports/form?type=USER&id=self"><view><view class="menu-icon gray"><image src="/assets/icons/menu/help.svg" /></view><text>帮助与反馈</text></view><image class="chevron-icon" src="/assets/icons/menu/chevron-right.svg" /></navigator>
     <navigator wx:if="{{isAdmin}}" class="menu-item" url="/pages/admin/index"><view><view class="menu-icon blue"><image src="/assets/icons/menu/admin.svg" /></view><text>运营管理</text></view><image class="chevron-icon" src="/assets/icons/menu/chevron-right.svg" /></navigator>
   </view>
+  <button class="delete-account" loading="{{deleting}}" bindtap="deleteAccount">注销账号</button>
   <text class="version">羽来 Yulai · M4</text>
 </view>

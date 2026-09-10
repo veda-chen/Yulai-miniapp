@@ -42,7 +42,7 @@ import {
 import { createReport } from "./modules/report.js";
 import { listSchools } from "./modules/school.js";
 import { getSession } from "./modules/session.js";
-import { getMe, updateMe } from "./modules/user.js";
+import { deleteMe, getMe, updateMe } from "./modules/user.js";
 import { getVenue, listVenues } from "./modules/venue.js";
 import type { Route } from "./types.js";
 
@@ -51,6 +51,7 @@ const routes: Readonly<Record<string, Route>> = {
   "auth.session": { handler: getSession, requiresAuth: true },
   "user.getMe": { handler: getMe, requiresAuth: true },
   "user.updateMe": { handler: updateMe, requiresAuth: true },
+  "user.deleteMe": { handler: deleteMe, requiresAuth: true },
   "school.list": { handler: listSchools, requiresAuth: false },
   "venue.list": { handler: listVenues, requiresAuth: false },
   "venue.get": { handler: getVenue, requiresAuth: false },

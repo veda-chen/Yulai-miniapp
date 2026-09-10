@@ -13,6 +13,11 @@ for (const path of [
 ])
   await stat(path);
 
+const router = await readFile("cloudfunctions/api/src/router.ts", "utf8");
+if (!router.includes('"user.deleteMe"')) throw new Error("缺少账号注销动作");
+const profilePage = await readFile("apps/miniprogram/pages/profile/index.wxml", "utf8");
+if (!profilePage.includes('bindtap="deleteAccount"')) throw new Error("缺少账号注销入口");
+
 const pkg = JSON.parse(await readFile("package.json", "utf8"));
 for (const script of ["backup:cloud", "restore:plan", "m5:verify", "release:gate", "release:check"])
   if (!pkg.scripts[script]) throw new Error(`缺少M5命令: ${script}`);
