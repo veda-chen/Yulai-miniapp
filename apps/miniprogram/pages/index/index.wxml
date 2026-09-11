@@ -1,7 +1,7 @@
 <view class="home-page">
   <view class="home-header">
     <view><text class="eyebrow">{{greeting}}</text><text class="home-name">{{userName}}</text><text class="home-date">{{dateText}}</text></view>
-    <navigator class="notify" url="/pages/notifications/list"><text class="notify-icon">◉</text><view class="notify-dot"></view></navigator>
+    <navigator class="notify" url="/pages/notifications/list"><image class="notify-icon" src="/assets/icons/menu/message.svg" /><view class="notify-dot"></view></navigator>
   </view>
   <view class="hero"><image class="hero-image" src="/assets/hero-badminton-bg.jpg" mode="aspectFill" /><view class="hero-shade"></view><view class="hero-content">
     <text class="hero-title">今天有约球计划吗？</text>
@@ -19,11 +19,11 @@
   </view></scroll-view>
   <view class="section-head quick-head"><text class="section-title">快捷入口</text></view>
   <view class="quick-grid">
-    <navigator open-type="switchTab" class="quick-item" url="/pages/activities/list"><view class="quick-icon">⌕</view><text>找球局</text></navigator>
-    <navigator open-type="switchTab" class="quick-item" url="/pages/venues/list"><view class="quick-icon">⌖</view><text>看场馆</text></navigator>
-    <navigator open-type="switchTab" class="quick-item" url="/pages/profile/index"><view class="quick-icon">◯</view><text>个人资料</text></navigator>
-    <navigator class="quick-item" url="/pages/notifications/list"><view class="quick-icon">◉</view><text>消息</text></navigator>
-    <navigator wx:if="{{isAdmin}}" class="quick-item" url="/pages/admin/index"><view class="quick-icon">◇</view><text>运营管理</text></navigator>
+    <navigator open-type="switchTab" class="quick-item" url="/pages/activities/list"><view class="quick-icon"><image src="/assets/icons/tab/calendar-active.png" /></view><text>找球局</text></navigator>
+    <navigator open-type="switchTab" class="quick-item" url="/pages/venues/list"><view class="quick-icon"><image src="/assets/icons/tab/pin-active.png" /></view><text>看场馆</text></navigator>
+    <navigator open-type="switchTab" class="quick-item" url="/pages/profile/index"><view class="quick-icon"><image src="/assets/icons/tab/user-active.png" /></view><text>个人资料</text></navigator>
+    <navigator class="quick-item" url="/pages/notifications/list"><view class="quick-icon"><image src="/assets/icons/menu/message.svg" /></view><text>消息</text></navigator>
+    <navigator wx:if="{{isAdmin}}" class="quick-item" url="/pages/admin/index"><view class="quick-icon"><image src="/assets/icons/menu/admin.svg" /></view><text>运营管理</text></navigator>
   </view>
   <text class="connection">{{status}}</text>
 </view>
