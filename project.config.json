@@ -11,7 +11,15 @@
       "disablePlugins": [],
       "outputPath": ""
     },
-    "useCompilerPlugins": ["typescript"]
+    "useCompilerPlugins": ["typescript"],
+    "compileWorklet": false,
+    "uploadWithSourceMap": true,
+    "packNpmManually": false,
+    "minifyWXSS": true,
+    "minifyWXML": true,
+    "localPlugins": false,
+    "disableUseStrict": false,
+    "condition": false
   },
   "compileType": "miniprogram",
   "miniprogramRoot": "apps/miniprogram/",
