@@ -61,6 +61,16 @@ export type VenueSummary = {
   name: string;
   address: string | null;
   description: string | null;
+  entranceGuide: string | null;
+  openingHours: string | null;
+  accessPolicy: string | null;
+  bookingInstructions: string | null;
+  contactPhone: string | null;
+  facilities: string[];
+  coverFileId: string | null;
+  floorPlanFileId: string | null;
+  verifiedAt: string | null;
+  verificationSource: string | null;
   verificationStatus: "ACTIVE" | "PENDING_VERIFICATION";
   updatedAt: unknown;
 };
@@ -69,6 +79,9 @@ export type CourtSummary = {
   id: string;
   name: string;
   locationHint: string | null;
+  floorName: string | null;
+  surface: string | null;
+  lighting: string | null;
 };
 
 export type ActivitySummary = {

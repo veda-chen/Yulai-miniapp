@@ -3,7 +3,7 @@
   <view wx:elif="{{message}}" class="state-card muted">{{message}}</view>
   <block wx:else>
     <view class="venue-hero">
-      <image class="hero-image" src="/assets/venue-header-v2.jpg" mode="aspectFill" />
+      <image class="hero-image" src="{{detail.venue.coverFileId || '/assets/venue-header-v2.jpg'}}" mode="aspectFill" />
       <view class="hero-shade"></view>
       <view class="hero-content">
         <text class="hero-kicker">羽来场馆指南</text>
@@ -20,13 +20,35 @@
     </view>
 
     <view class="info-card">
+      <view class="section-head"><view class="section-icon guide-icon"></view><view><text class="section-title">到馆指南</text><text class="section-count">开放和入场信息以场馆现场为准</text></view></view>
+      <view wx:if="{{detail.hasVisitInfo}}">
+        <view class="info-row"><text class="info-label">入口指引</text><text class="copy">{{detail.venue.entranceGuide || '暂无资料'}}</text></view>
+        <view class="info-row"><text class="info-label">开放说明</text><text class="copy">{{detail.venue.openingHours || '暂无资料'}}</text></view>
+        <view class="info-row"><text class="info-label">入场要求</text><text class="copy">{{detail.venue.accessPolicy || '暂无资料'}}</text></view>
+        <view class="info-row"><text class="info-label">预约方式</text><text class="copy">{{detail.venue.bookingInstructions || '暂无资料'}}</text></view>
+        <view class="info-row"><text class="info-label">场馆电话</text><text class="copy phone" bindtap="copyVenuePhone">{{detail.venue.contactPhone || '暂无资料'}}</text></view>
+      </view>
+      <view wx:else class="empty-courts"><text>到馆信息仍待现场核验</text><text class="empty-copy">核验前不会展示推测的入口、开放时间或联系方式。</text></view>
+    </view>
+
+    <view class="info-card">
+      <view class="section-head"><view class="section-icon facility-icon"></view><view><text class="section-title">设施与平面图</text><text class="section-count">帮助球友到馆后快速找场</text></view></view>
+      <view wx:if="{{detail.venue.facilities.length > 0}}" class="facility-list"><text wx:for="{{detail.venue.facilities}}" wx:key="*this" class="facility-chip">{{item}}</text></view>
+      <text wx:else class="placeholder-copy">洗手间、更衣、淋浴和无障碍设施仍待核验</text>
+      <image wx:if="{{detail.venue.floorPlanFileId}}" class="floor-plan" src="{{detail.venue.floorPlanFileId}}" mode="widthFix" />
+      <view wx:else class="floor-placeholder"><text class="floor-title">平面图待补充</text><text class="empty-copy">获得可公开使用的平面图后，将在这里标出场地位置。</text></view>
+    </view>
+
+    <view class="info-card">
       <view class="section-head"><view class="section-icon court-icon"></view><view><text class="section-title">场地</text><text class="section-count">{{detail.courts.length}} 片已收录</text></view></view>
       <view wx:if="{{detail.courts.length === 0}}" class="empty-courts"><text>场号和位置仍待现场核验</text><text class="empty-copy">核验后将在这里展示每片场地的位置说明。</text></view>
       <view wx:for="{{detail.courts}}" wx:key="id" class="court">
         <view class="court-number">{{index + 1}}</view>
-        <view class="court-main"><text class="court-name">{{item.name}}</text><text class="court-copy">{{item.locationHint || '暂无位置说明'}}</text></view>
+        <view class="court-main"><text class="court-name">{{item.name}}</text><text wx:if="{{item.metaText}}" class="court-meta">{{item.metaText}}</text><text class="court-copy">{{item.locationHint || '暂无位置说明'}}</text></view>
       </view>
     </view>
+
+    <view class="verification-card"><text class="verification-title">资料核验</text><text class="verification-copy">{{detail.verificationText}}</text><text wx:if="{{detail.venue.verificationSource}}" class="verification-source">来源：{{detail.venue.verificationSource}}</text></view>
 
     <navigator class="feedback-card" url="/pages/reports/form?type=VENUE&id={{detail.venue.id}}">
       <view><text class="feedback-title">发现资料有误？</text><text class="feedback-copy">提交场馆纠错，帮助其他球友准确找场</text></view><text class="feedback-arrow">›</text>

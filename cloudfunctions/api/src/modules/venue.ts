@@ -9,6 +9,16 @@ type VenueDocument = {
   name: string;
   address?: string | null;
   description?: string | null;
+  entranceGuide?: string | null;
+  openingHours?: string | null;
+  accessPolicy?: string | null;
+  bookingInstructions?: string | null;
+  contactPhone?: string | null;
+  facilities?: string[];
+  coverFileId?: string | null;
+  floorPlanFileId?: string | null;
+  verifiedAt?: Date | string | null;
+  verificationSource?: string | null;
   status: string;
   updatedAt?: unknown;
 };
@@ -17,6 +27,9 @@ type CourtDocument = {
   _id: string;
   name: string;
   locationHint?: string | null;
+  floorName?: string | null;
+  surface?: string | null;
+  lighting?: string | null;
   status: string;
 };
 
@@ -26,6 +39,19 @@ function mapVenue(venue: VenueDocument) {
     name: venue.name,
     address: venue.address ?? null,
     description: venue.description ?? null,
+    entranceGuide: venue.entranceGuide ?? null,
+    openingHours: venue.openingHours ?? null,
+    accessPolicy: venue.accessPolicy ?? null,
+    bookingInstructions: venue.bookingInstructions ?? null,
+    contactPhone: venue.contactPhone ?? null,
+    facilities: Array.isArray(venue.facilities) ? venue.facilities : [],
+    coverFileId: venue.coverFileId ?? null,
+    floorPlanFileId: venue.floorPlanFileId ?? null,
+    verifiedAt:
+      venue.verifiedAt instanceof Date
+        ? venue.verifiedAt.toISOString()
+        : (venue.verifiedAt ?? null),
+    verificationSource: venue.verificationSource ?? null,
     verificationStatus: venue.status,
     updatedAt: venue.updatedAt ?? null,
   };
@@ -75,6 +101,9 @@ export const getVenue: Handler = async (payload) => {
         id: court._id,
         name: court.name,
         locationHint: court.locationHint ?? null,
+        floorName: court.floorName ?? null,
+        surface: court.surface ?? null,
+        lighting: court.lighting ?? null,
       })),
   };
 };
