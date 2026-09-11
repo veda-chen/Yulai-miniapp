@@ -1,6 +1,7 @@
 import { AppError } from "./errors.js";
 import {
   getAdminDashboard,
+  listAuditLogs,
   listReports,
   resolveReport,
   restrictUser,
@@ -83,6 +84,7 @@ const routes: Readonly<Record<string, Route>> = {
   "report.create": { handler: createReport, requiresAuth: true },
   "admin.dashboard": { handler: getAdminDashboard, requiresAuth: true },
   "admin.report.list": { handler: listReports, requiresAuth: true },
+  "admin.audit.list": { handler: listAuditLogs, requiresAuth: true },
   "admin.report.resolve": { handler: resolveReport, requiresAuth: true },
   "admin.activity.unpublish": { handler: unpublishActivity, requiresAuth: true },
   "admin.user.restrict": { handler: restrictUser, requiresAuth: true },

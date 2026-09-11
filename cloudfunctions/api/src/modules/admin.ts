@@ -5,6 +5,30 @@ import { findCurrentUser, type UserDocument } from "./user.js";
 
 const REPORT_STATUSES = new Set(["OPEN", "RESOLVED", "DISMISSED"]);
 
+type ReportDocument = {
+  _id: string;
+  reporterId: string;
+  targetType: string;
+  targetId: string;
+  reason: string;
+  details: string;
+  status: string;
+  resolutionNote?: string;
+  resolvedBy?: string;
+  createdAt?: unknown;
+  resolvedAt?: unknown;
+};
+
+type AuditDocument = {
+  _id: string;
+  actorId: string;
+  action: string;
+  objectType: string;
+  objectId: string;
+  metadata?: unknown;
+  createdAt?: unknown;
+};
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
@@ -14,6 +38,21 @@ function requiredText(value: unknown, label: string, maxLength: number): string 
     throw new AppError("INVALID_ARGUMENT", `${label}格式不正确`);
   }
   return value.trim();
+}
+
+function serializeDate(value: unknown): string | null {
+  if (value instanceof Date) return value.toISOString();
+  if (typeof value === "string" || typeof value === "number") {
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? null : date.toISOString();
+  }
+  return null;
+}
+
+function auditSummary(metadata: unknown): string {
+  if (!isRecord(metadata)) return "";
+  const value = metadata.reason ?? metadata.note ?? metadata.outcome;
+  return typeof value === "string" ? value.slice(0, 200) : "";
 }
 
 async function requireAdmin(context: Parameters<Handler>[1]): Promise<UserDocument> {
@@ -47,8 +86,42 @@ export const listReports: Handler = async (payload, context) => {
     .where({ status })
     .orderBy("createdAt", "desc")
     .limit(50)
-    .get()) as unknown as { data: unknown[] };
-  return { reports: result.data };
+    .get()) as unknown as { data: ReportDocument[] };
+  return {
+    reports: result.data.map((report) => ({
+      id: report._id,
+      reporterId: report.reporterId,
+      targetType: report.targetType,
+      targetId: report.targetId,
+      reason: report.reason,
+      details: report.details,
+      status: report.status,
+      resolutionNote: report.resolutionNote ?? null,
+      resolvedBy: report.resolvedBy ?? null,
+      createdAt: serializeDate(report.createdAt),
+      resolvedAt: serializeDate(report.resolvedAt),
+    })),
+  };
+};
+
+export const listAuditLogs: Handler = async (_payload, context) => {
+  await requireAdmin(context);
+  const result = (await db
+    .collection("auditLogs")
+    .orderBy("createdAt", "desc")
+    .limit(50)
+    .get()) as unknown as { data: AuditDocument[] };
+  return {
+    logs: result.data.map((log) => ({
+      id: log._id,
+      actorId: log.actorId,
+      action: log.action,
+      objectType: log.objectType,
+      objectId: log.objectId,
+      summary: auditSummary(log.metadata),
+      createdAt: serializeDate(log.createdAt),
+    })),
+  };
 };
 
 export const resolveReport: Handler = async (payload, context) => {

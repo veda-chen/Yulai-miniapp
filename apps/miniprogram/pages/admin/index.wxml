@@ -1,18 +1,43 @@
-<view class="page">
+<view class="admin-page">
+  <view class="admin-hero">
+    <text class="hero-kicker">YULAI OPERATIONS</text>
+    <text class="hero-title">运营管理台</text>
+    <text class="hero-copy">处理用户反馈，查看关键操作记录</text>
+  </view>
+
   <view class="metrics">
-    <view class="metric"><text class="number">{{metrics.openReports}}</text><text>待处理举报</text></view>
-    <view class="metric"><text class="number">{{metrics.openActivities}}</text><text>开放球局</text></view>
-    <view class="metric"><text class="number">{{metrics.activeUsers}}</text><text>可用账号</text></view>
+    <view class="metric metric-warn"><text class="number">{{metrics.openReports}}</text><text>待处理举报</text></view>
+    <view class="metric metric-blue"><text class="number">{{metrics.openActivities}}</text><text>开放球局</text></view>
+    <view class="metric metric-green"><text class="number">{{metrics.activeUsers}}</text><text>可用账号</text></view>
   </view>
-  <view wx:if="{{loading}}" class="empty">正在加载</view>
-  <view wx:elif="{{reports.length === 0}}" class="empty">暂无待处理举报</view>
-  <view wx:for="{{reports}}" wx:key="_id" class="report">
-    <text class="title">{{item.targetType}} · {{item.reason}}</text>
-    <text class="copy">{{item.details}}</text>
-    <text class="copy">对象：{{item.targetId}}</text>
-    <view class="buttons">
-      <button wx:if="{{item.targetType === 'ACTIVITY' || item.targetType === 'USER'}}" size="mini" data-target-type="{{item.targetType}}" data-target-id="{{item.targetId}}" bindtap="moderateTarget">{{item.targetType === 'ACTIVITY' ? '下架对象' : '限制账号'}}</button>
-      <button size="mini" data-id="{{item._id}}" data-outcome="RESOLVED" bindtap="resolve">已处理</button><button size="mini" data-id="{{item._id}}" data-outcome="DISMISSED" bindtap="resolve">驳回</button>
+
+  <scroll-view class="tabs" scroll-x show-scrollbar="{{false}}"><view class="tab-track"><text wx:for="{{tabs}}" wx:key="key" class="tab {{activeTab === item.key ? 'active' : ''}}" data-key="{{item.key}}" bindtap="onTabTap">{{item.label}}</text></view></scroll-view>
+
+  <view wx:if="{{loading}}" class="empty">正在加载运营数据</view>
+  <view wx:elif="{{errorMessage}}" class="empty error">{{errorMessage}}</view>
+
+  <block wx:elif="{{activeTab === 'AUDIT'}}">
+    <view wx:if="{{logs.length === 0}}" class="empty">暂无操作记录</view>
+    <view wx:for="{{logs}}" wx:key="id" class="audit-card">
+      <view class="card-top"><text class="action-pill">{{item.actionLabel}}</text><text class="date">{{item.createdAtText}}</text></view>
+      <text class="record-title">{{item.objectLabel}} · {{item.objectId}}</text>
+      <text wx:if="{{item.summary}}" class="record-copy">{{item.summary}}</text>
     </view>
-  </view>
+  </block>
+
+  <block wx:else>
+    <view wx:if="{{reports.length === 0}}" class="empty">{{activeTab === 'OPEN' ? '暂无待处理举报' : '此分类暂无记录'}}</view>
+    <view wx:for="{{reports}}" wx:key="id" class="report-card">
+      <view class="card-top"><view><text class="target-pill">{{item.targetLabel}}</text><text class="reason">{{item.reasonLabel}}</text></view><text class="status status-{{item.status}}">{{item.statusLabel}}</text></view>
+      <text class="record-copy details">{{item.details}}</text>
+      <view class="object-row"><text>对象编号：{{item.targetId}}</text><navigator wx:if="{{item.targetType === 'ACTIVITY'}}" url="/pages/activities/detail?id={{item.targetId}}">查看球局 ›</navigator><navigator wx:if="{{item.targetType === 'VENUE'}}" url="/pages/venues/detail?id={{item.targetId}}">查看场馆 ›</navigator></view>
+      <text class="date">提交于 {{item.createdAtText}}</text>
+      <view wx:if="{{item.status !== 'OPEN'}}" class="resolution"><text class="resolution-label">处置说明</text><text>{{item.resolutionNote || '未填写'}}</text><text class="date">{{item.resolvedAtText}}</text></view>
+      <view wx:if="{{item.status === 'OPEN'}}" class="buttons">
+        <button wx:if="{{item.targetType === 'ACTIVITY' || item.targetType === 'USER'}}" class="action danger" loading="{{processingId === item.id}}" data-report-id="{{item.id}}" data-target-type="{{item.targetType}}" data-target-id="{{item.targetId}}" bindtap="moderateTarget">{{item.targetType === 'ACTIVITY' ? '下架并结案' : '限制并结案'}}</button>
+        <button class="action" loading="{{processingId === item.id}}" data-id="{{item.id}}" data-outcome="DISMISSED" bindtap="resolve">驳回</button>
+        <button class="action primary" loading="{{processingId === item.id}}" data-id="{{item.id}}" data-outcome="RESOLVED" bindtap="resolve">已处理</button>
+      </view>
+    </view>
+  </block>
 </view>

@@ -1,1 +1,5 @@
-{ "navigationBarTitleText": "运营管理" }
+{
+  "navigationBarTitleText": "运营管理",
+  "enablePullDownRefresh": true,
+  "backgroundColor": "#edf6ff"
+}
