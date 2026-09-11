@@ -2,6 +2,7 @@ import { beforeAll, describe, expect, it, vi } from "vitest";
 
 const database = vi.hoisted(() => {
   const update = vi.fn(async () => ({ stats: { updated: 1 } }));
+  const deleteFile = vi.fn(async () => ({ fileList: [] }));
   const currentUser = {
     _id: "user-1",
     openidHash: "stored-hash",
@@ -13,6 +14,7 @@ const database = vi.hoisted(() => {
   };
   return {
     update,
+    deleteFile,
     db: {
       serverDate: () => "SERVER_DATE",
       collection: (name: string) => {
@@ -26,9 +28,9 @@ const database = vi.hoisted(() => {
   };
 });
 
-vi.mock("../db.js", () => ({ db: database.db }));
+vi.mock("../db.js", () => ({ cloud: { deleteFile: database.deleteFile }, db: database.db }));
 
-import { parseAccountDeletion, parseProfileUpdate, updateMe } from "./user.js";
+import { parseAccountDeletion, parseAvatarUpdate, parseProfileUpdate, updateMe } from "./user.js";
 
 beforeAll(() => {
   process.env.OPENID_HASH_SECRET = "test-secret-that-is-at-least-32-characters";
@@ -73,6 +75,30 @@ describe("parseProfileUpdate", () => {
       },
     });
     expect(result).toMatchObject({ user: { school: null, needsProfile: false } });
+  });
+});
+
+describe("parseAvatarUpdate", () => {
+  it("accepts a cloud file in the current user's avatar directory", () => {
+    expect(
+      parseAvatarUpdate(
+        { avatarFileId: "cloud://test-env.example/avatars/user-1/avatar.jpg" },
+        "user-1",
+      ),
+    ).toEqual({ avatarFileId: "cloud://test-env.example/avatars/user-1/avatar.jpg" });
+  });
+
+  it("allows the avatar to be cleared", () => {
+    expect(parseAvatarUpdate({ avatarFileId: null }, "user-1")).toEqual({ avatarFileId: null });
+  });
+
+  it("rejects files outside the current user's avatar directory", () => {
+    expect(() =>
+      parseAvatarUpdate(
+        { avatarFileId: "cloud://test-env.example/avatars/user-2/avatar.jpg" },
+        "user-1",
+      ),
+    ).toThrow("头像文件不属于当前用户");
   });
 });
 

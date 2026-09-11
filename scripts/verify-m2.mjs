@@ -26,6 +26,7 @@ const router = await readFile("cloudfunctions/api/src/router.ts", "utf8");
 for (const action of [
   "user.getMe",
   "user.updateMe",
+  "user.updateAvatar",
   "school.list",
   "venue.list",
   "venue.get",

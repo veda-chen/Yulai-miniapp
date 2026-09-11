@@ -1,6 +1,15 @@
 <view class="page">
   <view wx:if="{{loading}}" class="card">正在加载资料</view>
   <view wx:else class="card form">
+    <view class="avatar-field">
+      <button class="avatar-picker" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar" loading="{{uploadingAvatar}}">
+        <image wx:if="{{avatarUrl}}" class="avatar-image" src="{{avatarUrl}}" mode="aspectFill" />
+        <text wx:else class="avatar-fallback">{{initial}}</text>
+        <text class="avatar-action">更换</text>
+      </button>
+      <text class="avatar-help">头像为可选资料，用于个人主页展示</text>
+      <button wx:if="{{avatarFileId}}" class="remove-avatar" bindtap="removeAvatar" disabled="{{uploadingAvatar}}">移除头像</button>
+    </view>
     <label class="field">
       <text class="label">昵称</text>
       <input maxlength="24" value="{{nickname}}" placeholder="请输入昵称" bindinput="onNicknameInput" />

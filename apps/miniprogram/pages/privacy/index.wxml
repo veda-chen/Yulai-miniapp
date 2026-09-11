@@ -14,17 +14,17 @@
   <view class="section surface">
     <text class="section-title">我们处理的信息</text>
     <view class="item"><text class="item-title">账号识别</text><text class="item-body">使用经过保护处理的微信用户标识识别账号，不在小程序页面保存或传递原始标识。</text></view>
-    <view class="item"><text class="item-title">个人资料</text><text class="item-body">昵称用于球局内展示；学校和自评水平均可不填，也可以随时修改或清空。</text></view>
+    <view class="item"><text class="item-title">个人资料</text><text class="item-body">昵称用于球局内展示；头像为可选资料，学校和自评水平均可不填，也可以随时修改或清空。</text></view>
     <view class="item"><text class="item-title">组局与现场记录</text><text class="item-body">使用功能时会产生球局、报名、到场、可选分组、比分与修改记录。</text></view>
     <view class="item"><text class="item-title">联系方式与举报</text><text class="item-body">联系方式由组织者自愿填写，默认只向组织者和正式参与者展示；举报内容仅用于平台治理。</text></view>
   </view>
 
   <view class="section surface">
     <text class="section-title">保存与账号注销</text>
-    <text class="paragraph">账号使用期间，我们保存提供服务所需的数据。注销时会清除昵称、学校和水平等个人资料，并把历史球局及报名记录中的昵称改为“已注销球友”。</text>
+    <text class="paragraph">账号使用期间，我们保存提供服务所需的数据。注销时会删除头像文件，清除昵称、学校和水平等个人资料，并把历史球局及报名记录中的昵称改为“已注销球友”。</text>
     <text class="paragraph">注销后，为处理安全事件、争议和举报，必要的最小账号关联信息最长保存180天；到期后系统会删除微信标识与内部用户编号之间的关联。已匿名化的球局、报名和比分记录可继续保留。</text>
     <text class="paragraph">你可以在“我的”页面使用“注销账号”。如需查询、更正或删除其他个人信息，可通过上方邮箱联系我们。</text>
   </view>
 
-  <view class="notice">当前为试点候选版本 · 更新日期：2026年9月10日</view>
+  <view class="notice">当前为试点候选版本 · 更新日期：2026年9月11日</view>
 </view>

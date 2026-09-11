@@ -14,6 +14,74 @@
   flex-direction: column;
 }
 
+.avatar-field {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 34rpx;
+}
+
+.avatar-picker {
+  position: relative;
+  overflow: hidden;
+  width: 168rpx;
+  height: 168rpx;
+  margin: 0;
+  padding: 0;
+  border: 6rpx solid #ffffff;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #cfe5ff, #2e8dff);
+  box-shadow: 0 10rpx 28rpx rgba(0, 122, 255, 0.18);
+}
+
+.avatar-picker::after,
+.remove-avatar::after {
+  border: 0;
+}
+
+.avatar-image,
+.avatar-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.avatar-fallback {
+  color: #ffffff;
+  font-size: 58rpx;
+  font-weight: 750;
+}
+
+.avatar-action {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 44rpx;
+  background: rgba(0, 0, 0, 0.46);
+  color: #ffffff;
+  font-size: 20rpx;
+  line-height: 44rpx;
+}
+
+.avatar-help {
+  margin-top: 14rpx;
+  color: #7b8581;
+  font-size: 22rpx;
+}
+
+.remove-avatar {
+  width: auto;
+  margin: 10rpx 0 0;
+  padding: 0 18rpx;
+  background: transparent;
+  color: #d93025;
+  font-size: 22rpx;
+  line-height: 1.8;
+}
+
 .field + .field {
   margin-top: 30rpx;
 }

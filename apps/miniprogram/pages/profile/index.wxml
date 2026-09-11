@@ -1,5 +1,5 @@
 <view class="profile-page">
-  <view class="profile-header"><view class="avatar">{{initial}}</view><text class="nickname">{{nickname}}</text><view class="meta-line"><text>{{schoolName}}</text><text class="dot">·</text><text class="level">{{levelText}}</text></view></view>
+  <view class="profile-header"><view class="avatar"><image wx:if="{{avatarFileId}}" class="avatar-image" src="{{avatarFileId}}" mode="aspectFill" /><text wx:else>{{initial}}</text></view><text class="nickname">{{nickname}}</text><view class="meta-line"><text>{{schoolName}}</text><text class="dot">·</text><text class="level">{{levelText}}</text></view></view>
   <view class="stats surface"><view class="stat"><text class="num">{{upcomingCount}}</text><text class="stat-label">即将参加</text></view><view class="stat"><text class="num">{{organizingCount}}</text><text class="stat-label">正在组织</text></view><view class="stat"><text class="num">{{gameCount}}</text><text class="stat-label">锁定对局</text></view></view>
   <view class="menu surface">
     <navigator open-type="switchTab" class="menu-item" url="/pages/activities/list"><view><view class="menu-icon blue"><image src="/assets/icons/menu/calendar.svg" /></view><text>我的球局</text></view><image class="chevron-icon" src="/assets/icons/menu/chevron-right.svg" /></navigator>

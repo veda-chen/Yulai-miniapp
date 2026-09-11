@@ -3,6 +3,7 @@ import { levelLabel } from "../../utils/labels";
 
 type Profile = {
   nickname: string | null;
+  avatarFileId: string | null;
   school: { name: string } | null;
   level: string;
   role: string;
@@ -15,6 +16,7 @@ Page({
     loading: true,
     nickname: "羽来球友",
     initial: "羽",
+    avatarFileId: "",
     schoolName: "学校未填写",
     levelText: "不清楚",
     upcomingCount: 0,
@@ -38,6 +40,7 @@ Page({
         loading: false,
         nickname,
         initial: nickname.slice(0, 1),
+        avatarFileId: profile.avatarFileId ?? "",
         schoolName: profile.school?.name ?? "学校未填写",
         levelText: levelLabel(profile.level),
         upcomingCount: activityResult.activities.filter(

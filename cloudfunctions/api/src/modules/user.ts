@@ -1,4 +1,4 @@
-import { db } from "../db.js";
+import { cloud, db } from "../db.js";
 import { AppError } from "../errors.js";
 import { hashOpenId } from "../identity.js";
 import type { Handler, RequestContext } from "../types.js";
@@ -28,6 +28,10 @@ type ProfileUpdate = {
   nickname?: string;
   schoolId?: string | null;
   level?: string;
+};
+
+type AvatarUpdate = {
+  avatarFileId: string | null;
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -77,6 +81,33 @@ export function parseProfileUpdate(payload: unknown): ProfileUpdate {
     throw new AppError("INVALID_ARGUMENT", "没有需要保存的资料");
   }
   return update;
+}
+
+export function parseAvatarUpdate(payload: unknown, userId: string): AvatarUpdate {
+  if (!isRecord(payload) || !("avatarFileId" in payload)) {
+    throw new AppError("INVALID_ARGUMENT", "请提交有效的头像信息");
+  }
+  if (payload.avatarFileId === null) return { avatarFileId: null };
+  if (typeof payload.avatarFileId !== "string" || payload.avatarFileId.length > 512) {
+    throw new AppError("INVALID_ARGUMENT", "头像文件无效");
+  }
+  const escapedUserId = userId.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const ownedPath = new RegExp(
+    `^cloud://[^/]+/avatars/${escapedUserId}/[A-Za-z0-9][A-Za-z0-9._-]{0,119}$`,
+  );
+  if (!ownedPath.test(payload.avatarFileId)) {
+    throw new AppError("INVALID_ARGUMENT", "头像文件不属于当前用户");
+  }
+  return { avatarFileId: payload.avatarFileId };
+}
+
+async function deleteAvatarFile(fileId: string | null) {
+  if (!fileId) return;
+  try {
+    await cloud.deleteFile({ fileList: [fileId] });
+  } catch {
+    console.error(JSON.stringify({ code: "AVATAR_DELETE_FAILED" }));
+  }
 }
 
 export async function findCurrentUser(context: RequestContext): Promise<UserDocument> {
@@ -146,6 +177,23 @@ export const updateMe: Handler = async (payload, context) => {
   return { user: await mapProfile({ ...user, ...update }) };
 };
 
+export const updateAvatar: Handler = async (payload, context) => {
+  const user = await findCurrentUser(context);
+  if (user.status !== "ACTIVE") {
+    throw new AppError("ACCOUNT_RESTRICTED", "当前账号暂不能修改头像");
+  }
+  const update = parseAvatarUpdate(payload, user._id);
+  if (update.avatarFileId === user.avatarFileId) {
+    return { user: await mapProfile(user) };
+  }
+  await db
+    .collection("users")
+    .doc(user._id)
+    .update({ data: { ...update, updatedAt: db.serverDate() } });
+  await deleteAvatarFile(user.avatarFileId);
+  return { user: await mapProfile({ ...user, ...update }) };
+};
+
 export function parseAccountDeletion(payload: unknown): void {
   if (!isRecord(payload) || payload.confirmation !== "DELETE_MY_ACCOUNT") {
     throw new AppError("INVALID_ARGUMENT", "请确认注销账号");
@@ -210,5 +258,6 @@ export const deleteMe: Handler = async (payload, context) => {
       },
     });
   });
+  await deleteAvatarFile(user.avatarFileId);
   return { deleted: true };
 };
