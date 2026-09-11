@@ -190,6 +190,7 @@ export const deleteMe: Handler = async (payload, context) => {
           updatedAt: deletedAt,
         },
       });
+    await transaction.collection("subscriptionPreferences").where({ userId: user._id }).remove();
     await transaction
       .collection("activities")
       .where({ organizerId: user._id })

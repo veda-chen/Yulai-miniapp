@@ -6,6 +6,7 @@ const requiredFiles = [
   "cloudfunctions/api/src/modules/report.ts",
   "cloudfunctions/api/src/modules/admin.ts",
   "apps/miniprogram/pages/notifications/list.ts",
+  "apps/miniprogram/config/subscription.ts",
   "apps/miniprogram/pages/activities/participants.ts",
   "apps/miniprogram/pages/reports/form.ts",
   "apps/miniprogram/pages/admin/index.ts",
@@ -24,6 +25,8 @@ for (const action of [
   "participant.setAttendance",
   "notification.list",
   "notification.markRead",
+  "notification.subscription.list",
+  "notification.subscription.save",
   "report.create",
   "admin.dashboard",
   "admin.report.resolve",
@@ -34,7 +37,7 @@ for (const action of [
 }
 
 const collections = JSON.parse(await readFile("cloudbase/collections.json", "utf8"));
-for (const name of ["activityChanges", "notificationJobs", "reports"]) {
+for (const name of ["activityChanges", "notificationJobs", "subscriptionPreferences", "reports"]) {
   const collection = collections.collections.find((item) => item.name === name);
   if (!collection) throw new Error(`缺少M3集合: ${name}`);
   if (collection.clientPermission !== "ADMINONLY") throw new Error(`${name}必须限制客户端直读写`);

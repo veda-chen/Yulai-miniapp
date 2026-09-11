@@ -28,5 +28,15 @@
     "TableName": "reports",
     "CommandType": "COMMAND",
     "Command": "{\"createIndexes\":\"reports\",\"indexes\":[{\"name\":\"reporter_target_status\",\"key\":{\"reporterId\":1,\"targetType\":1,\"targetId\":1,\"status\":1}},{\"name\":\"status_createdAt\",\"key\":{\"status\":1,\"createdAt\":-1}}]}"
+  },
+  {
+    "TableName": "subscriptionPreferences",
+    "CommandType": "COMMAND",
+    "Command": "{\"create\":\"subscriptionPreferences\"}"
+  },
+  {
+    "TableName": "subscriptionPreferences",
+    "CommandType": "COMMAND",
+    "Command": "{\"createIndexes\":\"subscriptionPreferences\",\"indexes\":[{\"name\":\"userId_templateId_unique\",\"key\":{\"userId\":1,\"templateId\":1},\"unique\":true},{\"name\":\"userId_updatedAt\",\"key\":{\"userId\":1,\"updatedAt\":-1}}]}"
   }
 ]

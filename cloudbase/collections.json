@@ -9,14 +9,25 @@
         {
           "name": "openidHash_unique",
           "unique": true,
-          "fields": [{ "field": "openidHash", "order": "asc" }]
+          "fields": [
+            {
+              "field": "openidHash",
+              "order": "asc"
+            }
+          ]
         },
         {
           "name": "status_deletedAt",
           "unique": false,
           "fields": [
-            { "field": "status", "order": "asc" },
-            { "field": "deletedAt", "order": "asc" }
+            {
+              "field": "status",
+              "order": "asc"
+            },
+            {
+              "field": "deletedAt",
+              "order": "asc"
+            }
           ]
         }
       ]
@@ -29,12 +40,26 @@
         {
           "name": "normalizedName_unique",
           "unique": true,
-          "fields": [{ "field": "normalizedName", "order": "asc" }]
+          "fields": [
+            {
+              "field": "normalizedName",
+              "order": "asc"
+            }
+          ]
         },
         {
           "name": "status_name",
           "unique": false,
-          "fields": [{ "field": "status", "order": "asc" }, { "field": "name", "order": "asc" }]
+          "fields": [
+            {
+              "field": "status",
+              "order": "asc"
+            },
+            {
+              "field": "name",
+              "order": "asc"
+            }
+          ]
         }
       ]
     },
@@ -46,7 +71,16 @@
         {
           "name": "status_name",
           "unique": false,
-          "fields": [{ "field": "status", "order": "asc" }, { "field": "name", "order": "asc" }]
+          "fields": [
+            {
+              "field": "status",
+              "order": "asc"
+            },
+            {
+              "field": "name",
+              "order": "asc"
+            }
+          ]
         }
       ]
     },
@@ -58,7 +92,16 @@
         {
           "name": "venueId_name_unique",
           "unique": true,
-          "fields": [{ "field": "venueId", "order": "asc" }, { "field": "name", "order": "asc" }]
+          "fields": [
+            {
+              "field": "venueId",
+              "order": "asc"
+            },
+            {
+              "field": "name",
+              "order": "asc"
+            }
+          ]
         }
       ]
     },
@@ -71,22 +114,46 @@
           "name": "public_startAt",
           "unique": false,
           "fields": [
-            { "field": "status", "order": "asc" },
-            { "field": "visibility", "order": "asc" },
-            { "field": "startAt", "order": "asc" }
+            {
+              "field": "status",
+              "order": "asc"
+            },
+            {
+              "field": "visibility",
+              "order": "asc"
+            },
+            {
+              "field": "startAt",
+              "order": "asc"
+            }
           ]
         },
         {
           "name": "venueId_startAt",
           "unique": false,
-          "fields": [{ "field": "venueId", "order": "asc" }, { "field": "startAt", "order": "asc" }]
+          "fields": [
+            {
+              "field": "venueId",
+              "order": "asc"
+            },
+            {
+              "field": "startAt",
+              "order": "asc"
+            }
+          ]
         },
         {
           "name": "organizerId_idempotencyKey_unique",
           "unique": true,
           "fields": [
-            { "field": "organizerId", "order": "asc" },
-            { "field": "idempotencyKey", "order": "asc" }
+            {
+              "field": "organizerId",
+              "order": "asc"
+            },
+            {
+              "field": "idempotencyKey",
+              "order": "asc"
+            }
           ]
         }
       ]
@@ -100,17 +167,32 @@
           "name": "activityId_userId_unique",
           "unique": true,
           "fields": [
-            { "field": "activityId", "order": "asc" },
-            { "field": "userId", "order": "asc" }
+            {
+              "field": "activityId",
+              "order": "asc"
+            },
+            {
+              "field": "userId",
+              "order": "asc"
+            }
           ]
         },
         {
           "name": "activityId_status_queueNo",
           "unique": false,
           "fields": [
-            { "field": "activityId", "order": "asc" },
-            { "field": "status", "order": "asc" },
-            { "field": "queueNo", "order": "asc" }
+            {
+              "field": "activityId",
+              "order": "asc"
+            },
+            {
+              "field": "status",
+              "order": "asc"
+            },
+            {
+              "field": "queueNo",
+              "order": "asc"
+            }
           ]
         }
       ]
@@ -124,17 +206,32 @@
           "name": "activityId_userId_unique",
           "unique": true,
           "fields": [
-            { "field": "activityId", "order": "asc" },
-            { "field": "userId", "order": "asc" }
+            {
+              "field": "activityId",
+              "order": "asc"
+            },
+            {
+              "field": "userId",
+              "order": "asc"
+            }
           ]
         },
         {
           "name": "activityId_status_attendanceStatus",
           "unique": false,
           "fields": [
-            { "field": "activityId", "order": "asc" },
-            { "field": "status", "order": "asc" },
-            { "field": "attendanceStatus", "order": "asc" }
+            {
+              "field": "activityId",
+              "order": "asc"
+            },
+            {
+              "field": "status",
+              "order": "asc"
+            },
+            {
+              "field": "attendanceStatus",
+              "order": "asc"
+            }
           ]
         }
       ]
@@ -148,9 +245,18 @@
           "name": "object_createdAt",
           "unique": false,
           "fields": [
-            { "field": "objectType", "order": "asc" },
-            { "field": "objectId", "order": "asc" },
-            { "field": "createdAt", "order": "desc" }
+            {
+              "field": "objectType",
+              "order": "asc"
+            },
+            {
+              "field": "objectId",
+              "order": "asc"
+            },
+            {
+              "field": "createdAt",
+              "order": "desc"
+            }
           ]
         }
       ]
@@ -164,8 +270,14 @@
           "name": "activityId_version_unique",
           "unique": true,
           "fields": [
-            { "field": "activityId", "order": "asc" },
-            { "field": "version", "order": "desc" }
+            {
+              "field": "activityId",
+              "order": "asc"
+            },
+            {
+              "field": "version",
+              "order": "desc"
+            }
           ]
         }
       ]
@@ -178,15 +290,64 @@
         {
           "name": "dedupeKey_unique",
           "unique": true,
-          "fields": [{ "field": "dedupeKey", "order": "asc" }]
+          "fields": [
+            {
+              "field": "dedupeKey",
+              "order": "asc"
+            }
+          ]
         },
         {
           "name": "userId_status_createdAt",
           "unique": false,
           "fields": [
-            { "field": "userId", "order": "asc" },
-            { "field": "status", "order": "asc" },
-            { "field": "createdAt", "order": "desc" }
+            {
+              "field": "userId",
+              "order": "asc"
+            },
+            {
+              "field": "status",
+              "order": "asc"
+            },
+            {
+              "field": "createdAt",
+              "order": "desc"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "subscriptionPreferences",
+      "description": "微信订阅消息模板授权结果，不保存原始OpenID",
+      "clientPermission": "ADMINONLY",
+      "indexes": [
+        {
+          "name": "userId_templateId_unique",
+          "unique": true,
+          "fields": [
+            {
+              "field": "userId",
+              "order": "asc"
+            },
+            {
+              "field": "templateId",
+              "order": "asc"
+            }
+          ]
+        },
+        {
+          "name": "userId_updatedAt",
+          "unique": false,
+          "fields": [
+            {
+              "field": "userId",
+              "order": "asc"
+            },
+            {
+              "field": "updatedAt",
+              "order": "desc"
+            }
           ]
         }
       ]
@@ -200,18 +361,36 @@
           "name": "reporter_target_status",
           "unique": false,
           "fields": [
-            { "field": "reporterId", "order": "asc" },
-            { "field": "targetType", "order": "asc" },
-            { "field": "targetId", "order": "asc" },
-            { "field": "status", "order": "asc" }
+            {
+              "field": "reporterId",
+              "order": "asc"
+            },
+            {
+              "field": "targetType",
+              "order": "asc"
+            },
+            {
+              "field": "targetId",
+              "order": "asc"
+            },
+            {
+              "field": "status",
+              "order": "asc"
+            }
           ]
         },
         {
           "name": "status_createdAt",
           "unique": false,
           "fields": [
-            { "field": "status", "order": "asc" },
-            { "field": "createdAt", "order": "desc" }
+            {
+              "field": "status",
+              "order": "asc"
+            },
+            {
+              "field": "createdAt",
+              "order": "desc"
+            }
           ]
         }
       ]
@@ -225,16 +404,28 @@
           "name": "activityId_roundNo_unique",
           "unique": true,
           "fields": [
-            { "field": "activityId", "order": "asc" },
-            { "field": "roundNo", "order": "desc" }
+            {
+              "field": "activityId",
+              "order": "asc"
+            },
+            {
+              "field": "roundNo",
+              "order": "desc"
+            }
           ]
         },
         {
           "name": "activityId_status",
           "unique": false,
           "fields": [
-            { "field": "activityId", "order": "asc" },
-            { "field": "status", "order": "asc" }
+            {
+              "field": "activityId",
+              "order": "asc"
+            },
+            {
+              "field": "status",
+              "order": "asc"
+            }
           ]
         }
       ]
@@ -248,14 +439,25 @@
           "name": "activityId_createdAt",
           "unique": false,
           "fields": [
-            { "field": "activityId", "order": "asc" },
-            { "field": "createdAt", "order": "asc" }
+            {
+              "field": "activityId",
+              "order": "asc"
+            },
+            {
+              "field": "createdAt",
+              "order": "asc"
+            }
           ]
         },
         {
           "name": "roundId",
           "unique": false,
-          "fields": [{ "field": "roundId", "order": "asc" }]
+          "fields": [
+            {
+              "field": "roundId",
+              "order": "asc"
+            }
+          ]
         }
       ]
     },
@@ -267,22 +469,54 @@
         {
           "name": "matchId_userId_unique",
           "unique": true,
-          "fields": [{ "field": "matchId", "order": "asc" }, { "field": "userId", "order": "asc" }]
+          "fields": [
+            {
+              "field": "matchId",
+              "order": "asc"
+            },
+            {
+              "field": "userId",
+              "order": "asc"
+            }
+          ]
         },
         {
           "name": "userId_result",
           "unique": false,
-          "fields": [{ "field": "userId", "order": "asc" }, { "field": "result", "order": "asc" }]
+          "fields": [
+            {
+              "field": "userId",
+              "order": "asc"
+            },
+            {
+              "field": "result",
+              "order": "asc"
+            }
+          ]
         },
         {
           "name": "activityId",
           "unique": false,
-          "fields": [{ "field": "activityId", "order": "asc" }]
+          "fields": [
+            {
+              "field": "activityId",
+              "order": "asc"
+            }
+          ]
         },
         {
           "name": "matchId_team",
           "unique": false,
-          "fields": [{ "field": "matchId", "order": "asc" }, { "field": "team", "order": "asc" }]
+          "fields": [
+            {
+              "field": "matchId",
+              "order": "asc"
+            },
+            {
+              "field": "team",
+              "order": "asc"
+            }
+          ]
         }
       ]
     },
@@ -295,16 +529,28 @@
           "name": "matchId_createdAt",
           "unique": false,
           "fields": [
-            { "field": "matchId", "order": "asc" },
-            { "field": "createdAt", "order": "desc" }
+            {
+              "field": "matchId",
+              "order": "asc"
+            },
+            {
+              "field": "createdAt",
+              "order": "desc"
+            }
           ]
         },
         {
           "name": "activityId_status",
           "unique": false,
           "fields": [
-            { "field": "activityId", "order": "asc" },
-            { "field": "status", "order": "asc" }
+            {
+              "field": "activityId",
+              "order": "asc"
+            },
+            {
+              "field": "status",
+              "order": "asc"
+            }
           ]
         }
       ]

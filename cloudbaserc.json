@@ -13,7 +13,8 @@
       "memorySize": 256,
       "installDependency": true,
       "envVariables": {
-        "OPENID_HASH_SECRET": "{{env.OPENID_HASH_SECRET}}"
+        "OPENID_HASH_SECRET": "{{env.OPENID_HASH_SECRET}}",
+        "SUBSCRIPTION_OPENID_KEY": "{{env.SUBSCRIPTION_OPENID_KEY}}"
       },
       "triggers": [
         {

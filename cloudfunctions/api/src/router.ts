@@ -28,7 +28,12 @@ import {
   unlockScore,
   updateDraftMatch,
 } from "./modules/live.js";
-import { listNotifications, markNotificationRead } from "./modules/notification.js";
+import {
+  listNotifications,
+  listSubscriptionPreferences,
+  markNotificationRead,
+  saveSubscriptionPreferences,
+} from "./modules/notification.js";
 import {
   finishActivity,
   listParticipants,
@@ -81,6 +86,8 @@ const routes: Readonly<Record<string, Route>> = {
   "score.stats": { handler: getPlayerStats, requiresAuth: true },
   "notification.list": { handler: listNotifications, requiresAuth: true },
   "notification.markRead": { handler: markNotificationRead, requiresAuth: true },
+  "notification.subscription.list": { handler: listSubscriptionPreferences, requiresAuth: true },
+  "notification.subscription.save": { handler: saveSubscriptionPreferences, requiresAuth: true },
   "report.create": { handler: createReport, requiresAuth: true },
   "admin.dashboard": { handler: getAdminDashboard, requiresAuth: true },
   "admin.report.list": { handler: listReports, requiresAuth: true },

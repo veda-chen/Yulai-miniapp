@@ -1,9 +1,15 @@
-<view class="page">
+<view class="notification-page">
+  <view class="subscription-card state-{{subscriptionState}}">
+    <view class="subscription-icon"><view class="bell"></view></view>
+    <view class="subscription-main"><text class="subscription-title">{{subscriptionTitle}}</text><text class="subscription-copy">{{subscriptionCopy}}</text></view>
+    <button class="subscription-button" loading="{{subscribing}}" bindtap="requestSubscription">{{subscriptionState === 'ENABLED' ? '再次授权' : '设置'}}</button>
+  </view>
+  <view class="privacy-note">订阅提醒由你主动选择，一次授权仅用于对应模板；站内消息始终保留。</view>
+
+  <view class="section-head"><text class="section-title">站内消息</text><text class="message-count">{{notifications.length}} 条</text></view>
   <view wx:if="{{loading}}" class="empty">正在加载消息</view>
-  <view wx:elif="{{notifications.length === 0}}" class="empty">暂无消息</view>
+  <view wx:elif="{{notifications.length === 0}}" class="empty"><text class="empty-title">暂无消息</text><text class="empty-copy">球局报名、变更和现场通知会显示在这里</text></view>
   <view wx:for="{{notifications}}" wx:key="id" class="item {{item.isRead ? 'read' : ''}}" data-id="{{item.id}}" data-activity-id="{{item.activityId}}" bindtap="openNotification">
-    <text class="title">{{item.title}}</text>
-    <text class="body">{{item.body}}</text>
-    <text class="time">{{item.timeText}}</text>
+    <view class="item-dot"></view><view class="item-main"><text class="title">{{item.title}}</text><text class="body">{{item.body}}</text><text class="time">{{item.timeText}}</text></view><text class="chevron">›</text>
   </view>
 </view>

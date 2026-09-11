@@ -28,6 +28,9 @@ if (!values.CLOUDBASE_ENV_ID || values.CLOUDBASE_ENV_ID.startsWith("replace-")) 
 if (!values.OPENID_HASH_SECRET || values.OPENID_HASH_SECRET.length < 32) {
   missing.push("OPENID_HASH_SECRET（至少32字符）");
 }
+if (!values.SUBSCRIPTION_OPENID_KEY || values.SUBSCRIPTION_OPENID_KEY.length < 32) {
+  missing.push("SUBSCRIPTION_OPENID_KEY（至少32字符）");
+}
 
 if (missing.length) {
   console.error(`云开发环境尚未就绪，缺少：${missing.join("、")}`);

@@ -78,5 +78,15 @@
     "TableName": "auditLogs",
     "CommandType": "COMMAND",
     "Command": "{\"createIndexes\":\"auditLogs\",\"indexes\":[{\"name\":\"object_createdAt\",\"key\":{\"objectType\":1,\"objectId\":1,\"createdAt\":-1}}]}"
+  },
+  {
+    "TableName": "subscriptionPreferences",
+    "CommandType": "COMMAND",
+    "Command": "{\"create\":\"subscriptionPreferences\"}"
+  },
+  {
+    "TableName": "subscriptionPreferences",
+    "CommandType": "COMMAND",
+    "Command": "{\"createIndexes\":\"subscriptionPreferences\",\"indexes\":[{\"name\":\"userId_templateId_unique\",\"key\":{\"userId\":1,\"templateId\":1},\"unique\":true},{\"name\":\"userId_updatedAt\",\"key\":{\"userId\":1,\"updatedAt\":-1}}]}"
   }
 ]
