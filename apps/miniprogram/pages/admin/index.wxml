@@ -11,6 +11,8 @@
     <view class="metric metric-green"><text class="number">{{metrics.activeUsers}}</text><text>可用账号</text></view>
   </view>
 
+  <navigator class="venue-entry" url="/pages/admin/venue-edit"><view><text class="venue-entry-title">维护场馆资料</text><text class="venue-entry-copy">录入入口、开放说明、设施、图片和平面图</text></view><text class="venue-entry-arrow">›</text></navigator>
+
   <scroll-view class="tabs" scroll-x show-scrollbar="{{false}}"><view class="tab-track"><text wx:for="{{tabs}}" wx:key="key" class="tab {{activeTab === item.key ? 'active' : ''}}" data-key="{{item.key}}" bindtap="onTabTap">{{item.label}}</text></view></scroll-view>
 
   <view wx:if="{{loading}}" class="empty">正在加载运营数据</view>

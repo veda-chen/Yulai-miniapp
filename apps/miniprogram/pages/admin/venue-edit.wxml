@@ -1,0 +1,23 @@
+<view class="page">
+  <view class="intro"><text class="kicker">VENUE OPERATIONS</text><text class="title">场馆资料维护</text><text class="subtitle">录入核验事实，空缺内容继续标记为待核验</text></view>
+  <view class="card selector"><text class="label">维护场馆</text><picker range="{{venues}}" range-key="name" value="{{venueIndex}}" bindchange="onVenueChange"><view class="picker-value">{{venues[venueIndex].name || '请选择场馆'}} ›</view></picker></view>
+  <view wx:if="{{loading}}" class="card state">正在加载场馆资料</view>
+  <view wx:else class="card form">
+    <label class="field"><text class="label">场馆名称</text><input maxlength="80" value="{{form.name}}" data-field="name" bindinput="onFieldInput" /></label>
+    <label class="field"><text class="label">地址</text><textarea maxlength="200" value="{{form.address}}" data-field="address" bindinput="onFieldInput" /></label>
+    <label class="field"><text class="label">场馆说明</text><textarea maxlength="1000" value="{{form.description}}" data-field="description" bindinput="onFieldInput" /></label>
+    <label class="field"><text class="label">入口指引</text><textarea maxlength="500" value="{{form.entranceGuide}}" data-field="entranceGuide" bindinput="onFieldInput" /></label>
+    <label class="field"><text class="label">开放说明</text><textarea maxlength="500" value="{{form.openingHours}}" data-field="openingHours" bindinput="onFieldInput" /></label>
+    <label class="field"><text class="label">入场要求</text><textarea maxlength="500" value="{{form.accessPolicy}}" data-field="accessPolicy" bindinput="onFieldInput" /></label>
+    <label class="field"><text class="label">预约方式与线下费用</text><textarea maxlength="500" value="{{form.bookingInstructions}}" data-field="bookingInstructions" bindinput="onFieldInput" /></label>
+    <label class="field"><text class="label">公开联系电话</text><input maxlength="100" value="{{form.contactPhone}}" data-field="contactPhone" bindinput="onFieldInput" /></label>
+    <label class="field"><text class="label">设施（顿号或逗号分隔）</text><textarea maxlength="400" value="{{form.facilitiesText}}" data-field="facilitiesText" bindinput="onFieldInput" /></label>
+    <view class="field"><text class="label">封面图</text><image wx:if="{{form.coverFileId}}" class="preview cover" src="{{form.coverFileId}}" mode="aspectFill" /><view class="image-actions"><button data-field="coverFileId" bindtap="uploadImage" loading="{{uploadingField === 'coverFileId'}}">选择图片</button><button wx:if="{{form.coverFileId}}" class="remove" data-field="coverFileId" bindtap="removeImage">移除</button></view></view>
+    <view class="field"><text class="label">场馆平面图</text><image wx:if="{{form.floorPlanFileId}}" class="preview plan" src="{{form.floorPlanFileId}}" mode="widthFix" /><view class="image-actions"><button data-field="floorPlanFileId" bindtap="uploadImage" loading="{{uploadingField === 'floorPlanFileId'}}">选择图片</button><button wx:if="{{form.floorPlanFileId}}" class="remove" data-field="floorPlanFileId" bindtap="removeImage">移除</button></view></view>
+    <label class="field"><text class="label">核验日期</text><picker mode="date" value="{{form.verifiedAt}}" bindchange="onVerifiedDateChange"><view class="picker-value">{{form.verifiedAt || '尚未核验'}} ›</view></picker></label>
+    <label class="field"><text class="label">核验来源</text><textarea maxlength="300" value="{{form.verificationSource}}" data-field="verificationSource" bindinput="onFieldInput" /></label>
+    <label class="field"><text class="label">发布状态</text><picker range="{{statuses}}" range-key="label" value="{{statusIndex}}" bindchange="onStatusChange"><view class="picker-value">{{statuses[statusIndex].label}} ›</view></picker></label>
+    <button class="save" bindtap="save" loading="{{saving}}">保存场馆资料</button>
+    <text class="message">{{message}}</text>
+  </view>
+</view>

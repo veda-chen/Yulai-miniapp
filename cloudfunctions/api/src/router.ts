@@ -1,11 +1,13 @@
 import { AppError } from "./errors.js";
 import {
   getAdminDashboard,
+  listAdminVenues,
   listAuditLogs,
   listReports,
   resolveReport,
   restrictUser,
   unpublishActivity,
+  updateAdminVenue,
 } from "./modules/admin.js";
 import {
   acknowledgeActivityChange,
@@ -91,6 +93,8 @@ const routes: Readonly<Record<string, Route>> = {
   "notification.subscription.save": { handler: saveSubscriptionPreferences, requiresAuth: true },
   "report.create": { handler: createReport, requiresAuth: true },
   "admin.dashboard": { handler: getAdminDashboard, requiresAuth: true },
+  "admin.venue.list": { handler: listAdminVenues, requiresAuth: true },
+  "admin.venue.update": { handler: updateAdminVenue, requiresAuth: true },
   "admin.report.list": { handler: listReports, requiresAuth: true },
   "admin.audit.list": { handler: listAuditLogs, requiresAuth: true },
   "admin.report.resolve": { handler: resolveReport, requiresAuth: true },

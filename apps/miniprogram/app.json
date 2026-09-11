@@ -9,6 +9,7 @@
     "pages/notifications/list",
     "pages/reports/form",
     "pages/admin/index",
+    "pages/admin/venue-edit",
     "pages/profile/index",
     "pages/profile/edit",
     "pages/privacy/index",

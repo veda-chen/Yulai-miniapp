@@ -29,6 +29,8 @@ for (const action of [
   "notification.subscription.save",
   "report.create",
   "admin.dashboard",
+  "admin.venue.list",
+  "admin.venue.update",
   "admin.report.resolve",
   "admin.activity.unpublish",
   "admin.user.restrict",
