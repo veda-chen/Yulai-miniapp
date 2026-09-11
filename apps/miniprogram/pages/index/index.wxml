@@ -3,7 +3,7 @@
     <view><text class="eyebrow">{{greeting}}</text><text class="home-name">{{userName}}</text><text class="home-date">{{dateText}}</text></view>
     <navigator class="notify" url="/pages/notifications/list"><text class="notify-icon">◉</text><view class="notify-dot"></view></navigator>
   </view>
-  <view class="hero"><view class="hero-shade"></view><view class="hero-content">
+  <view class="hero"><image class="hero-image" src="/assets/hero-badminton-bg.jpg" mode="aspectFill" /><view class="hero-shade"></view><view class="hero-content">
     <text class="hero-title">今天有约球计划吗？</text>
     <text class="hero-copy">大学城各高校球友在线组队，轻松找到志同道合的搭档。</text>
     <navigator class="hero-button" url="/pages/activities/form"><text class="plus">＋</text> 创建球局</navigator>
