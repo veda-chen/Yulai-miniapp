@@ -1,6 +1,11 @@
 <view class="list-page">
-  <view class="title-row"><text class="page-title">球局</text><navigator class="create-round" url="/pages/activities/form">＋</navigator></view>
-  <view class="search-wrap"><text class="search-icon">⌕</text><input value="{{keyword}}" placeholder="搜索球局、场馆、学校" bindinput="onSearchInput" /></view>
+  <view class="list-banner">
+    <image class="banner-image" src="/assets/activity-header-v2.jpg" mode="aspectFill" />
+    <view class="banner-shade"></view>
+    <view class="banner-content"><text class="banner-kicker">YULAI · 羽来</text><text class="page-title">找到今晚的球局</text><text class="banner-copy">和附近球友，一起上场</text></view>
+    <navigator class="create-round" url="/pages/activities/form">＋</navigator>
+  </view>
+  <view class="search-wrap"><view class="search-icon"></view><input value="{{keyword}}" placeholder="搜索球局、场馆、学校" bindinput="onSearchInput" /></view>
   <scroll-view class="chips" scroll-x show-scrollbar="{{false}}"><view class="chip-track"><text class="chip active">全部</text><text class="chip">今天</text><text class="chip">明天</text><text class="chip">广工</text><text class="chip">进阶</text><text class="chip">娱乐</text></view></scroll-view>
   <view wx:if="{{loading}}" class="empty surface">正在加载球局</view>
   <view wx:elif="{{message}}" class="empty surface">{{message}}</view>

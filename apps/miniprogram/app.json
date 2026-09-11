@@ -30,26 +30,26 @@
       {
         "pagePath": "pages/index/index",
         "text": "首页",
-        "iconPath": "assets/icons/tab/home.png",
-        "selectedIconPath": "assets/icons/tab/home-active.png"
+        "iconPath": "assets/icons/tab/home-v2.png",
+        "selectedIconPath": "assets/icons/tab/home-v2-active.png"
       },
       {
         "pagePath": "pages/activities/list",
         "text": "球局",
-        "iconPath": "assets/icons/tab/calendar.png",
-        "selectedIconPath": "assets/icons/tab/calendar-active.png"
+        "iconPath": "assets/icons/tab/calendar-v2.png",
+        "selectedIconPath": "assets/icons/tab/calendar-v2-active.png"
       },
       {
         "pagePath": "pages/venues/list",
         "text": "场馆",
-        "iconPath": "assets/icons/tab/pin.png",
-        "selectedIconPath": "assets/icons/tab/pin-active.png"
+        "iconPath": "assets/icons/tab/pin-v2.png",
+        "selectedIconPath": "assets/icons/tab/pin-v2-active.png"
       },
       {
         "pagePath": "pages/profile/index",
         "text": "我的",
-        "iconPath": "assets/icons/tab/user.png",
-        "selectedIconPath": "assets/icons/tab/user-active.png"
+        "iconPath": "assets/icons/tab/user-v2.png",
+        "selectedIconPath": "assets/icons/tab/user-v2-active.png"
       }
     ]
   },

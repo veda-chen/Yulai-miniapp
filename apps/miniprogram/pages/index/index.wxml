@@ -19,10 +19,10 @@
   </view></scroll-view>
   <view class="section-head quick-head"><text class="section-title">快捷入口</text></view>
   <view class="quick-grid">
-    <navigator open-type="switchTab" class="quick-item" url="/pages/activities/list"><view class="quick-icon"><image src="/assets/icons/tab/calendar-active.png" /></view><text>找球局</text></navigator>
-    <navigator open-type="switchTab" class="quick-item" url="/pages/venues/list"><view class="quick-icon"><image src="/assets/icons/tab/pin-active.png" /></view><text>看场馆</text></navigator>
-    <navigator open-type="switchTab" class="quick-item" url="/pages/profile/index"><view class="quick-icon"><image src="/assets/icons/tab/user-active.png" /></view><text>个人资料</text></navigator>
-    <navigator class="quick-item" url="/pages/notifications/list"><view class="quick-icon"><image src="/assets/icons/menu/message.svg" /></view><text>消息</text></navigator>
+    <navigator open-type="switchTab" class="quick-item" url="/pages/activities/list"><view class="quick-icon quick-blue"><image src="/assets/icons/quick/discover.svg" /></view><text>找球局</text></navigator>
+    <navigator open-type="switchTab" class="quick-item" url="/pages/venues/list"><view class="quick-icon quick-green"><image src="/assets/icons/quick/venue.svg" /></view><text>看场馆</text></navigator>
+    <navigator open-type="switchTab" class="quick-item" url="/pages/profile/index"><view class="quick-icon quick-purple"><image src="/assets/icons/quick/profile.svg" /></view><text>个人资料</text></navigator>
+    <navigator class="quick-item" url="/pages/notifications/list"><view class="quick-icon quick-orange"><image src="/assets/icons/quick/message.svg" /></view><text>消息</text></navigator>
     <navigator wx:if="{{isAdmin}}" class="quick-item" url="/pages/admin/index"><view class="quick-icon"><image src="/assets/icons/menu/admin.svg" /></view><text>运营管理</text></navigator>
   </view>
   <text class="connection">{{status}}</text>
