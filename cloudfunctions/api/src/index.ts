@@ -1,6 +1,10 @@
 import { cloud } from "./db.js";
 import { AppError, errorMessage } from "./errors.js";
 import { createRequestContext } from "./request-context.js";
+import {
+  isSubscriptionDeliveryTimerEvent,
+  processPendingSubscriptionMessages,
+} from "./modules/notification.js";
 import { isRetentionTimerEvent, purgeExpiredDeletedUsers } from "./modules/retention.js";
 import { resolveRoute } from "./router.js";
 import type { CloudEvent, WxContext } from "./types.js";
@@ -13,6 +17,12 @@ export function createMain(getWxContext: () => WxContext) {
       if (isRetentionTimerEvent(event)) {
         requestId = "retention-timer";
         const data = await purgeExpiredDeletedUsers();
+        return { ok: true, requestId, data };
+      }
+
+      if (isSubscriptionDeliveryTimerEvent(event)) {
+        requestId = "subscription-delivery-timer";
+        const data = await processPendingSubscriptionMessages();
         return { ok: true, requestId, data };
       }
 

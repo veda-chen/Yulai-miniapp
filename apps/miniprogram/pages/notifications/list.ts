@@ -17,7 +17,7 @@ type Notification = {
 type SubscriptionPreference = {
   templateKey: SubscriptionTemplateKey;
   templateId: string;
-  status: "accept" | "reject" | "ban";
+  status: "accept" | "reject" | "ban" | "consumed";
   updatedAt?: string | null;
 };
 

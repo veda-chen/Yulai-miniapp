@@ -88,5 +88,15 @@
     "TableName": "subscriptionPreferences",
     "CommandType": "COMMAND",
     "Command": "{\"createIndexes\":\"subscriptionPreferences\",\"indexes\":[{\"name\":\"userId_templateId_unique\",\"key\":{\"userId\":1,\"templateId\":1},\"unique\":true},{\"name\":\"userId_updatedAt\",\"key\":{\"userId\":1,\"updatedAt\":-1}}]}"
+  },
+  {
+    "TableName": "notificationJobs",
+    "CommandType": "COMMAND",
+    "Command": "{\"create\":\"notificationJobs\"}"
+  },
+  {
+    "TableName": "notificationJobs",
+    "CommandType": "COMMAND",
+    "Command": "{\"createIndexes\":\"notificationJobs\",\"indexes\":[{\"name\":\"dedupeKey_unique\",\"key\":{\"dedupeKey\":1},\"unique\":true},{\"name\":\"userId_status_createdAt\",\"key\":{\"userId\":1,\"status\":1,\"createdAt\":-1}},{\"name\":\"subscriptionStatus_createdAt\",\"key\":{\"subscriptionStatus\":1,\"createdAt\":1}}]}"
   }
 ]

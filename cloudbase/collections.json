@@ -314,6 +314,20 @@
               "order": "desc"
             }
           ]
+        },
+        {
+          "name": "subscriptionStatus_createdAt",
+          "unique": false,
+          "fields": [
+            {
+              "field": "subscriptionStatus",
+              "order": "asc"
+            },
+            {
+              "field": "createdAt",
+              "order": "asc"
+            }
+          ]
         }
       ]
     },

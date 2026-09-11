@@ -14,13 +14,19 @@
       "installDependency": true,
       "envVariables": {
         "OPENID_HASH_SECRET": "{{env.OPENID_HASH_SECRET}}",
-        "SUBSCRIPTION_OPENID_KEY": "{{env.SUBSCRIPTION_OPENID_KEY}}"
+        "SUBSCRIPTION_OPENID_KEY": "{{env.SUBSCRIPTION_OPENID_KEY}}",
+        "WECHAT_MINIPROGRAM_STATE": "{{env.WECHAT_MINIPROGRAM_STATE}}"
       },
       "triggers": [
         {
           "name": "purge-deleted-users-daily",
           "type": "timer",
           "config": "0 30 3 * * * *"
+        },
+        {
+          "name": "deliver-subscription-notifications-every-minute",
+          "type": "timer",
+          "config": "0 */1 * * * * *"
         }
       ]
     }

@@ -31,6 +31,9 @@ if (!values.OPENID_HASH_SECRET || values.OPENID_HASH_SECRET.length < 32) {
 if (!values.SUBSCRIPTION_OPENID_KEY || values.SUBSCRIPTION_OPENID_KEY.length < 32) {
   missing.push("SUBSCRIPTION_OPENID_KEY（至少32字符）");
 }
+if (!["developer", "trial", "formal"].includes(values.WECHAT_MINIPROGRAM_STATE)) {
+  missing.push("WECHAT_MINIPROGRAM_STATE（developer、trial或formal）");
+}
 
 if (missing.length) {
   console.error(`云开发环境尚未就绪，缺少：${missing.join("、")}`);

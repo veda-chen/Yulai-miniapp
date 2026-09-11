@@ -17,7 +17,7 @@
   {
     "TableName": "notificationJobs",
     "CommandType": "COMMAND",
-    "Command": "{\"createIndexes\":\"notificationJobs\",\"indexes\":[{\"name\":\"dedupeKey_unique\",\"key\":{\"dedupeKey\":1},\"unique\":true},{\"name\":\"userId_status_createdAt\",\"key\":{\"userId\":1,\"status\":1,\"createdAt\":-1}}]}"
+    "Command": "{\"createIndexes\":\"notificationJobs\",\"indexes\":[{\"name\":\"dedupeKey_unique\",\"key\":{\"dedupeKey\":1},\"unique\":true},{\"name\":\"userId_status_createdAt\",\"key\":{\"userId\":1,\"status\":1,\"createdAt\":-1}},{\"name\":\"subscriptionStatus_createdAt\",\"key\":{\"subscriptionStatus\":1,\"createdAt\":1}}]}"
   },
   {
     "TableName": "reports",

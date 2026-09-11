@@ -12,21 +12,27 @@ export type SubscriptionTemplate = {
 export const SUBSCRIPTION_TEMPLATES: SubscriptionTemplate[] = [
   {
     key: "ACTIVITY_UPDATE",
-    id: "",
+    id: "cqCZYss6j--bOHkYnZs2VEJoxE6mBK6ifpuocdagg0A",
     label: "球局时间或场地变更",
   },
   {
     key: "ACTIVITY_CANCELLED",
-    id: "",
+    id: "cqCZYss6j--bOHkYnZs2VEJoxE6mBK6ifpuocdagg0A",
     label: "球局取消",
   },
   {
     key: "WAITLIST_PROMOTED",
-    id: "",
+    id: "SH-jFRByW81RL-m1nmw294VxYQ8Fota5ysyGd4XMgkM",
     label: "候补递补",
   },
 ];
 
 export function configuredSubscriptionTemplates(): SubscriptionTemplate[] {
-  return SUBSCRIPTION_TEMPLATES.filter((template) => template.id.trim().length >= 8).slice(0, 3);
+  const uniqueTemplates = new Map<string, SubscriptionTemplate>();
+  for (const template of SUBSCRIPTION_TEMPLATES) {
+    if (template.id.trim().length >= 8 && !uniqueTemplates.has(template.id)) {
+      uniqueTemplates.set(template.id, template);
+    }
+  }
+  return [...uniqueTemplates.values()].slice(0, 3);
 }
