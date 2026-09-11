@@ -8,7 +8,7 @@
       "createdAt": 1757482800005,
       "canvasData": {
         "x": 0,
-        "y": 373,
+        "y": 384,
         "naturalSize": {
           "width": 2560,
           "height": 1440
@@ -130,7 +130,7 @@
     }
   ],
   "config": {
-    "autoLayout": true,
+    "autoLayout": false,
     "deviceType": "desktop",
     "designLibrary": {
       "name": "苹果",
