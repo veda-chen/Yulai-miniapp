@@ -6,7 +6,7 @@
     <navigator class="create-round" url="/pages/activities/form">＋</navigator>
   </view>
   <view class="search-wrap"><view class="search-icon"></view><input value="{{keyword}}" placeholder="搜索球局、场馆、学校" bindinput="onSearchInput" /></view>
-  <scroll-view class="chips" scroll-x show-scrollbar="{{false}}"><view class="chip-track"><text class="chip active">全部</text><text class="chip">今天</text><text class="chip">明天</text><text class="chip">广工</text><text class="chip">进阶</text><text class="chip">娱乐</text></view></scroll-view>
+  <scroll-view class="chips" scroll-x show-scrollbar="{{false}}"><view class="chip-track"><text wx:for="{{filters}}" wx:key="key" class="chip {{activeFilter === item.key ? 'active' : ''}}" data-key="{{item.key}}" bindtap="onFilterTap">{{item.label}}</text></view></scroll-view>
   <view wx:if="{{loading}}" class="empty surface">正在加载球局</view>
   <view wx:elif="{{message}}" class="empty surface">{{message}}</view>
   <view wx:elif="{{viewActivities.length === 0}}" class="empty surface">没有找到符合条件的公开球局</view>

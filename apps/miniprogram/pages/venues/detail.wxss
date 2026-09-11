@@ -1,49 +1,9 @@
-.page {
-  padding: 32rpx;
-}
-
-.card {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 22rpx;
-  padding: 30rpx;
-  border: 1rpx solid #d9e5e0;
-  border-radius: 22rpx;
-  background: #ffffff;
-}
-
-.head {
-  display: flex;
-  flex-direction: column;
-}
-
-.name,
-.section-title {
-  font-size: 34rpx;
-  font-weight: 600;
-}
-
-.badge {
-  align-self: flex-start;
-  margin-top: 12rpx;
-  padding: 6rpx 12rpx;
-  border-radius: 999rpx;
-  background: #fff4d6;
-  color: #835d0b;
-  font-size: 22rpx;
-}
-
-.copy,
-.muted {
-  margin-top: 14rpx;
-  color: #66736e;
-  font-size: 26rpx;
-}
-
-.court {
-  display: flex;
-  flex-direction: column;
-  margin-top: 20rpx;
-  padding-top: 20rpx;
-  border-top: 1rpx solid #e4ece8;
-}
+.venue-detail-page { min-height:100vh; box-sizing:border-box; padding:24rpx 32rpx 60rpx; background:linear-gradient(180deg,#eef8f5 0,#f5f7f6 440rpx); }
+.state-card,.info-card,.feedback-card { margin-bottom:22rpx; border:1rpx solid rgba(25,113,94,.11); border-radius:28rpx; background:#fff; box-shadow:0 10rpx 28rpx rgba(25,74,61,.06); }.state-card { padding:60rpx 30rpx; color:#66736e; text-align:center; }
+.venue-hero { position:relative; overflow:hidden; height:330rpx; margin-bottom:26rpx; border-radius:36rpx; background:#0c4748; box-shadow:0 16rpx 38rpx rgba(10,65,67,.2); }.hero-image,.hero-shade { position:absolute; inset:0; width:100%; height:100%; }.hero-shade { background:linear-gradient(90deg,rgba(3,28,34,.9),rgba(3,35,40,.43) 68%,rgba(3,35,40,.08)); }.hero-content { position:relative; z-index:1; display:flex; flex-direction:column; justify-content:flex-end; box-sizing:border-box; width:78%; height:100%; padding:42rpx; color:#fff; }.hero-kicker { color:#75ead1; font-size:21rpx; font-weight:700; letter-spacing:3rpx; }.name { margin-top:15rpx; font-size:38rpx; font-weight:750; line-height:1.28; }.badge { align-self:flex-start; margin-top:18rpx; padding:7rpx 15rpx; border-radius:999rpx; background:rgba(255,236,178,.96); color:#72520c; font-size:20rpx; font-weight:650; }.badge.verified { background:#dff8ef; color:#08745f; }
+.info-card { padding:30rpx; }.section-head { display:flex; align-items:center; gap:18rpx; }.section-title,.section-count { display:block; }.section-title { font-size:31rpx; font-weight:700; }.section-count { margin-top:3rpx; color:#83908c; font-size:20rpx; }.section-icon { position:relative; flex:none; width:72rpx; height:72rpx; border-radius:22rpx; background:#dff7ef; }.address-icon::before { content:""; position:absolute; top:16rpx; left:22rpx; width:25rpx; height:31rpx; border:4rpx solid #11866f; border-radius:50% 50% 50% 0; transform:rotate(-45deg); }.address-icon view { position:absolute; z-index:1; top:28rpx; left:33rpx; width:8rpx; height:8rpx; border-radius:50%; background:#11866f; }.court-icon::before { content:""; position:absolute; inset:16rpx; border:3rpx solid #11866f; border-radius:5rpx; }.court-icon::after { content:""; position:absolute; top:34rpx; left:16rpx; width:40rpx; height:3rpx; background:#11866f; }
+.info-row { margin-top:24rpx; padding-top:22rpx; border-top:1rpx solid #edf2ef; }.info-label,.copy { display:block; }.info-label { color:#7a8782; font-size:21rpx; }.copy { margin-top:8rpx; color:#26332f; font-size:26rpx; line-height:1.6; }
+.empty-courts { display:flex; flex-direction:column; margin-top:24rpx; padding:30rpx; border-radius:20rpx; background:#f5f8f7; color:#53635d; font-size:25rpx; text-align:center; }.empty-copy { margin-top:9rpx; color:#8a9692; font-size:21rpx; }
+.court { display:flex; align-items:center; margin-top:22rpx; padding-top:22rpx; border-top:1rpx solid #e4ece8; }.court-number { display:flex; align-items:center; justify-content:center; width:56rpx; height:56rpx; margin-right:20rpx; border-radius:18rpx; background:#e4f7f1; color:#11866f; font-size:24rpx; font-weight:750; }.court-main { flex:1; }.court-name,.court-copy { display:block; }.court-name { font-size:27rpx; font-weight:650; }.court-copy { margin-top:6rpx; color:#76837f; font-size:22rpx; }
+.feedback-card { display:flex; align-items:center; justify-content:space-between; padding:28rpx 30rpx; }.feedback-title,.feedback-copy { display:block; }.feedback-title { color:#26332f; font-size:27rpx; font-weight:650; }.feedback-copy { margin-top:7rpx; color:#7a8782; font-size:21rpx; }.feedback-arrow { color:#11866f; font-size:42rpx; }
+.muted { color:#66736e; }

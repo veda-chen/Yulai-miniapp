@@ -1,22 +1,35 @@
-<view class="page">
-  <view wx:if="{{loading}}" class="card">正在加载场馆</view>
-  <view wx:elif="{{message}}" class="card muted">{{message}}</view>
+<view class="venue-detail-page">
+  <view wx:if="{{loading}}" class="state-card">正在加载场馆</view>
+  <view wx:elif="{{message}}" class="state-card muted">{{message}}</view>
   <block wx:else>
-    <view class="card">
-      <view class="head">
+    <view class="venue-hero">
+      <image class="hero-image" src="/assets/venue-header-v2.jpg" mode="aspectFill" />
+      <view class="hero-shade"></view>
+      <view class="hero-content">
+        <text class="hero-kicker">羽来场馆指南</text>
         <text class="name">{{detail.venue.name}}</text>
         <text wx:if="{{detail.venue.verificationStatus === 'PENDING_VERIFICATION'}}" class="badge">资料待现场核验</text>
+        <text wx:else class="badge verified">资料已核验</text>
       </view>
-      <text class="copy">{{detail.venue.address || '暂无地址资料'}}</text>
-      <text class="copy">{{detail.venue.description || '暂无场馆说明'}}</text>
     </view>
-    <view class="card">
-      <text class="section-title">场地</text>
-      <text wx:if="{{detail.courts.length === 0}}" class="copy">场号和位置仍待现场核验</text>
+
+    <view class="info-card">
+      <view class="section-head"><view class="section-icon address-icon"><view></view></view><text class="section-title">场馆信息</text></view>
+      <view class="info-row"><text class="info-label">地址</text><text class="copy">{{detail.venue.address || '暂无地址资料'}}</text></view>
+      <view class="info-row"><text class="info-label">说明</text><text class="copy">{{detail.venue.description || '暂无场馆说明'}}</text></view>
+    </view>
+
+    <view class="info-card">
+      <view class="section-head"><view class="section-icon court-icon"></view><view><text class="section-title">场地</text><text class="section-count">{{detail.courts.length}} 片已收录</text></view></view>
+      <view wx:if="{{detail.courts.length === 0}}" class="empty-courts"><text>场号和位置仍待现场核验</text><text class="empty-copy">核验后将在这里展示每片场地的位置说明。</text></view>
       <view wx:for="{{detail.courts}}" wx:key="id" class="court">
-        <text>{{item.name}}</text>
-        <text class="copy">{{item.locationHint || '暂无位置说明'}}</text>
+        <view class="court-number">{{index + 1}}</view>
+        <view class="court-main"><text class="court-name">{{item.name}}</text><text class="court-copy">{{item.locationHint || '暂无位置说明'}}</text></view>
       </view>
     </view>
+
+    <navigator class="feedback-card" url="/pages/reports/form?type=VENUE&id={{detail.venue.id}}">
+      <view><text class="feedback-title">发现资料有误？</text><text class="feedback-copy">提交场馆纠错，帮助其他球友准确找场</text></view><text class="feedback-arrow">›</text>
+    </navigator>
   </block>
 </view>

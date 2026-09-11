@@ -2,6 +2,7 @@ import { callCloud } from "../../services/cloud-api";
 
 type VenueDetail = {
   venue: {
+    id: string;
     name: string;
     address: string | null;
     description: string | null;
