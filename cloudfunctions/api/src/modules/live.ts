@@ -7,7 +7,9 @@ import {
   generateBalancedMatches,
   teamForUser,
   validateBadmintonScore,
+  validateMatchPlayers,
   type GroupingCandidate,
+  type MatchType,
 } from "./live-domain.js";
 
 type Store = Pick<typeof db, "collection">;
@@ -28,6 +30,7 @@ type MatchDocument = {
   courtLabel: string;
   teamAUserIds: string[];
   teamBUserIds: string[];
+  matchType?: MatchType;
   status: string;
   scoreA: number | null;
   scoreB: number | null;
@@ -113,21 +116,14 @@ function assertLiveActivity(activity: ActivityDocument): void {
 }
 
 function parsePlayers(payload: Record<string, unknown>): {
-  teamAUserIds: [string, string];
-  teamBUserIds: [string, string];
+  matchType: MatchType;
+  teamAUserIds: string[];
+  teamBUserIds: string[];
 } {
   const teamA = Array.isArray(payload.teamAUserIds) ? payload.teamAUserIds : [];
   const teamB = Array.isArray(payload.teamBUserIds) ? payload.teamBUserIds : [];
-  const players = [...teamA, ...teamB];
-  if (
-    teamA.length !== 2 ||
-    teamB.length !== 2 ||
-    players.some((item) => typeof item !== "string") ||
-    new Set(players).size !== 4
-  ) {
-    throw new AppError("INVALID_ARGUMENT", "双打对局必须选择4名不同球友");
-  }
-  return { teamAUserIds: teamA as [string, string], teamBUserIds: teamB as [string, string] };
+  const matchType: MatchType = payload.matchType === "SINGLES" ? "SINGLES" : "DOUBLES";
+  return validateMatchPlayers(teamA, teamB, matchType);
 }
 
 async function assertActivePlayers(activity: ActivityDocument, playerIds: string[]): Promise<void> {
@@ -169,6 +165,7 @@ function mapMatch(match: MatchDocument, names: Map<string, string>) {
     courtLabel: match.courtLabel,
     teamA: match.teamAUserIds.map((userId) => ({ userId, nickname: names.get(userId) ?? "球友" })),
     teamB: match.teamBUserIds.map((userId) => ({ userId, nickname: names.get(userId) ?? "球友" })),
+    matchType: match.matchType ?? (match.teamAUserIds.length === 1 ? "SINGLES" : "DOUBLES"),
     status: match.status,
     scoreA: match.scoreA,
     scoreB: match.scoreB,
@@ -290,6 +287,7 @@ export const generateGrouping: Handler = async (payload, context) => {
     roundId,
     courtLabel: courts[index]?.name ?? `场地${index + 1}`,
     ...item,
+    matchType: "DOUBLES",
     status: "DRAFT",
     scoreA: null,
     scoreB: null,

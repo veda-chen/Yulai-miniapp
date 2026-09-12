@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { generateBalancedMatches, teamForUser, validateBadmintonScore } from "./live-domain.js";
+import {
+  generateBalancedMatches,
+  teamForUser,
+  validateBadmintonScore,
+  validateMatchPlayers,
+} from "./live-domain.js";
 
 describe("live domain", () => {
   it("creates doubles matches without duplicate players and favors fewer games", () => {
@@ -31,5 +36,19 @@ describe("live domain", () => {
   it("identifies the player's team", () => {
     expect(teamForUser("u2", ["u1", "u2"], ["u3", "u4"])).toBe("A");
     expect(teamForUser("u5", ["u1", "u2"], ["u3", "u4"])).toBeNull();
+  });
+
+  it("accepts singles and doubles player selections", () => {
+    expect(validateMatchPlayers(["u1"], ["u2"], "SINGLES")).toMatchObject({
+      matchType: "SINGLES",
+      teamAUserIds: ["u1"],
+      teamBUserIds: ["u2"],
+    });
+    expect(validateMatchPlayers(["u1", "u2"], ["u3", "u4"], "DOUBLES")).toMatchObject({
+      matchType: "DOUBLES",
+    });
+    expect(() => validateMatchPlayers(["u1"], ["u1"], "SINGLES")).toThrow(
+      "单打对局必须选择2名不同球友",
+    );
   });
 });

@@ -56,7 +56,12 @@ vi.mock("./user.js", () => ({
   }),
 }));
 
-import { createActivity, criticalChangedFields, parseActivityInput } from "./activity.js";
+import {
+  createActivity,
+  criticalChangedFields,
+  isHistoricalActivity,
+  parseActivityInput,
+} from "./activity.js";
 
 beforeEach(() => {
   database.activitySet.mockClear();
@@ -91,6 +96,21 @@ describe("parseActivityInput", () => {
 
   it("allows school-independent creation fields", () => {
     expect(parseActivityInput(valid, now)).not.toHaveProperty("schoolId");
+  });
+
+  it("recognizes past participation while excluding cancelled activities", () => {
+    expect(
+      isHistoricalActivity(
+        { status: "OPEN", startAt: "2026-09-08T11:00:00.000Z" },
+        new Date("2026-09-09T00:00:00.000Z"),
+      ),
+    ).toBe(true);
+    expect(
+      isHistoricalActivity(
+        { status: "CANCELLED", startAt: "2026-09-08T11:00:00.000Z" },
+        new Date("2026-09-09T00:00:00.000Z"),
+      ),
+    ).toBe(false);
   });
 
   it("rejects a deadline after the start", () => {

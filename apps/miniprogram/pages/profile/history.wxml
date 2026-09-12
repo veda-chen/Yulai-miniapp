@@ -1,0 +1,13 @@
+<view class="history-page">
+  <view class="history-head"><text class="history-title">参加过的球局</text><text class="history-copy">这里保留你已开始或已结束的球局记录</text></view>
+  <view wx:if="{{loading}}" class="empty surface">正在加载参加记录</view>
+  <view wx:elif="{{message}}" class="empty surface">{{message}}</view>
+  <view wx:elif="{{activities.length === 0}}" class="empty surface"><text class="empty-title">还没有历史球局</text><text class="empty-copy">参加的球局开始后会显示在这里</text></view>
+  <view wx:else class="history-list">
+    <navigator wx:for="{{activities}}" wx:key="id" class="history-card surface" url="/pages/activities/detail?id={{item.id}}">
+      <view class="card-head"><text class="card-title">{{item.title}}</text><text class="status">{{item.statusText}}</text></view>
+      <text class="venue">⌖ {{item.venue.name}}</text>
+      <view class="card-foot"><text>{{item.timeText}}</text><text class="participation">{{item.participationText}} ›</text></view>
+    </navigator>
+  </view>
+</view>

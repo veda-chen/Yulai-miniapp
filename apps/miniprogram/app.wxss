@@ -5,7 +5,13 @@ page {
 }
 
 button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
   font-family: inherit;
+  line-height: 1.2 !important;
+  text-align: center;
 }
 
 .safe-page {

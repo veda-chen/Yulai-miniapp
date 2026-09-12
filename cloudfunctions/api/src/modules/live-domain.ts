@@ -1,6 +1,7 @@
 import { AppError } from "../errors.js";
 
 export type GroupingCandidate = { userId: string; level: string; gamesPlayed: number };
+export type MatchType = "SINGLES" | "DOUBLES";
 export type GeneratedMatch = {
   teamAUserIds: [string, string];
   teamBUserIds: [string, string];
@@ -72,6 +73,31 @@ export function validateBadmintonScore(scoreA: number, scoreB: number): void {
   if (winner < 21 || (winner < 30 && winner - loser < 2)) {
     throw new AppError("INVALID_ARGUMENT", "需至少21分且领先2分，30分封顶");
   }
+}
+
+export function validateMatchPlayers(
+  teamA: unknown[],
+  teamB: unknown[],
+  matchType: MatchType,
+): { matchType: MatchType; teamAUserIds: string[]; teamBUserIds: string[] } {
+  const teamSize = matchType === "SINGLES" ? 1 : 2;
+  const players = [...teamA, ...teamB];
+  if (
+    teamA.length !== teamSize ||
+    teamB.length !== teamSize ||
+    players.some((item) => typeof item !== "string" || item.length < 1) ||
+    new Set(players).size !== teamSize * 2
+  ) {
+    throw new AppError(
+      "INVALID_ARGUMENT",
+      matchType === "SINGLES" ? "单打对局必须选择2名不同球友" : "双打对局必须选择4名不同球友",
+    );
+  }
+  return {
+    matchType,
+    teamAUserIds: teamA as string[],
+    teamBUserIds: teamB as string[],
+  };
 }
 
 export function teamForUser(

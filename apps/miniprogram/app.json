@@ -12,6 +12,7 @@
     "pages/admin/venue-edit",
     "pages/profile/index",
     "pages/profile/edit",
+    "pages/profile/history",
     "pages/privacy/index",
     "pages/venues/list",
     "pages/venues/detail"

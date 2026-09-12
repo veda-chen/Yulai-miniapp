@@ -201,6 +201,16 @@ export function criticalChangedFields(
   );
 }
 
+export function isHistoricalActivity(
+  activity: { status: string; startAt: unknown },
+  now = new Date(),
+): boolean {
+  if (activity.status === "CANCELLED" || activity.status === "HIDDEN") return false;
+  if (activity.status === "ENDED") return true;
+  const startAt = Date.parse(toIso(activity.startAt) ?? "");
+  return Number.isFinite(startAt) && startAt <= now.getTime();
+}
+
 function mapActivity(
   activity: ActivityDocument,
   options: { includeContact: boolean; isOrganizer: boolean },
@@ -285,6 +295,43 @@ export const listActivities: Handler = async (_payload, context) => {
       currentRegistrationStatus: registrationByActivity.get(activity._id) ?? null,
     })),
   };
+};
+
+export const listActivityHistory: Handler = async (_payload, context) => {
+  const user = await findCurrentUser(context);
+  const registrationResult = (await db
+    .collection("registrations")
+    .where({ userId: user._id })
+    .limit(100)
+    .get()) as unknown as { data: Array<RegistrationDocument & { activityId: string }> };
+  const registrations = registrationResult.data.filter((registration) =>
+    ["CONFIRMED", "ATTENDED", "NO_SHOW"].includes(registration.status),
+  );
+  if (registrations.length === 0) return { activities: [] };
+
+  const registrationByActivity = new Map(
+    registrations.map((registration) => [registration.activityId, registration.status]),
+  );
+  const activityResult = (await db
+    .collection("activities")
+    .where({ _id: db.command.in([...registrationByActivity.keys()]) })
+    .limit(100)
+    .get()) as unknown as { data: ActivityDocument[] };
+  const now = new Date();
+  const activities = activityResult.data
+    .filter((activity) => isHistoricalActivity(activity, now))
+    .sort(
+      (left, right) =>
+        Date.parse(toIso(right.startAt) ?? "") - Date.parse(toIso(left.startAt) ?? ""),
+    )
+    .map((activity) => ({
+      ...mapActivity(activity, {
+        includeContact: true,
+        isOrganizer: activity.organizerId === user._id,
+      }),
+      currentRegistrationStatus: registrationByActivity.get(activity._id) ?? null,
+    }));
+  return { activities };
 };
 
 export const getActivity: Handler = async (payload, context) => {

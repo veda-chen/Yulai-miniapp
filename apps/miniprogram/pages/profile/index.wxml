@@ -3,6 +3,7 @@
   <view class="stats surface"><view class="stat"><text class="num">{{upcomingCount}}</text><text class="stat-label">即将参加</text></view><view class="stat"><text class="num">{{organizingCount}}</text><text class="stat-label">正在组织</text></view><view class="stat"><text class="num">{{gameCount}}</text><text class="stat-label">锁定对局</text></view></view>
   <view class="menu surface">
     <navigator open-type="switchTab" class="menu-item" url="/pages/activities/list"><view><view class="menu-icon blue"><image src="/assets/icons/menu/calendar.svg" /></view><text>我的球局</text></view><image class="chevron-icon" src="/assets/icons/menu/chevron-right.svg" /></navigator>
+    <navigator class="menu-item" url="/pages/profile/history"><view><view class="menu-icon gray"><image src="/assets/icons/menu/calendar.svg" /></view><text>参加记录</text></view><image class="chevron-icon" src="/assets/icons/menu/chevron-right.svg" /></navigator>
     <navigator class="menu-item" url="/pages/profile/edit"><view><view class="menu-icon gray"><image src="/assets/icons/menu/edit.svg" /></view><text>编辑个人资料</text></view><image class="chevron-icon" src="/assets/icons/menu/chevron-right.svg" /></navigator>
     <navigator class="menu-item" url="/pages/notifications/list"><view><view class="menu-icon gray"><image src="/assets/icons/menu/message.svg" /></view><text>消息通知</text></view><image class="chevron-icon" src="/assets/icons/menu/chevron-right.svg" /></navigator>
   </view>

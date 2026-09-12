@@ -8,6 +8,7 @@ type Match = {
   courtLabel: string;
   teamA: Array<{ userId: string; nickname: string }>;
   teamB: Array<{ userId: string; nickname: string }>;
+  matchType: "SINGLES" | "DOUBLES";
   status: string;
   scoreA: number | null;
   scoreB: number | null;
@@ -59,6 +60,11 @@ Page({
     >,
     courtOptions: ["1片场", "2片场", "3片场", "4片场", "5片场", "6片场"],
     courtIndex: 0,
+    matchTypes: [
+      { value: "SINGLES", label: "单打", playerCount: 2 },
+      { value: "DOUBLES", label: "双打", playerCount: 4 },
+    ],
+    matchTypeIndex: 0,
     selectedPlayers: [] as string[],
     statsText: "暂无锁定战绩",
   },
@@ -119,6 +125,9 @@ Page({
   onPlayerChange(event: WechatMiniprogram.CustomEvent<{ value: string[] }>) {
     this.setData({ selectedPlayers: event.detail.value });
   },
+  onMatchTypeChange(event: WechatMiniprogram.CustomEvent<{ value: string }>) {
+    this.setData({ matchTypeIndex: Number(event.detail.value), selectedPlayers: [] });
+  },
   onScoreInput(event: WechatMiniprogram.CustomEvent<{ value: string }>) {
     const index = Number(event.currentTarget.dataset.index);
     const field = event.currentTarget.dataset.side === "A" ? "inputScoreA" : "inputScoreB";
@@ -157,16 +166,22 @@ Page({
     );
   },
   async createMatch() {
-    if (this.data.selectedPlayers.length !== 4) {
-      wx.showToast({ title: "请选择4名不同球友", icon: "none" });
+    const matchType = this.data.matchTypes[this.data.matchTypeIndex];
+    if (!matchType || this.data.selectedPlayers.length !== matchType.playerCount) {
+      wx.showToast({
+        title: matchType?.value === "SINGLES" ? "请选择2名不同球友" : "请选择4名不同球友",
+        icon: "none",
+      });
       return;
     }
+    const teamSize = matchType.playerCount / 2;
     await this.run(
       "match.create",
       {
         activityId: this.activityId,
-        teamAUserIds: this.data.selectedPlayers.slice(0, 2),
-        teamBUserIds: this.data.selectedPlayers.slice(2, 4),
+        matchType: matchType.value,
+        teamAUserIds: this.data.selectedPlayers.slice(0, teamSize),
+        teamBUserIds: this.data.selectedPlayers.slice(teamSize, matchType.playerCount),
         idempotencyKey: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
       },
       "对局已创建",

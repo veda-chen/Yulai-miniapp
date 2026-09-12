@@ -14,6 +14,7 @@ import {
   cancelActivity,
   createActivity,
   getActivity,
+  listActivityHistory,
   listActivities,
   updateActivity,
 } from "./modules/activity.js";
@@ -65,6 +66,7 @@ const routes: Readonly<Record<string, Route>> = {
   "venue.list": { handler: listVenues, requiresAuth: false },
   "venue.get": { handler: getVenue, requiresAuth: false },
   "activity.list": { handler: listActivities, requiresAuth: false },
+  "activity.history": { handler: listActivityHistory, requiresAuth: true },
   "activity.get": { handler: getActivity, requiresAuth: false },
   "activity.create": { handler: createActivity, requiresAuth: true },
   "activity.update": { handler: updateActivity, requiresAuth: true },
