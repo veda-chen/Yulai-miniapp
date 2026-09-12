@@ -8,6 +8,6 @@
   <view wx:if="{{waitlist.length > 0}}" class="section-title">候补名单</view>
   <view wx:for="{{waitlist}}" wx:key="userId" class="member">
     <text>第{{item.position}}位 · {{item.nickname}}</text>
-    <button wx:if="{{canManage}}" size="mini" data-user-id="{{item.userId}}" bindtap="promote">补入</button>
+    <button wx:if="{{canManage}}" class="promote-button" data-user-id="{{item.userId}}" bindtap="promote">补入</button>
   </view>
 </view>

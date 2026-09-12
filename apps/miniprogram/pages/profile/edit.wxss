@@ -130,3 +130,15 @@ input,
   font-size: 24rpx;
   text-align: center;
 }
+
+.remove-avatar {
+  box-sizing: border-box;
+  height: 56rpx;
+  padding: 0 18rpx;
+}
+
+.save {
+  box-sizing: border-box;
+  height: 88rpx;
+  padding: 0 28rpx;
+}

@@ -3,3 +3,4 @@
 .menu { overflow:hidden; margin-top:28rpx; }.menu-item { display:flex; align-items:center; justify-content:space-between; min-height:100rpx; padding:0 30rpx; border-bottom:1rpx solid #e5e5ea; font-size:27rpx; font-weight:550; }.menu-item:last-child { border-bottom:0; }.menu-item > view { display:flex; align-items:center; }.menu-icon { display:inline-flex; align-items:center; justify-content:center; width:58rpx; height:58rpx; margin-right:22rpx; border-radius:18rpx; }.menu-icon image { width:32rpx; height:32rpx; }.menu-icon.blue { background:#e8f2ff; }.menu-icon.gray { background:#f2f2f7; }.chevron-icon { width:30rpx; height:30rpx; opacity:.7; }.version { display:block; margin-top:40rpx; color:#aeaeb2; font-size:21rpx; text-align:center; }
 
 .delete-account { margin-top:36rpx; border:0; background:transparent; color:#d93025; font-size:24rpx; } .delete-account::after { border:0; }
+.delete-account { box-sizing:border-box; height:64rpx; padding:0 24rpx; }
