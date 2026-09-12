@@ -16,6 +16,7 @@
     "pages/venues/list",
     "pages/venues/detail"
   ],
+  "lazyCodeLoading": "requiredComponents",
   "window": {
     "navigationBarTitleText": "羽来",
     "navigationBarBackgroundColor": "#ffffff",
