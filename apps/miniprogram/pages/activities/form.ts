@@ -4,6 +4,7 @@ import { chinaFormToIso, getDefaultActivityTimes, toChinaFormValue } from "../..
 type ValueEvent = WechatMiniprogram.CustomEvent<{ value: string }>;
 type SwitchEvent = WechatMiniprogram.CustomEvent<{ value: boolean }>;
 type Venue = { id: string; name: string };
+type ProfileData = { user: { nickname: string | null; needsProfile: boolean } };
 type Activity = {
   id: string;
   title: string;
@@ -45,6 +46,7 @@ Page({
   data: {
     loading: true,
     saving: false,
+    profileRequired: false,
     activityId: "",
     version: 0,
     idempotencyKey: "",
@@ -71,20 +73,43 @@ Page({
   async onLoad(options: Record<string, string | undefined>) {
     try {
       await callCloud("auth.session");
-      const venueData = await callCloud<{ venues: Venue[] }>("venue.list");
+      const [venueData, profileData] = await Promise.all([
+        callCloud<{ venues: Venue[] }>("venue.list"),
+        callCloud<ProfileData>("user.getMe"),
+      ]);
       if (venueData.venues.length === 0) throw new Error("暂无可用场馆");
       this.setData({
         venues: venueData.venues,
+        profileRequired: profileData.user.needsProfile,
         idempotencyKey: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`,
       });
       if (options.id) await this.loadActivity(options.id, venueData.venues);
       this.setData({ loading: false });
+      if (!options.id && profileData.user.needsProfile) await this.promptForProfile();
     } catch (error) {
       this.setData({
         loading: false,
         message: error instanceof Error ? error.message : "表单加载失败",
       });
     }
+  },
+
+  async onShow() {
+    if (this.data.loading || !this.data.profileRequired) return;
+    try {
+      const profile = await callCloud<ProfileData>("user.getMe");
+      this.setData({ profileRequired: profile.user.needsProfile });
+    } catch {}
+  },
+
+  async promptForProfile() {
+    const result = await wx.showModal({
+      title: "请先设置昵称",
+      content: "发布球局前需要一个昵称，方便球友识别组织者。学校和头像仍可不填。",
+      confirmText: "去设置",
+      cancelText: "稍后再说",
+    });
+    if (result.confirm) wx.navigateTo({ url: "/pages/profile/edit" });
   },
 
   async loadActivity(id: string, venues: Venue[]) {
@@ -155,6 +180,10 @@ Page({
 
   async onSave() {
     if (this.data.saving) return;
+    if (this.data.profileRequired) {
+      await this.promptForProfile();
+      return;
+    }
     const venue = this.data.venues[this.data.venueIndex];
     const level = this.data.levels[this.data.levelIndex];
     const visibility = this.data.visibilities[this.data.visibilityIndex];

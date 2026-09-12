@@ -1,9 +1,5 @@
 import { callCloud } from "../../services/cloud-api";
 
-type HealthData = {
-  status: "ok";
-};
-
 type SessionData = {
   user: {
     id: string;
@@ -52,8 +48,6 @@ Page({
     greeting: "你好",
     userName: "球友",
     dateText: "",
-    status: "正在连接云开发",
-    isAdmin: false,
     activities: [] as Array<
       Activity & {
         shortTime: string;
@@ -76,10 +70,9 @@ Page({
 
   async onShow() {
     try {
-      const health = await callCloud<HealthData>("health.get");
       await callCloud<SessionData>("auth.session");
       const [profile, activityData] = await Promise.all([
-        callCloud<ProfileData & { user: ProfileData["user"] & { role: string } }>("user.getMe"),
+        callCloud<ProfileData>("user.getMe"),
         callCloud<{ activities: Activity[] }>("activity.list"),
       ]);
       const activities = activityData.activities
@@ -96,13 +89,9 @@ Page({
           registrationText: item.currentRegistrationStatus === "WAITLISTED" ? "候补中" : "已报名",
         }));
       this.setData({
-        status: health.status === "ok" ? "云开发连接正常" : "云开发返回异常",
         userName: profile.user.nickname ?? "球友",
-        isAdmin: profile.user.role === "ADMIN",
         activities,
       });
-    } catch {
-      this.setData({ status: "请先创建云环境并部署 api 云函数" });
-    }
+    } catch {}
   },
 });

@@ -1,6 +1,10 @@
 <view class="form-page">
   <view wx:if="{{loading}}" class="form-card surface loading">正在加载表单</view>
   <block wx:else>
+    <view wx:if="{{profileRequired}}" class="profile-alert">
+      <view><text class="profile-alert-title">发布前请先设置昵称</text><text class="profile-alert-copy">昵称用于展示球局组织者；学校和头像可以不填。</text></view>
+      <button bindtap="promptForProfile">去设置</button>
+    </view>
     <text class="group-title">基本信息</text>
     <view class="form-card surface">
       <label class="field"><text class="label">标题</text><input class="control" data-field="title" maxlength="60" value="{{title}}" placeholder="留空自动生成" bindinput="onTextInput" /></label>
@@ -32,6 +36,6 @@
       <view class="toggle-row"><view><text class="toggle-title">启用计分</text><text class="toggle-copy">参与者均可录入比分</text></view><switch checked="{{scoringEnabled}}" color="#34c759" bindchange="onScoringChange" /></view>
     </view>
     <text class="message">{{message}}</text>
-    <view class="save-bar"><button class="primary-button save" loading="{{saving}}" bindtap="onSave">{{activityId ? '保存修改' : '发布球局'}}</button></view>
+    <view class="save-bar"><button class="primary-button save" loading="{{saving}}" disabled="{{profileRequired || saving}}" bindtap="onSave">{{profileRequired ? '请先设置昵称' : (activityId ? '保存修改' : '发布球局')}}</button></view>
   </block>
 </view>

@@ -1,11 +1,28 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const database = vi.hoisted(() => {
-  const addActivity = vi.fn(async () => ({ _id: "activity-1" }));
+  const activitySet = vi.fn(async () => ({}));
+  const registrationSet = vi.fn(async () => ({}));
+  const participantSet = vi.fn(async () => ({}));
+  const transactionCollection = (name: string) => {
+    if (name === "activities") {
+      return {
+        where: () => ({ limit: () => ({ get: async () => ({ data: [] }) }) }),
+        doc: () => ({ set: activitySet }),
+      };
+    }
+    if (name === "registrations") return { doc: () => ({ set: registrationSet }) };
+    if (name === "participants") return { doc: () => ({ set: participantSet }) };
+    throw new Error(`Unexpected transaction collection: ${name}`);
+  };
   return {
-    addActivity,
+    activitySet,
+    registrationSet,
+    participantSet,
     db: {
       serverDate: () => "SERVER_DATE",
+      runTransaction: async (callback: (transaction: unknown) => unknown) =>
+        callback({ collection: transactionCollection }),
       command: {
         in: (values: string[]) => ({ in: values }),
         gt: (value: Date) => ({ gt: value }),
@@ -21,12 +38,6 @@ const database = vi.hoisted(() => {
                 }),
               }),
             }),
-          };
-        }
-        if (name === "activities") {
-          return {
-            where: () => ({ limit: () => ({ get: async () => ({ data: [] }) }) }),
-            add: addActivity,
           };
         }
         throw new Error(`Unexpected collection: ${name}`);
@@ -48,7 +59,9 @@ vi.mock("./user.js", () => ({
 import { createActivity, criticalChangedFields, parseActivityInput } from "./activity.js";
 
 beforeEach(() => {
-  database.addActivity.mockClear();
+  database.activitySet.mockClear();
+  database.registrationSet.mockClear();
+  database.participantSet.mockClear();
 });
 
 const valid = {
@@ -102,19 +115,38 @@ describe("parseActivityInput", () => {
       { requestId: "request-1", openid: "openid-1" },
     );
 
-    expect(database.addActivity).toHaveBeenCalledWith({
+    expect(database.activitySet).toHaveBeenCalledWith({
       data: expect.objectContaining({
         organizerId: "user-1",
         visibility: "PUBLIC",
         groupingEnabled: false,
         scoringEnabled: false,
-        registeredCount: 0,
+        registeredCount: 1,
         waitlistCount: 0,
-        confirmedUserIds: [],
+        confirmedUserIds: ["user-1"],
         waitlistUserIds: [],
-        nextQueueNo: 1,
+        nextQueueNo: 2,
       }),
     });
-    expect(result).toMatchObject({ activity: { id: "activity-1", isOrganizer: true } });
+    expect(database.registrationSet).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        activityId: expect.any(String),
+        userId: "user-1",
+        nickname: "组织者",
+        status: "CONFIRMED",
+        queueNo: 1,
+      }),
+    });
+    expect(database.participantSet).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        activityId: expect.any(String),
+        userId: "user-1",
+        status: "ACTIVE",
+        attendanceStatus: "PENDING",
+      }),
+    });
+    expect(result).toMatchObject({
+      activity: { id: expect.any(String), isOrganizer: true, registeredCount: 1 },
+    });
   });
 });

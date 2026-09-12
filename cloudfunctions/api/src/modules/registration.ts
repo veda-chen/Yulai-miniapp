@@ -212,6 +212,9 @@ export const leaveRegistration: Handler = async (payload, context) => {
       await activities.where({ _id: activityId }).limit(1).get(),
     );
     if (!activity) throw new AppError("ACTIVITY_NOT_FOUND", "球局不存在");
+    if (activity.organizerId === user._id) {
+      throw new AppError("ORGANIZER_CANNOT_LEAVE", "组织者已计入活动人数，取消球局后才能退出");
+    }
     const current = documentData<RegistrationDocument>(
       await registrations
         .where({ _id: registrationId(activityId, user._id) })

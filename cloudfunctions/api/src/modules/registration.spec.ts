@@ -181,4 +181,24 @@ describe("registration transaction", () => {
       ]),
     );
   });
+
+  it("does not let the organizer leave their own activity", async () => {
+    fixture.documents.activities?.set("activity-1", {
+      ...fixture.documents.activities.get("activity-1"),
+      organizerId: "user-1",
+      confirmedUserIds: ["user-1"],
+      registeredCount: 1,
+      nextQueueNo: 2,
+    });
+
+    await expect(
+      leaveRegistration(
+        { activityId: "activity-1", idempotencyKey: "leave-organizer" },
+        { requestId: "request-1", openid: "openid" },
+      ),
+    ).rejects.toMatchObject({
+      code: "ORGANIZER_CANNOT_LEAVE",
+      message: "组织者已计入活动人数，取消球局后才能退出",
+    });
+  });
 });

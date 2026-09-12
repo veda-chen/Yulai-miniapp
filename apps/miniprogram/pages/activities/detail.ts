@@ -81,6 +81,7 @@ Page({
 
   onLoad(options: Record<string, string | undefined>) {
     this.activityId = options.id ?? "";
+    wx.showShareMenu({ menus: ["shareAppMessage", "shareTimeline"] });
   },
 
   async onShow() {
@@ -236,9 +237,20 @@ Page({
   },
 
   onShareAppMessage() {
+    const activity = this.data.activity;
     return {
-      title: this.data.activity?.title ?? "羽来球局",
+      title: activity ? `${activity.title}｜${activity.venue.name}` : "羽来球局",
       path: `/pages/activities/detail?id=${this.activityId}`,
+      imageUrl: "/assets/hero-badminton-bg.jpg",
+    };
+  },
+
+  onShareTimeline() {
+    const activity = this.data.activity;
+    return {
+      title: activity ? `${activity.title}｜${activity.venue.name}` : "羽来球局",
+      query: `id=${this.activityId}`,
+      imageUrl: "/assets/hero-badminton-bg.jpg",
     };
   },
 });

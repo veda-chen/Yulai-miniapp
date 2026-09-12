@@ -397,56 +397,72 @@ export const createActivity: Handler = async (payload, context) => {
   if (user.status !== "ACTIVE") throw new AppError("ACCOUNT_RESTRICTED", "当前账号暂不能创建球局");
   if (!user.nickname) throw new AppError("PROFILE_REQUIRED", "请先设置昵称再创建球局");
   const idempotencyKey = requiredString(payload.idempotencyKey, "请求标识", 64);
-  const activities = db.collection("activities");
-  const existing = (await activities
-    .where({ organizerId: user._id, idempotencyKey })
-    .limit(1)
-    .get()) as unknown as { data: ActivityDocument[] };
-  if (existing.data[0]) {
-    return { activity: mapActivity(existing.data[0], { includeContact: true, isOrganizer: true }) };
-  }
-
   const input = parseActivityInput(payload);
   const venue = await getVenue(input.venueId);
   const title = input.title ?? defaultTitle(input.startAt, venue.name);
-  const now = db.serverDate();
-  const document = {
-    ...input,
-    title,
-    organizerId: user._id,
-    organizerName: user.nickname,
-    venueName: venue.name,
-    status: "OPEN",
-    registeredCount: 0,
-    waitlistCount: 0,
-    confirmedUserIds: [],
-    waitlistUserIds: [],
-    nextQueueNo: 1,
-    changeVersion: 0,
-    idempotencyKey,
-    version: 1,
-    createdAt: now,
-    updatedAt: now,
-  };
+  const activityId = stableId(`activity:${user._id}:${idempotencyKey}`);
+  const organizerRegistrationId = stableId(`${activityId}:${user._id}`);
+  const activity = await db.runTransaction(async (transaction: CloudTransaction) => {
+    const activities = transaction.collection("activities");
+    const existing = documentData<ActivityDocument>(
+      await activities.where({ organizerId: user._id, idempotencyKey }).limit(1).get(),
+    );
+    if (existing) return existing;
 
-  try {
-    const created = (await activities.add({ data: document })) as { _id: string };
-    return {
-      activity: mapActivity({ ...document, _id: created._id } as ActivityDocument, {
-        includeContact: true,
-        isOrganizer: true,
-      }),
+    const now = db.serverDate();
+    const document = {
+      ...input,
+      title,
+      organizerId: user._id,
+      organizerName: user.nickname,
+      venueName: venue.name,
+      status: "OPEN",
+      registeredCount: 1,
+      waitlistCount: 0,
+      confirmedUserIds: [user._id],
+      waitlistUserIds: [],
+      nextQueueNo: 2,
+      changeVersion: 0,
+      idempotencyKey,
+      version: 1,
+      createdAt: now,
+      updatedAt: now,
     };
-  } catch (error) {
-    const raced = (await activities
-      .where({ organizerId: user._id, idempotencyKey })
-      .limit(1)
-      .get()) as unknown as { data: ActivityDocument[] };
-    if (raced.data[0]) {
-      return { activity: mapActivity(raced.data[0], { includeContact: true, isOrganizer: true }) };
-    }
-    throw error;
-  }
+    await activities.doc(activityId).set({ data: document });
+    await transaction
+      .collection("registrations")
+      .doc(organizerRegistrationId)
+      .set({
+        data: {
+          activityId,
+          userId: user._id,
+          nickname: user.nickname,
+          status: "CONFIRMED",
+          queueNo: 1,
+          joinedAt: now,
+          statusChangedAt: now,
+          acknowledgedChangeVersion: 0,
+          createdAt: now,
+          updatedAt: now,
+        },
+      });
+    await transaction
+      .collection("participants")
+      .doc(organizerRegistrationId)
+      .set({
+        data: {
+          activityId,
+          userId: user._id,
+          status: "ACTIVE",
+          attendanceStatus: "PENDING",
+          confirmedAt: now,
+          createdAt: now,
+          updatedAt: now,
+        },
+      });
+    return { ...document, _id: activityId } as ActivityDocument;
+  });
+  return { activity: mapActivity(activity, { includeContact: true, isOrganizer: true }) };
 };
 
 export const updateActivity: Handler = async (payload, context) => {
@@ -514,7 +530,19 @@ export const updateActivity: Handler = async (payload, context) => {
           createdAt: now,
         },
       });
-    for (const userId of fresh.confirmedUserIds ?? []) {
+    if ((fresh.confirmedUserIds ?? []).includes(user._id)) {
+      await transaction
+        .collection("registrations")
+        .doc(stableId(`${id}:${user._id}`))
+        .update({
+          data: {
+            acknowledgedChangeVersion: nextChangeVersion,
+            acknowledgedAt: now,
+            updatedAt: now,
+          },
+        });
+    }
+    for (const userId of (fresh.confirmedUserIds ?? []).filter((id) => id !== user._id)) {
       await createNotification(
         transaction,
         {
@@ -634,7 +662,7 @@ export const cancelActivity: Handler = async (payload, context) => {
       });
     const recipients = [
       ...new Set([...(activity.confirmedUserIds ?? []), ...(activity.waitlistUserIds ?? [])]),
-    ];
+    ].filter((userId) => userId !== user._id);
     for (const userId of recipients) {
       await createNotification(
         transaction,
