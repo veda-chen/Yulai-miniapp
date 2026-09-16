@@ -8,7 +8,7 @@
     <text class="hero-copy">大学城各高校球友在线组队，轻松找到志同道合的搭档。</text>
     <navigator class="hero-button" url="/pages/activities/form"><text class="plus">＋</text> 创建球局</navigator>
   </view></view>
-  <view class="section-head"><text class="section-title">我的球局</text><navigator open-type="switchTab" class="section-link" url="/pages/activities/list">全部 ›</navigator></view>
+  <view class="section-head"><text class="section-title">我的球局</text><navigator class="section-link" url="/pages/profile/history">参加记录 ›</navigator></view>
   <scroll-view class="activity-scroll" scroll-x enhanced show-scrollbar="{{false}}"><view class="activity-track">
     <navigator wx:for="{{activities}}" wx:key="id" class="activity-card surface" url="/pages/activities/detail?id={{item.id}}">
       <view class="activity-top"><view><text class="activity-time">{{item.shortTime}}</text><text class="activity-date">{{item.shortDate}}</text></view><text class="status-pill {{item.waitlistCount > 0 ? 'waiting' : ''}}">{{item.registrationText || '报名中'}}</text></view>
@@ -17,4 +17,9 @@
     </navigator>
     <view wx:if="{{activities.length === 0}}" class="empty-card surface"><text class="activity-title">还没有参加的球局</text><text class="activity-venue">去看看最近有哪些活动</text></view>
   </view></scroll-view>
+  <navigator class="find-activity surface" url="/pages/activities/list">
+    <view class="find-icon"><view class="find-lens"></view></view>
+    <view class="find-copy"><text class="find-title">找球局</text><text class="find-description">看看大学城最近有哪些公开球局</text></view>
+    <text class="find-arrow">›</text>
+  </navigator>
 </view>

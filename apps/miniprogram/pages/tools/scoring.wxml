@@ -1,0 +1,11 @@
+<view class="score-page">
+  <view class="score-hero"><text class="score-kicker">BADMINTON SCORE</text><text class="score-title">临时计分</text><text class="score-rule">21分制 · 领先2分 · 30分封顶</text></view>
+  <view class="score-board surface">
+    <view class="player"><input maxlength="12" value="{{nameA}}" data-side="A" bindinput="onNameInput" /><text class="score blue">{{scoreA}}</text><view class="score-actions"><button data-side="A" data-delta="-1" bindtap="changeScore">−</button><button class="plus blue-bg" data-side="A" data-delta="1" disabled="{{finished}}" bindtap="changeScore">＋1</button></view></view>
+    <view class="divider"><text>VS</text></view>
+    <view class="player"><input maxlength="12" value="{{nameB}}" data-side="B" bindinput="onNameInput" /><text class="score green">{{scoreB}}</text><view class="score-actions"><button data-side="B" data-delta="-1" bindtap="changeScore">−</button><button class="plus green-bg" data-side="B" data-delta="1" disabled="{{finished}}" bindtap="changeScore">＋1</button></view></view>
+  </view>
+  <view class="status {{finished ? 'finished' : ''}}">{{statusText}}</view>
+  <view class="bottom-actions"><button class="secondary-action" bindtap="undo">撤回一分</button><button class="secondary-action danger" bindtap="reset">重新开始</button></view>
+  <text class="privacy-note">这是本机临时工具，比分不会写入球局或个人战绩。</text>
+</view>

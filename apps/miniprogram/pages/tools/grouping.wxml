@@ -1,0 +1,16 @@
+<view class="tool-page">
+  <view class="intro"><text class="intro-title">快速分组</text><text class="intro-copy">一行输入一个名字，也可以用逗号分隔。名单只在当前页面使用。</text></view>
+  <view class="form-card surface">
+    <text class="label">临时名单</text>
+    <textarea value="{{namesInput}}" maxlength="600" placeholder="例如：\n小羽\n阿来\n小陈\n小林" bindinput="onNamesInput" />
+    <text class="count">已识别 {{playerCount}} 人</text>
+    <view class="option-row"><text>对局类型</text><picker range="{{modeOptions}}" range-key="label" value="{{modeIndex}}" bindchange="onModeChange"><view class="picker-value">{{modeOptions[modeIndex].label}} ›</view></picker></view>
+    <view class="option-row"><text>可用场地</text><picker range="{{courtOptions}}" value="{{courtIndex}}" bindchange="onCourtChange"><view class="picker-value">{{courtOptions[courtIndex]}} ›</view></picker></view>
+    <button class="generate" bindtap="generate">{{generated ? '重新随机分组' : '生成分组'}}</button>
+  </view>
+  <block wx:if="{{generated}}">
+    <view class="result-head"><text>本轮安排</text><text>{{matches.length}} 场</text></view>
+    <view wx:for="{{matches}}" wx:key="court" class="match-card surface"><text class="court">场地 {{item.court}}</text><view class="side"><text>A</text><text>{{item.teamA}}</text></view><view class="versus">VS</view><view class="side"><text>B</text><text>{{item.teamB}}</text></view></view>
+    <view wx:if="{{waiting.length > 0}}" class="waiting surface"><text class="waiting-title">本轮候场</text><text class="waiting-names">{{waitingText}}</text></view>
+  </block>
+</view>

@@ -1,0 +1,5 @@
+<navigator class="tool-card" url="{{url}}">
+  <view class="tool-icon {{tone}}">{{icon}}</view>
+  <view class="tool-main"><view class="tool-title-row"><text class="tool-title">{{title}}</text><text wx:if="{{badge}}" class="tool-badge">{{badge}}</text></view><text class="tool-description">{{description}}</text></view>
+  <text class="tool-arrow">›</text>
+</navigator>

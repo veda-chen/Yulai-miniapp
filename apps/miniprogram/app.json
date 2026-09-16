@@ -1,6 +1,9 @@
 {
   "pages": [
     "pages/index/index",
+    "pages/tools/index",
+    "pages/tools/grouping",
+    "pages/tools/scoring",
     "pages/activities/list",
     "pages/activities/detail",
     "pages/activities/form",
@@ -36,10 +39,10 @@
         "selectedIconPath": "assets/icons/tab/home-v2-active.png"
       },
       {
-        "pagePath": "pages/activities/list",
-        "text": "球局",
-        "iconPath": "assets/icons/tab/calendar-v2.png",
-        "selectedIconPath": "assets/icons/tab/calendar-v2-active.png"
+        "pagePath": "pages/tools/index",
+        "text": "工具",
+        "iconPath": "assets/icons/tab/tools-v2.png",
+        "selectedIconPath": "assets/icons/tab/tools-v2-active.png"
       },
       {
         "pagePath": "pages/venues/list",
