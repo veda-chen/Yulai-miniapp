@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="960" viewBox="0 0 1500 960">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#eef5ff"/><stop offset="1" stop-color="#edf7f2"/></linearGradient>
+    <linearGradient id="hero" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#3579a8"/><stop offset="1" stop-color="#173b50"/></linearGradient>
+    <linearGradient id="court" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#0d765f"/><stop offset="1" stop-color="#0a3f35"/></linearGradient>
+    <filter id="shadow"><feDropShadow dx="0" dy="12" stdDeviation="18" flood-color="#1e3754" flood-opacity=".14"/></filter>
+    <style>
+      text{font-family:"Microsoft YaHei","PingFang SC",sans-serif}.phone{filter:url(#shadow)}.muted{fill:#73777f}.blue{fill:#0879f9}.green{fill:#11866f}.white{fill:#fff}.title{font-size:25px;font-weight:700}.small{font-size:15px}.tiny{font-size:12px}.card-title{font-size:17px;font-weight:700}.label{font-size:13px;font-weight:600}
+    </style>
+  </defs>
+  <rect width="1500" height="960" fill="url(#bg)"/>
+  <text x="70" y="65" font-size="34" font-weight="750" fill="#18212d">羽来 · 个性化 UI 效果总览</text>
+  <text x="70" y="98" font-size="17" fill="#687282">同一套业务组件，可切换品牌色、明暗模式、卡片密度、计分板风格与首页模块</text>
+
+  <!-- Phone 1: blue light -->
+  <g transform="translate(65 135)" class="phone">
+    <rect width="420" height="755" rx="42" fill="#fff" stroke="#dfe6ef"/>
+    <rect x="155" y="12" width="110" height="24" rx="12" fill="#17202b"/>
+    <text x="28" y="67" class="small muted">下午好</text><text x="28" y="100" class="title" fill="#1d1d1f">球友</text><text x="28" y="125" class="tiny muted">9月18日 星期五</text>
+    <circle cx="370" cy="82" r="24" fill="#f5f7fa" stroke="#e2e5ea"/><path d="M361 82h18M366 75l-7 7 7 7" fill="none" stroke="#0879f9" stroke-width="2"/>
+    <rect x="24" y="150" width="372" height="160" rx="27" fill="url(#hero)"/>
+    <text x="48" y="194" font-size="23" font-weight="700" class="white">今天有约球计划吗？</text><text x="48" y="225" class="small white" opacity=".9">大学城球友在线组队</text>
+    <rect x="48" y="250" width="118" height="38" rx="19" fill="#fff"/><text x="70" y="275" class="label blue">＋ 创建球局</text>
+    <text x="25" y="352" class="title" fill="#1d1d1f">我的球局</text><text x="327" y="350" class="small blue">参加记录 ›</text>
+    <rect x="24" y="372" width="310" height="145" rx="25" fill="#fff" stroke="#e4e7eb"/>
+    <text x="45" y="405" class="card-title" fill="#1d1d1f">周五 19:00</text><rect x="250" y="390" width="62" height="27" rx="14" fill="#34c759"/><text x="263" y="409" class="tiny white">已报名</text>
+    <text x="45" y="444" class="card-title" fill="#1d1d1f">周五晚羽毛球局</text><text x="45" y="473" class="small muted">⌖ 广工大学城体育馆</text><text x="45" y="500" class="tiny muted">进阶局</text><text x="274" y="500" class="tiny muted">4/6 人</text>
+    <text x="25" y="566" class="title" fill="#1d1d1f">找球局</text><text x="328" y="564" class="small blue">查看全部 ›</text>
+    <rect x="24" y="584" width="372" height="52" rx="18" fill="#fff" stroke="#e1e5ea"/><circle cx="51" cy="608" r="8" fill="none" stroke="#73777f" stroke-width="2"/><path d="M57 614l7 7" stroke="#73777f" stroke-width="2"/><text x="78" y="614" class="small muted">搜索球局、场馆或水平</text>
+    <text x="25" y="669" class="label muted">推荐球局</text>
+    <rect x="24" y="686" width="310" height="48" rx="18" fill="#f8fafc" stroke="#e4e7eb"/><text x="42" y="716" class="small" fill="#1d1d1f">明晚新手友好局 · 2/8 人</text>
+  </g>
+
+  <!-- Phone 2: green compact -->
+  <g transform="translate(540 135)" class="phone">
+    <rect width="420" height="755" rx="42" fill="#f4f8f6" stroke="#d8e6e0"/>
+    <rect x="155" y="12" width="110" height="24" rx="12" fill="#17231f"/>
+    <text x="28" y="67" class="small muted">下午好</text><text x="28" y="100" class="title" fill="#18231f">球友</text><text x="28" y="125" class="tiny muted">9月18日 星期五</text>
+    <rect x="24" y="150" width="372" height="58" rx="19" fill="#fff" stroke="#dce9e3"/><text x="44" y="177" class="card-title" fill="#18231f">创建球局</text><text x="44" y="196" class="tiny muted">约上附近球友一起打球</text><text x="363" y="187" font-size="29" class="green">＋</text>
+    <text x="25" y="252" class="title" fill="#18231f">我的球局</text><text x="327" y="250" class="small green">参加记录 ›</text>
+    <rect x="24" y="270" width="286" height="112" rx="22" fill="#fff" stroke="#dce9e3"/>
+    <text x="42" y="299" class="card-title" fill="#18231f">周五 19:00</text><rect x="236" y="285" width="58" height="24" rx="12" fill="#11866f"/><text x="248" y="302" class="tiny white">已报名</text>
+    <text x="42" y="331" class="small" font-weight="650" fill="#18231f">周五晚羽毛球局</text><text x="42" y="356" class="tiny muted">⌖ 广工体育馆　4/6 人</text>
+    <text x="25" y="431" class="title" fill="#18231f">找球局</text><text x="328" y="429" class="small green">查看全部 ›</text>
+    <rect x="24" y="449" width="372" height="52" rx="18" fill="#fff" stroke="#dce9e3"/><circle cx="51" cy="473" r="8" fill="none" stroke="#11866f" stroke-width="2"/><path d="M57 479l7 7" stroke="#11866f" stroke-width="2"/><text x="78" y="479" class="small muted">搜索球局、场馆或水平</text>
+    <text x="25" y="531" class="label muted">推荐球局</text>
+    <rect x="24" y="548" width="286" height="112" rx="22" fill="#fff" stroke="#dce9e3"/>
+    <text x="42" y="577" class="card-title" fill="#18231f">周六 14:30</text><rect x="237" y="563" width="58" height="24" rx="12" fill="#11866f"/><text x="249" y="580" class="tiny white">报名中</text>
+    <text x="42" y="609" class="small" font-weight="650" fill="#18231f">大学城欢乐双打</text><text x="42" y="634" class="tiny muted">⌖ 广工体育馆　3/8 人</text>
+    <text x="25" y="703" class="title" fill="#18231f">快捷工具</text><rect x="24" y="718" width="180" height="44" rx="16" fill="#e3f3ed"/><text x="46" y="746" class="small green">快速分组</text><rect x="216" y="718" width="180" height="44" rx="16" fill="#e3f3ed"/><text x="238" y="746" class="small green">临时计分</text>
+  </g>
+
+  <!-- Phone 3: dark settings -->
+  <g transform="translate(1015 135)" class="phone">
+    <rect width="420" height="755" rx="42" fill="#111315" stroke="#2d3238"/>
+    <rect x="155" y="12" width="110" height="24" rx="12" fill="#020303"/>
+    <text x="25" y="76" font-size="27" font-weight="750" fill="#f5f6f7">让羽来更顺手</text><text x="25" y="103" class="small" fill="#9da3aa">调整后实时预览，保存后全局生效</text>
+    <rect x="22" y="127" width="376" height="210" rx="26" fill="#1b1e21" stroke="#30353a"/>
+    <text x="42" y="160" class="card-title" fill="#f5f6f7">外观</text><text x="42" y="192" class="tiny" fill="#9da3aa">品牌配色</text>
+    <rect x="42" y="207" width="150" height="42" rx="15" fill="#183f35" stroke="#11866f"/><text x="91" y="233" class="small green">球场绿</text><rect x="207" y="207" width="150" height="42" rx="15" fill="#22262a" stroke="#3a4047"/><text x="258" y="233" class="small" fill="#c3c7cc">羽来蓝</text>
+    <text x="42" y="277" class="tiny" fill="#9da3aa">明暗模式</text><rect x="42" y="290" width="150" height="32" rx="12" fill="#183f35" stroke="#11866f"/><text x="99" y="311" class="tiny green">深色</text><rect x="207" y="290" width="150" height="32" rx="12" fill="#22262a"/><text x="250" y="311" class="tiny" fill="#c3c7cc">跟随系统</text>
+    <rect x="22" y="355" width="376" height="250" rx="26" fill="#1b1e21" stroke="#30353a"/>
+    <text x="42" y="389" class="card-title" fill="#f5f6f7">实时预览</text><rect x="42" y="408" width="336" height="78" rx="18" fill="#202429" stroke="#343a40"/><text x="59" y="436" class="small" font-weight="650" fill="#f5f6f7">周五晚羽毛球局</text><text x="59" y="462" class="tiny" fill="#9da3aa">广工体育馆 · 4/6 人</text><rect x="299" y="423" width="58" height="24" rx="12" fill="#11866f"/><text x="311" y="440" class="tiny white">已报名</text>
+    <rect x="42" y="501" width="336" height="83" rx="18" fill="url(#court)"/><text x="65" y="528" class="tiny white" opacity=".8">A 方</text><text x="65" y="563" font-size="29" font-weight="750" class="white">18</text><line x1="210" y1="516" x2="210" y2="570" stroke="#79b6a7"/><text x="235" y="528" class="tiny white" opacity=".8">B 方</text><text x="235" y="563" font-size="29" font-weight="750" class="white">16</text>
+    <rect x="22" y="623" width="376" height="80" rx="24" fill="#1b1e21" stroke="#30353a"/><text x="42" y="654" class="small" fill="#f5f6f7">首页 Hero</text><text x="42" y="681" class="tiny" fill="#9da3aa">快捷工具、常用场馆可排序</text><rect x="328" y="644" width="48" height="27" rx="14" fill="#11866f"/><circle cx="362" cy="657.5" r="10" fill="#fff"/>
+    <rect x="22" y="721" width="180" height="48" rx="24" fill="#24282c" stroke="#343a40"/><text x="77" y="751" class="small" fill="#c3c7cc">恢复默认</text><rect x="218" y="721" width="180" height="48" rx="24" fill="#11866f"/><text x="277" y="751" class="small white">保存设置</text>
+  </g>
+
+  <text x="90" y="920" class="small blue">羽来蓝 · 浅色 · 舒适卡片</text>
+  <text x="565" y="920" class="small green">球场绿 · 浅色 · 紧凑卡片 · 隐藏 Hero</text>
+  <text x="1040" y="920" class="small green">球场绿 · 深色 · 球场计分板 · 模块排序</text>
+  <g transform="translate(70 948)"><circle cx="6" cy="-5" r="6" fill="#0879f9"/><text x="20" y="0" class="small" fill="#586473">所有样式均使用预设组件；配色只影响显示，不改变报名、权限和计分逻辑。</text></g>
+</svg>

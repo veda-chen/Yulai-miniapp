@@ -1,0 +1,5 @@
+<view class="board surface {{scoreTheme}}">
+  <view class="player"><input wx:if="{{editableNames && !readonly}}" maxlength="12" value="{{nameA}}" data-side="A" bindinput="nameInput" /><text wx:else class="name">{{nameA}}</text><text class="score side-a">{{scoreA}}</text><view wx:if="{{!readonly}}" class="actions"><button data-side="A" data-delta="-1" bindtap="change">−</button><button class="plus side-a-bg" data-side="A" data-delta="1" disabled="{{finished}}" bindtap="change">＋1</button></view></view>
+  <view class="divider">VS</view>
+  <view class="player"><input wx:if="{{editableNames && !readonly}}" maxlength="12" value="{{nameB}}" data-side="B" bindinput="nameInput" /><text wx:else class="name">{{nameB}}</text><text class="score side-b">{{scoreB}}</text><view wx:if="{{!readonly}}" class="actions"><button data-side="B" data-delta="-1" bindtap="change">−</button><button class="plus side-b-bg" data-side="B" data-delta="1" disabled="{{finished}}" bindtap="change">＋1</button></view></view>
+</view>

@@ -1,4 +1,4 @@
-<view class="privacy-page">
+<view class="privacy-page {{appearanceClass}}">
   <view class="intro">
     <text class="eyebrow">羽来 Yulai</text>
     <text class="title">隐私与数据说明</text>

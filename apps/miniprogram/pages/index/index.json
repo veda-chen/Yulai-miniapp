@@ -1,3 +1,9 @@
 {
-  "navigationBarTitleText": "羽来"
+  "navigationBarTitleText": "羽来",
+  "usingComponents": {
+    "activity-card": "/components/activity-card/index",
+    "empty-state": "/components/empty-state/index",
+    "hero-banner": "/components/hero-banner/index",
+    "tool-card": "/components/tool-card/index"
+  }
 }

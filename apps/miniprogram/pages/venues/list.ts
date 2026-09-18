@@ -1,4 +1,5 @@
 import { callCloud } from "../../services/cloud-api";
+import { appearanceView, applyNativeAppearance, loadAppearanceState } from "../../utils/appearance";
 
 type Venue = {
   id: string;
@@ -12,6 +13,13 @@ Page({
     loading: true,
     venues: [] as Venue[],
     message: "",
+    ...appearanceView(),
+  },
+
+  onShow() {
+    const state = loadAppearanceState();
+    applyNativeAppearance(state.preferences);
+    this.setData(appearanceView(state.preferences));
   },
 
   async onLoad() {

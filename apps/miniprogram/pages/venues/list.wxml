@@ -1,4 +1,4 @@
-<view class="venue-page">
+<view class="venue-page {{appearanceClass}}">
   <view class="venue-banner">
     <image class="venue-banner-image" src="/assets/venue-header-v2.jpg" mode="aspectFill" />
     <view class="venue-banner-shade"></view>

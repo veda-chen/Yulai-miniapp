@@ -1,0 +1,6 @@
+<view class="hero {{heroStyle}} {{readonly ? 'readonly' : ''}}" role="button" aria-label="{{readonly ? '首页封面预览' : actionText}}" bindtap="activate">
+  <image wx:if="{{heroStyle === 'photo'}}" class="image" src="{{imageSrc}}" mode="aspectFill" />
+  <view class="shade"></view>
+  <view wx:if="{{heroStyle === 'gradient'}}" class="court-lines"><view class="court-line vertical"></view><view class="court-line horizontal"></view><view class="court-circle"></view></view>
+  <view class="content"><text class="kicker">YULAI · 羽来</text><text class="title">{{title}}</text><text class="description">{{description}}</text><view class="action"><text class="plus">＋</text><text>{{actionText}}</text></view></view>
+</view>

@@ -1,4 +1,5 @@
 import { callCloud } from "../../services/cloud-api";
+import { appearanceView, applyNativeAppearance, loadAppearanceState } from "../../utils/appearance";
 import { formatChinaDateTime } from "../../utils/date";
 
 type AdminTab = "OPEN" | "RESOLVED" | "DISMISSED" | "AUDIT";
@@ -98,6 +99,7 @@ function mapAudit(log: AuditLog): AuditView {
 
 Page({
   data: {
+    ...appearanceView(),
     loading: true,
     processingId: "",
     metrics: { openReports: 0, activeUsers: 0, openActivities: 0 },
@@ -138,6 +140,9 @@ Page({
   },
 
   async onShow() {
+    const appearance = loadAppearanceState();
+    applyNativeAppearance(appearance.preferences);
+    this.setData(appearanceView(appearance.preferences));
     await this.refresh();
   },
 

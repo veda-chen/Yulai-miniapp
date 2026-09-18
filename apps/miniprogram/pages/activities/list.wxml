@@ -1,4 +1,4 @@
-<view class="list-page">
+<view class="list-page {{appearanceClass}}">
   <view class="list-banner">
     <image class="banner-image" src="/assets/activity-header-v2.jpg" mode="aspectFill" />
     <view class="banner-shade"></view>

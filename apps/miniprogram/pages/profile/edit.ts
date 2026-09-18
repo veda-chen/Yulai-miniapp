@@ -1,4 +1,5 @@
 import { callCloud } from "../../services/cloud-api";
+import { appearanceView, applyNativeAppearance, loadAppearanceState } from "../../utils/appearance";
 
 type ValueEvent = WechatMiniprogram.CustomEvent<{ value: string }>;
 type AvatarEvent = WechatMiniprogram.CustomEvent<{ avatarUrl: string }>;
@@ -37,9 +38,13 @@ Page({
     levels: LEVELS,
     levelIndex: 0,
     message: "学校为可选资料，可以随时清空",
+    ...appearanceView(),
   },
 
   async onLoad() {
+    const appearance = loadAppearanceState();
+    applyNativeAppearance(appearance.preferences);
+    this.setData(appearanceView(appearance.preferences));
     try {
       await callCloud("auth.session");
       const [profile, schoolData] = await Promise.all([

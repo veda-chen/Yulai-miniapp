@@ -1,0 +1,2 @@
+.avatar { display:flex; align-items:center; justify-content:center; overflow:hidden; box-sizing:border-box; border-radius:50%; background:linear-gradient(135deg,var(--primary-soft,#cfe5ff),var(--primary,#2e8dff)); color:#fff; font-weight:750; }
+.avatar image { display:block; width:100%; height:100%; }

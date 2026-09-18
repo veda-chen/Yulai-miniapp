@@ -1,0 +1,5 @@
+<view class="activity-card surface {{density}}" role="button" aria-label="{{readonly ? '球局卡片预览' : title}}" bindtap="activate">
+  <view class="top"><view class="time-group"><view class="time-icon"><view class="clock-icon"></view></view><view><text class="time">{{time}}</text><text class="date">{{date}}</text></view></view><text class="status {{waiting ? 'waiting' : ''}}">{{status}}</text></view>
+  <text class="title">{{title}}</text><view class="venue-row"><view class="venue-icon"><view class="pin-dot"></view></view><text class="venue">{{venue}}</text></view>
+  <view class="meta"><text>{{level}}</text><text>{{countText}}</text></view>
+</view>

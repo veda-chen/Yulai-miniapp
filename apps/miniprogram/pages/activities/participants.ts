@@ -1,4 +1,5 @@
 import { callCloud } from "../../services/cloud-api";
+import { appearanceView, applyNativeAppearance, loadAppearanceState } from "../../utils/appearance";
 
 type Participant = { userId: string; nickname: string; attendanceStatus: string };
 type WaitingMember = { userId: string; nickname: string; position: number };
@@ -16,11 +17,15 @@ Page({
     waitlist: [] as WaitingMember[],
     canManage: false,
     loading: true,
+    ...appearanceView(),
   },
   onLoad(options: Record<string, string | undefined>) {
     this.activityId = options.id ?? "";
   },
   async onShow() {
+    const appearance = loadAppearanceState();
+    applyNativeAppearance(appearance.preferences);
+    this.setData(appearanceView(appearance.preferences));
     await this.load();
   },
   async load() {

@@ -1,4 +1,5 @@
 import { callCloud } from "../../services/cloud-api";
+import { appearanceView, applyNativeAppearance, loadAppearanceState } from "../../utils/appearance";
 
 type Participant = { userId: string; nickname: string; attendanceStatus: string };
 type Round = { id: string; roundNo: number; status: string; version: number };
@@ -42,6 +43,7 @@ Page({
   activityId: "",
   data: {
     loading: true,
+    ...appearanceView(),
     submitting: false,
     message: "",
     activity: null as LiveData["activity"] | null,
@@ -73,6 +75,9 @@ Page({
     this.activityId = options.id ?? "";
   },
   async onShow() {
+    const appearance = loadAppearanceState();
+    applyNativeAppearance(appearance.preferences);
+    this.setData(appearanceView(appearance.preferences));
     if (this.activityId) await this.load();
   },
   async onPullDownRefresh() {

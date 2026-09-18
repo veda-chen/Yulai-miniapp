@@ -1,4 +1,4 @@
-<view class="history-page">
+<view class="history-page {{appearanceClass}}">
   <view class="history-head"><text class="history-title">参加过的球局</text><text class="history-copy">这里保留你已开始或已结束的球局记录</text></view>
   <view wx:if="{{loading}}" class="empty surface">正在加载参加记录</view>
   <view wx:elif="{{message}}" class="empty surface">{{message}}</view>

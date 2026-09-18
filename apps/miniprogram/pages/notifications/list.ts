@@ -4,6 +4,7 @@ import {
 } from "../../config/subscription";
 import { callCloud } from "../../services/cloud-api";
 import { formatChinaDateTime } from "../../utils/date";
+import { appearanceView, applyNativeAppearance, loadAppearanceState } from "../../utils/appearance";
 
 type Notification = {
   id: string;
@@ -56,9 +57,13 @@ Page({
     subscriptionTitle: "微信提醒待配置",
     subscriptionCopy: "站内消息正常可用。",
     configuredTemplateCount: 0,
+    ...appearanceView(),
   },
 
   async onShow() {
+    const appearance = loadAppearanceState();
+    applyNativeAppearance(appearance.preferences);
+    this.setData(appearanceView(appearance.preferences));
     const templates = configuredSubscriptionTemplates();
     try {
       const notificationPromise = callCloud<{ notifications: Notification[] }>("notification.list");

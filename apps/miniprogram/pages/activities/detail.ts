@@ -1,5 +1,6 @@
 import { callCloud } from "../../services/cloud-api";
 import { formatChinaDateTime } from "../../utils/date";
+import { appearanceView, applyNativeAppearance, loadAppearanceState } from "../../utils/appearance";
 import { levelLabel } from "../../utils/labels";
 
 type Activity = {
@@ -77,6 +78,7 @@ Page({
     changeConfirmation: null as { acknowledged: number; pending: number } | null,
     submitting: false,
     message: "",
+    ...appearanceView(),
   },
 
   onLoad(options: Record<string, string | undefined>) {
@@ -85,6 +87,9 @@ Page({
   },
 
   async onShow() {
+    const appearance = loadAppearanceState();
+    applyNativeAppearance(appearance.preferences);
+    this.setData(appearanceView(appearance.preferences));
     if (this.activityId) await this.loadActivity();
   },
 

@@ -1,4 +1,4 @@
-<view class="page">
+<view class="page {{appearanceClass}}">
   <view class="intro"><text class="kicker">VENUE OPERATIONS</text><text class="title">场馆资料维护</text><text class="subtitle">录入核验事实，空缺内容继续标记为待核验</text></view>
   <view class="card selector"><text class="label">维护场馆</text><picker range="{{venues}}" range-key="name" value="{{venueIndex}}" bindchange="onVenueChange"><view class="picker-value">{{venues[venueIndex].name || '请选择场馆'}} ›</view></picker></view>
   <view wx:if="{{loading}}" class="card state">正在加载场馆资料</view>

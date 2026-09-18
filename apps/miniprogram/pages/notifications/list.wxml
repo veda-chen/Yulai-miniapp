@@ -1,4 +1,4 @@
-<view class="notification-page">
+<view class="notification-page {{appearanceClass}}">
   <view class="subscription-card state-{{subscriptionState}}">
     <view class="subscription-icon"><view class="bell"></view></view>
     <view class="subscription-main"><text class="subscription-title">{{subscriptionTitle}}</text><text class="subscription-copy">{{subscriptionCopy}}</text></view>

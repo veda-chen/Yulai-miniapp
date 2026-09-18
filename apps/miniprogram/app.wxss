@@ -1,6 +1,19 @@
 page {
-  background: #f2f2f7;
-  color: #1d1d1f;
+  --primary: #007aff;
+  --primary-soft: #e8f2ff;
+  --page-bg: #f2f2f7;
+  --surface: #ffffff;
+  --text: #1d1d1f;
+  --muted: #6e6e73;
+  --border: #e5e5ea;
+  --surface-radius: 36rpx;
+  --control-radius: 20rpx;
+  --font-title: 28rpx;
+  --font-body: 25rpx;
+  --font-small: 23rpx;
+  --hero-end: #203a56;
+  background: var(--page-bg);
+  color: var(--text);
   font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
 }
 
@@ -21,9 +34,9 @@ button {
 }
 
 .surface {
-  background: #ffffff;
-  border: 1rpx solid #e5e5ea;
-  border-radius: 36rpx;
+  background: var(--surface);
+  border: 1rpx solid var(--border);
+  border-radius: var(--surface-radius);
   box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.04);
 }
 
@@ -37,11 +50,26 @@ button {
 .primary-button {
   border: 0;
   border-radius: 999rpx;
-  background: #007aff;
+  background: var(--primary);
   color: #ffffff;
   font-size: 30rpx;
   font-weight: 600;
 }
+
+.theme-green { --primary:#11866f; --primary-soft:#e1f5ef; --hero-end:#173e37; }
+.theme-orange { --primary:#d65f27; --primary-soft:#fff0e8; --hero-end:#66331f; }
+.corner-compact { --surface-radius:20rpx; --control-radius:14rpx; }
+.text-large { --font-title:31rpx; --font-body:28rpx; --font-small:25rpx; }
+.mode-dark { --page-bg:#0f1114; --surface:#1b1e22; --text:#f5f5f7; --muted:#a4a7ad; --border:#30343a; color:var(--text); }
+.mode-dark .surface { box-shadow:none; }
+.mode-dark input,.mode-dark textarea,.mode-dark picker { color:var(--text); }
+.mode-dark .primary-button { color:#fff; }
+.mode-dark.tools-page,.mode-dark.venue-page,.mode-dark.history-page,.mode-dark.list-page,.mode-dark.form-page,.mode-dark.detail-page,.mode-dark.live-page,.mode-dark.tool-page,.mode-dark.notification-page,.mode-dark.venue-detail-page,.mode-dark.privacy-page,.mode-dark.admin-page,.mode-dark.page { background:var(--page-bg); color:var(--text); }
+.mode-dark .ideas,.mode-dark .venue-card,.mode-dark .search-wrap,.mode-dark .action-bar,.mode-dark .form-card,.mode-dark .card,.mode-dark .panel,.mode-dark .notice-card { background:var(--surface); color:var(--text); }
+.mode-dark .section-title,.mode-dark .row-title,.mode-dark .venue-name,.mode-dark .card-title,.mode-dark .empty-title,.mode-dark .info-title,.mode-dark .body-copy { color:var(--text); }
+.mode-dark .secondary,.mode-dark .venue-address,.mode-dark .history-copy,.mode-dark .section-copy { color:var(--muted); }
+.theme-green .section-link,.theme-green .link,.theme-green .manage-link,.theme-green .participation,.theme-green .venue-more,.theme-green .find-arrow,.theme-orange .section-link,.theme-orange .link,.theme-orange .manage-link,.theme-orange .participation,.theme-orange .venue-more,.theme-orange .find-arrow { color:var(--primary) !important; }
+.theme-green .live-entry,.theme-green .publish,.theme-green .small.primary,.theme-orange .live-entry,.theme-orange .publish,.theme-orange .small.primary { background:var(--primary) !important; }
 
 .primary-button::after {
   border: 0;

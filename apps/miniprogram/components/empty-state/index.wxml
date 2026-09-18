@@ -1,0 +1,1 @@
+<view class="empty surface"><text class="title">{{title}}</text><text wx:if="{{description}}" class="description">{{description}}</text><navigator wx:if="{{url && actionText}}" class="action" url="{{url}}">{{actionText}}</navigator><button wx:elif="{{actionText}}" class="action-button" bindtap="activate">{{actionText}}</button></view>

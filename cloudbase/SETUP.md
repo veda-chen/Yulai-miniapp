@@ -8,6 +8,8 @@ M1 开发环境为 `cloud1-d1g8z3590d3768cbb`，小程序已显式绑定该环�
 
 根据 `collections.json` 创建集合和索引。所有集合的客户端权限设为 `ADMINONLY`，业务数据只允许通过 `api` 云函数访问。这样可见性、正式参与者和管理员权限始终由服务端判断。
 
+已有环境升级个性化设置功能时，先执行 `u5-appearance-commands.json` 创建 `appearancePreferences` 集合及用户唯一索引，再部署新版 `api` 云函数。客户端在集合和接口部署完成前会保留本机设置，不会丢失外观偏好。
+
 导入 `seeds/venues.json` 前，将 `SERVER_DATE` 替换为控制台支持的服务端日期或由初始化脚本写入。试点场馆保持 `PENDING_VERIFICATION`，直到名称、地址、场地图和场地编号现场核验完成。
 
 ## 云函数

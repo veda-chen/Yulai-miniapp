@@ -1,4 +1,4 @@
-<view class="page">
+<view class="page {{appearanceClass}}">
   <view class="card">
     <text class="form-title">{{pageTitle}}</text>
     <text class="form-copy">你提交的信息将进入运营审核，不会直接修改公开内容。</text>

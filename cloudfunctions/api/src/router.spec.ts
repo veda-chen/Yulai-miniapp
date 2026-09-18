@@ -10,6 +10,8 @@ describe("resolveRoute", () => {
     expect(resolveRoute("user.updateMe")).toMatchObject({ requiresAuth: true });
     expect(resolveRoute("user.deleteMe")).toMatchObject({ requiresAuth: true });
     expect(resolveRoute("venue.list")).toMatchObject({ requiresAuth: false });
+    expect(resolveRoute("appearance.get")).toMatchObject({ requiresAuth: true });
+    expect(resolveRoute("appearance.save")).toMatchObject({ requiresAuth: true });
   });
 
   it("requires authentication for activity writes", () => {

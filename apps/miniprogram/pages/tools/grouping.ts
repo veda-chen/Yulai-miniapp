@@ -1,3 +1,5 @@
+import { appearanceView, applyNativeAppearance, loadAppearanceState } from "../../utils/appearance";
+
 type Match = {
   court: number;
   teamA: string;
@@ -26,6 +28,7 @@ function shuffle<T>(values: T[]): T[] {
 
 Page({
   data: {
+    ...appearanceView(),
     namesInput: "",
     playerCount: 0,
     modeOptions: [
@@ -39,6 +42,11 @@ Page({
     waiting: [] as string[],
     waitingText: "",
     generated: false,
+  },
+  onShow() {
+    const state = loadAppearanceState();
+    applyNativeAppearance(state.preferences);
+    this.setData(appearanceView(state.preferences));
   },
 
   onNamesInput(event: WechatMiniprogram.CustomEvent<{ value: string }>) {

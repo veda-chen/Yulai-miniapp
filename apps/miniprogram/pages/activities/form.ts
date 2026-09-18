@@ -1,5 +1,6 @@
 import { callCloud } from "../../services/cloud-api";
 import { chinaFormToIso, getDefaultActivityTimes, toChinaFormValue } from "../../utils/date";
+import { appearanceView, applyNativeAppearance, loadAppearanceState } from "../../utils/appearance";
 
 type ValueEvent = WechatMiniprogram.CustomEvent<{ value: string }>;
 type SwitchEvent = WechatMiniprogram.CustomEvent<{ value: boolean }>;
@@ -68,6 +69,7 @@ Page({
     groupingEnabled: false,
     scoringEnabled: false,
     message: "",
+    ...appearanceView(),
   },
 
   async onLoad(options: Record<string, string | undefined>) {
@@ -95,6 +97,9 @@ Page({
   },
 
   async onShow() {
+    const appearance = loadAppearanceState();
+    applyNativeAppearance(appearance.preferences);
+    this.setData(appearanceView(appearance.preferences));
     if (this.data.loading || !this.data.profileRequired) return;
     try {
       const profile = await callCloud<ProfileData>("user.getMe");

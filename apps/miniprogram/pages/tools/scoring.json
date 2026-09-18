@@ -1,3 +1,4 @@
 {
-  "navigationBarTitleText": "临时计分"
+  "navigationBarTitleText": "临时计分",
+  "usingComponents": { "score-board": "/components/score-board/index" }
 }

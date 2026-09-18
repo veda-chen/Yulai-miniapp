@@ -1,0 +1,12 @@
+[
+  {
+    "TableName": "appearancePreferences",
+    "CommandType": "COMMAND",
+    "Command": "{\"create\":\"appearancePreferences\"}"
+  },
+  {
+    "TableName": "appearancePreferences",
+    "CommandType": "COMMAND",
+    "Command": "{\"createIndexes\":\"appearancePreferences\",\"indexes\":[{\"name\":\"userId_unique\",\"key\":{\"userId\":1},\"unique\":true}]}"
+  }
+]

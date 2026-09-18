@@ -1,4 +1,4 @@
-<view class="page">
+<view class="page {{appearanceClass}}">
   <view wx:if="{{loading}}" class="empty">正在加载</view>
   <view wx:elif="{{participants.length === 0}}" class="empty">暂无正式成员</view>
   <view wx:for="{{participants}}" wx:key="userId" class="member" data-user-id="{{item.userId}}" bindtap="changeAttendance">

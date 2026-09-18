@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "个性化设置",
+  "usingComponents": {
+    "activity-card": "/components/activity-card/index",
+    "hero-banner": "/components/hero-banner/index",
+    "score-board": "/components/score-board/index",
+    "ui-button": "/components/ui-button/index"
+  }
+}

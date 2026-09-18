@@ -1,5 +1,11 @@
 import { callCloud } from "../../services/cloud-api";
 import { levelLabel } from "../../utils/labels";
+import {
+  appearanceView,
+  applyNativeAppearance,
+  clearAppearanceState,
+  loadAppearanceState,
+} from "../../utils/appearance";
 
 type Profile = {
   nickname: string | null;
@@ -24,9 +30,13 @@ Page({
     gameCount: 0,
     isAdmin: false,
     deleting: false,
+    ...appearanceView(),
   },
 
   async onShow() {
+    const appearance = loadAppearanceState();
+    applyNativeAppearance(appearance.preferences);
+    this.setData(appearanceView(appearance.preferences));
     try {
       await callCloud("auth.session");
       const [profileResult, activityResult, scoreResult] = await Promise.all([
@@ -74,6 +84,7 @@ Page({
     this.setData({ deleting: true });
     try {
       await callCloud("user.deleteMe", { confirmation: "DELETE_MY_ACCOUNT" });
+      clearAppearanceState();
       await wx.showModal({ title: "账号已注销", content: "个人资料已清除。", showCancel: false });
       wx.reLaunch({ url: "/pages/activities/list" });
     } catch (error) {

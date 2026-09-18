@@ -1,4 +1,4 @@
-<view class="live-page">
+<view class="live-page {{appearanceClass}}">
   <view wx:if="{{loading}}" class="empty surface">正在加载现场</view><view wx:elif="{{message}}" class="empty surface">{{message}}</view>
   <block wx:else>
     <view class="hero"><text class="hero-title">现场模式</text><text class="hero-copy">{{statsText}}</text><view class="feature-row"><text wx:if="{{activity.groupingEnabled}}">智能组队</text><text wx:if="{{activity.scoringEnabled}}">参与者计分</text></view></view>

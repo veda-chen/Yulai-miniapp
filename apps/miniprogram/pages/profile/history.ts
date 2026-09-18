@@ -1,5 +1,6 @@
 import { callCloud } from "../../services/cloud-api";
 import { formatChinaDateTime } from "../../utils/date";
+import { appearanceView, applyNativeAppearance, loadAppearanceState } from "../../utils/appearance";
 
 type Activity = {
   id: string;
@@ -29,9 +30,13 @@ Page({
     activities: [] as Array<
       Activity & { timeText: string; statusText: string; participationText: string }
     >,
+    ...appearanceView(),
   },
 
   async onShow() {
+    const state = loadAppearanceState();
+    applyNativeAppearance(state.preferences);
+    this.setData(appearanceView(state.preferences));
     await this.load();
   },
 

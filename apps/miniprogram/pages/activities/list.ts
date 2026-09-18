@@ -1,6 +1,7 @@
 import { callCloud } from "../../services/cloud-api";
 import { formatChinaDateTime } from "../../utils/date";
 import { levelLabel } from "../../utils/labels";
+import { appearanceView, applyNativeAppearance, loadAppearanceState } from "../../utils/appearance";
 
 type Activity = {
   id: string;
@@ -99,6 +100,7 @@ Page({
     activeFilter: "all" as FilterKey,
     keyword: "",
     message: "",
+    ...appearanceView(),
   },
 
   onSearchInput(event: WechatMiniprogram.CustomEvent<{ value: string }>) {
@@ -123,6 +125,9 @@ Page({
   },
 
   async onShow() {
+    const appearance = loadAppearanceState();
+    applyNativeAppearance(appearance.preferences);
+    this.setData(appearanceView(appearance.preferences));
     try {
       const result = await callCloud<{ activities: Activity[] }>("activity.list");
       const activities = result.activities.map((activity) => {

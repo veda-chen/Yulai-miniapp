@@ -1,4 +1,4 @@
-<view class="tool-page">
+<view class="tool-page {{appearanceClass}}">
   <view class="intro"><text class="intro-title">快速分组</text><text class="intro-copy">一行输入一个名字，也可以用逗号分隔。名单只在当前页面使用。</text></view>
   <view class="form-card surface">
     <text class="label">临时名单</text>

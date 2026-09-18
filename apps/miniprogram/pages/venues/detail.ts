@@ -1,5 +1,6 @@
 import { callCloud } from "../../services/cloud-api";
 import { formatChinaDateTime } from "../../utils/date";
+import { appearanceView, applyNativeAppearance, loadAppearanceState } from "../../utils/appearance";
 
 type VenueDetail = {
   venue: {
@@ -40,9 +41,13 @@ Page({
     loading: true,
     detail: null as DisplayVenueDetail | null,
     message: "",
+    ...appearanceView(),
   },
 
   async onLoad(options: Record<string, string | undefined>) {
+    const appearance = loadAppearanceState();
+    applyNativeAppearance(appearance.preferences);
+    this.setData(appearanceView(appearance.preferences));
     try {
       const detail = await callCloud<VenueDetail>("venue.get", { id: options.id });
       const hasVisitInfo = Boolean(

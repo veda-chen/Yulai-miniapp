@@ -1,4 +1,4 @@
-<view class="detail-page">
+<view class="detail-page {{appearanceClass}}">
   <view wx:if="{{loading}}" class="state-card surface">正在加载球局</view>
   <view wx:elif="{{message}}" class="state-card surface">{{message}}</view>
   <block wx:else>

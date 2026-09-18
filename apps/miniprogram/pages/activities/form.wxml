@@ -1,41 +1,60 @@
-<view class="form-page">
-  <view wx:if="{{loading}}" class="form-card surface loading">正在加载表单</view>
+<view class="form-page {{appearanceClass}}">
+  <view class="form-hero">
+    <image class="form-hero-image" src="/assets/hero-badminton-bg.jpg" mode="aspectFill" />
+    <view class="form-hero-shade"></view>
+    <view class="court-decoration"><view class="court-line vertical"></view><view class="court-line horizontal"></view><view class="court-circle"></view></view>
+    <view class="form-hero-content">
+      <text class="hero-kicker">CREATE A GAME · 发起组局</text>
+      <text class="hero-title">{{activityId ? '完善球局信息' : '约一场，马上开打'}}</text>
+      <text class="hero-copy">填写时间、场馆与人数，现场组队和计分按需开启。</text>
+      <view class="hero-tags"><text>公开组局</text><text>随时分享</text><text>工具可选</text></view>
+    </view>
+  </view>
+
+  <view wx:if="{{loading}}" class="form-card surface loading"><view class="loading-dot"></view><text>正在准备球局表单</text></view>
   <block wx:else>
     <view wx:if="{{profileRequired}}" class="profile-alert">
-      <view><text class="profile-alert-title">发布前请先设置昵称</text><text class="profile-alert-copy">昵称用于展示球局组织者；学校和头像可以不填。</text></view>
+      <view class="alert-icon">!</view>
+      <view class="alert-copy"><text class="profile-alert-title">发布前请先设置昵称</text><text class="profile-alert-copy">昵称用于展示球局组织者；学校和头像可以不填。</text></view>
       <button bindtap="promptForProfile">去设置</button>
     </view>
-    <text class="group-title">基本信息</text>
-    <view class="form-card surface">
-      <label class="field"><text class="label">标题</text><input class="control" data-field="title" maxlength="60" value="{{title}}" placeholder="留空自动生成" bindinput="onTextInput" /></label>
-      <label class="field"><text class="label">场馆</text><picker class="control" range="{{venues}}" range-key="name" value="{{venueIndex}}" bindchange="onVenueChange"><view>{{venues[venueIndex].name}} ›</view></picker></label>
-      <label class="field"><text class="label">场号或位置</text><input class="control" data-field="locationHint" maxlength="100" value="{{locationHint}}" placeholder="可不填" bindinput="onTextInput" /></label>
+
+    <view class="group-heading"><view class="group-icon">羽</view><view><text class="group-title">基本信息</text><text class="group-copy">告诉球友在哪里、打什么局</text></view><text class="step">01</text></view>
+    <view class="form-card surface accent-blue">
+      <label class="field"><text class="label">标题</text><input class="control" data-field="title" maxlength="60" value="{{title}}" placeholder="留空自动生成" placeholder-class="placeholder" bindinput="onTextInput" /></label>
+      <label class="field"><text class="label">场馆</text><picker class="control" range="{{venues}}" range-key="name" value="{{venueIndex}}" bindchange="onVenueChange"><view class="picker-value">{{venues[venueIndex].name}} <text>›</text></view></picker></label>
+      <label class="field"><text class="label">场号或位置</text><input class="control" data-field="locationHint" maxlength="100" value="{{locationHint}}" placeholder="例如 7 号场（可不填）" placeholder-class="placeholder" bindinput="onTextInput" /></label>
     </view>
-    <text class="group-title">时间安排</text>
-    <view class="form-card surface">
+
+    <view class="group-heading"><view class="group-icon warm">时</view><view><text class="group-title">时间安排</text><text class="group-copy">设置开打、结束与报名截止时间</text></view><text class="step">02</text></view>
+    <view class="form-card surface accent-orange">
       <view class="field"><text class="label">开始时间</text><view class="date-control"><picker mode="date" value="{{startDate}}" data-field="startDate" bindchange="onTextInput"><view>{{startDate}}</view></picker><picker mode="time" value="{{startTime}}" data-field="startTime" bindchange="onTextInput"><view>{{startTime}}</view></picker></view></view>
       <view class="field"><text class="label">结束时间</text><view class="date-control"><picker mode="date" value="{{endDate}}" data-field="endDate" bindchange="onTextInput"><view>{{endDate}}</view></picker><picker mode="time" value="{{endTime}}" data-field="endTime" bindchange="onTextInput"><view>{{endTime}}</view></picker></view></view>
       <view class="field"><text class="label">报名截止</text><view class="date-control"><picker mode="date" value="{{deadlineDate}}" data-field="deadlineDate" bindchange="onTextInput"><view>{{deadlineDate}}</view></picker><picker mode="time" value="{{deadlineTime}}" data-field="deadlineTime" bindchange="onTextInput"><view>{{deadlineTime}}</view></picker></view></view>
     </view>
-    <text class="group-title">参与要求</text>
-    <view class="form-card surface">
+
+    <view class="group-heading"><view class="group-icon green">人</view><view><text class="group-title">参与要求</text><text class="group-copy">控制规模、水平与可见范围</text></view><text class="step">03</text></view>
+    <view class="form-card surface accent-green">
       <label class="field"><text class="label">人数上限</text><view class="number-control"><input data-field="capacity" type="number" value="{{capacity}}" bindinput="onTextInput" /><text>人</text></view></label>
-      <label class="field"><text class="label">水平要求</text><picker class="control" range="{{levels}}" range-key="label" value="{{levelIndex}}" bindchange="onLevelChange"><view>{{levels[levelIndex].label}} ›</view></picker></label>
-      <label class="field"><text class="label">球局可见范围</text><picker class="control" range="{{visibilities}}" range-key="label" value="{{visibilityIndex}}" bindchange="onVisibilityChange"><view>{{visibilities[visibilityIndex].label}} ›</view></picker></label>
+      <label class="field"><text class="label">水平要求</text><picker class="control" range="{{levels}}" range-key="label" value="{{levelIndex}}" bindchange="onLevelChange"><view class="picker-value">{{levels[levelIndex].label}} <text>›</text></view></picker></label>
+      <label class="field"><text class="label">球局可见范围</text><picker class="control" range="{{visibilities}}" range-key="label" value="{{visibilityIndex}}" bindchange="onVisibilityChange"><view class="picker-value">{{visibilities[visibilityIndex].label}} <text>›</text></view></picker></label>
     </view>
-    <text class="group-title">说明与联系</text>
-    <view class="form-card surface">
-      <label class="field"><text class="label">费用说明</text><input class="control" data-field="feeNote" maxlength="200" value="{{feeNote}}" placeholder="线下沟通，可不填" bindinput="onTextInput" /></label>
-      <label class="field"><text class="label">联系方式</text><input class="control" data-field="contact" maxlength="100" value="{{contact}}" placeholder="可不填" bindinput="onTextInput" /></label>
-      <label class="field"><text class="label">联系方式可见范围</text><picker class="control" range="{{contactVisibilities}}" range-key="label" value="{{contactVisibilityIndex}}" bindchange="onContactVisibilityChange"><view>{{contactVisibilities[contactVisibilityIndex].label}} ›</view></picker></label>
-      <label class="textarea-field"><text class="label">详细说明</text><textarea data-field="details" maxlength="1000" value="{{details}}" placeholder="补充活动规则、用球等信息" bindinput="onTextInput" /></label>
+
+    <view class="group-heading"><view class="group-icon purple">言</view><view><text class="group-title">说明与联系</text><text class="group-copy">补充费用、联系方式与活动规则</text></view><text class="step">04</text></view>
+    <view class="form-card surface accent-purple">
+      <label class="field"><text class="label">费用说明</text><input class="control" data-field="feeNote" maxlength="200" value="{{feeNote}}" placeholder="线下沟通，可不填" placeholder-class="placeholder" bindinput="onTextInput" /></label>
+      <label class="field"><text class="label">联系方式</text><input class="control" data-field="contact" maxlength="100" value="{{contact}}" placeholder="可不填" placeholder-class="placeholder" bindinput="onTextInput" /></label>
+      <label class="field"><text class="label">联系方式可见范围</text><picker class="control" range="{{contactVisibilities}}" range-key="label" value="{{contactVisibilityIndex}}" bindchange="onContactVisibilityChange"><view class="picker-value">{{contactVisibilities[contactVisibilityIndex].label}} <text>›</text></view></picker></label>
+      <label class="textarea-field"><text class="label">详细说明</text><textarea data-field="details" maxlength="1000" value="{{details}}" placeholder="补充活动规则、用球等信息" placeholder-class="placeholder" bindinput="onTextInput" /></label>
     </view>
-    <text class="group-title">现场工具（可选）</text>
-    <view class="form-card surface">
-      <view class="toggle-row"><view><text class="toggle-title">启用组队</text><text class="toggle-copy">到场后辅助分组</text></view><switch checked="{{groupingEnabled}}" color="#34c759" bindchange="onGroupingChange" /></view>
-      <view class="toggle-row"><view><text class="toggle-title">启用计分</text><text class="toggle-copy">参与者均可录入比分</text></view><switch checked="{{scoringEnabled}}" color="#34c759" bindchange="onScoringChange" /></view>
+
+    <view class="group-heading"><view class="group-icon cyan">具</view><view><text class="group-title">现场工具</text><text class="group-copy">可选功能，不影响普通组局</text></view><text class="step optional">可选</text></view>
+    <view class="form-card surface tool-card">
+      <view class="toggle-row"><view class="tool-copy"><view class="mini-icon">组</view><view><text class="toggle-title">启用组队</text><text class="toggle-copy">到场后辅助生成单打或双打分组</text></view></view><switch checked="{{groupingEnabled}}" color="{{primaryColor}}" bindchange="onGroupingChange" /></view>
+      <view class="toggle-row"><view class="tool-copy"><view class="mini-icon score">分</view><view><text class="toggle-title">启用计分</text><text class="toggle-copy">参与球局的人都可以录入比分</text></view></view><switch checked="{{scoringEnabled}}" color="{{primaryColor}}" bindchange="onScoringChange" /></view>
     </view>
-    <text class="message">{{message}}</text>
-    <view class="save-bar"><button class="primary-button save" loading="{{saving}}" disabled="{{profileRequired || saving}}" bindtap="onSave">{{profileRequired ? '请先设置昵称' : (activityId ? '保存修改' : '发布球局')}}</button></view>
+
+    <text wx:if="{{message}}" class="message">{{message}}</text>
+    <view class="save-bar"><view class="save-copy"><text>{{activityId ? '确认修改' : '准备好了吗？'}}</text><text>{{profileRequired ? '需要先设置昵称' : '发布后即可邀请球友'}}</text></view><button class="primary-button save" loading="{{saving}}" disabled="{{profileRequired || saving}}" bindtap="onSave">{{profileRequired ? '设置昵称' : (activityId ? '保存修改' : '发布球局')}}</button></view>
   </block>
 </view>

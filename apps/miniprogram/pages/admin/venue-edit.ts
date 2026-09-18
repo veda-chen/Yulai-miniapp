@@ -1,4 +1,5 @@
 import { callCloud } from "../../services/cloud-api";
+import { appearanceView, applyNativeAppearance, loadAppearanceState } from "../../utils/appearance";
 
 type ValueEvent = WechatMiniprogram.CustomEvent<{ value: string }>;
 type VenueItem = { id: string; name: string; status: string };
@@ -33,6 +34,7 @@ function chinaDate(value: string | null): string {
 
 Page({
   data: {
+    ...appearanceView(),
     loading: true,
     saving: false,
     uploadingField: "",
@@ -60,6 +62,9 @@ Page({
   },
 
   async onLoad() {
+    const appearance = loadAppearanceState();
+    applyNativeAppearance(appearance.preferences);
+    this.setData(appearanceView(appearance.preferences));
     try {
       const result = await callCloud<{ venues: VenueItem[] }>("admin.venue.list");
       if (result.venues.length === 0) throw new Error("暂无可维护场馆");

@@ -1,0 +1,4 @@
+<view class="avatar" style="width:{{size}}rpx;height:{{size}}rpx;font-size:{{size * 0.36}}rpx">
+  <image wx:if="{{src && !imageFailed}}" src="{{src}}" mode="aspectFill" binderror="onImageError" />
+  <text wx:else>{{initial}}</text>
+</view>

@@ -1,4 +1,5 @@
 import { callCloud } from "../../services/cloud-api";
+import { appearanceView, applyNativeAppearance, loadAppearanceState } from "../../utils/appearance";
 
 type ValueEvent = WechatMiniprogram.CustomEvent<{ value: string }>;
 const GENERAL_REASONS = [
@@ -26,8 +27,12 @@ Page({
     detailsLabel: "补充说明",
     placeholder: "请描述具体情况，便于核查",
     submitText: "提交举报",
+    ...appearanceView(),
   },
   onLoad(options: Record<string, string | undefined>) {
+    const appearance = loadAppearanceState();
+    applyNativeAppearance(appearance.preferences);
+    this.setData(appearanceView(appearance.preferences));
     this.targetType = options.type === "VENUE" ? "VENUE" : (options.type ?? "ACTIVITY");
     this.targetId = options.id ?? "";
     if (this.targetType === "VENUE") {

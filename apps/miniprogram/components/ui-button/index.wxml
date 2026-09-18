@@ -1,0 +1,1 @@
+<button class="ui-button {{variant}}" loading="{{loading}}" disabled="{{disabled}}" bindtap="activate">{{label}}</button>

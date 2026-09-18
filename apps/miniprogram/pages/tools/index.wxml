@@ -1,4 +1,4 @@
-<view class="tools-page">
+<view class="tools-page {{appearanceClass}}">
   <view class="tools-hero"><text class="hero-kicker">YULAI LAB</text><text class="hero-title">随开随用的球场工具</text><text class="hero-copy">无需创建球局，临时名单和比分只保留在当前页面。</text></view>
   <view class="section-head"><text class="section-title">快捷工具</text><text class="section-note">无需发布球局</text></view>
   <view class="tool-list">

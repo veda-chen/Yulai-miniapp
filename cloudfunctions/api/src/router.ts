@@ -19,6 +19,7 @@ import {
   updateActivity,
 } from "./modules/activity.js";
 import { getHealth } from "./modules/health.js";
+import { getAppearance, saveAppearance } from "./modules/appearance.js";
 import {
   confirmScore,
   createManualMatch,
@@ -62,6 +63,8 @@ const routes: Readonly<Record<string, Route>> = {
   "user.updateMe": { handler: updateMe, requiresAuth: true },
   "user.updateAvatar": { handler: updateAvatar, requiresAuth: true },
   "user.deleteMe": { handler: deleteMe, requiresAuth: true },
+  "appearance.get": { handler: getAppearance, requiresAuth: true },
+  "appearance.save": { handler: saveAppearance, requiresAuth: true },
   "school.list": { handler: listSchools, requiresAuth: false },
   "venue.list": { handler: listVenues, requiresAuth: false },
   "venue.get": { handler: getVenue, requiresAuth: false },

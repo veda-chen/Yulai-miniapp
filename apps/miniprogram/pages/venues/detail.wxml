@@ -1,4 +1,4 @@
-<view class="venue-detail-page">
+<view class="venue-detail-page {{appearanceClass}}">
   <view wx:if="{{loading}}" class="state-card">正在加载场馆</view>
   <view wx:elif="{{message}}" class="state-card muted">{{message}}</view>
   <block wx:else>

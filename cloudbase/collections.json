@@ -568,6 +568,23 @@
           ]
         }
       ]
+    },
+    {
+      "name": "appearancePreferences",
+      "description": "用户个性化设置与跨设备同步版本",
+      "clientPermission": "ADMINONLY",
+      "indexes": [
+        {
+          "name": "userId_unique",
+          "unique": true,
+          "fields": [
+            {
+              "field": "userId",
+              "order": "asc"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
