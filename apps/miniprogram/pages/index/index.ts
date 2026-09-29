@@ -1,12 +1,14 @@
 import { callCloud } from "../../services/cloud-api";
-import { filterRecommendedActivities } from "../../utils/activity-recommendations";
+import { activitySearchListUrl, normalizeActivitySearchKeyword } from "../../utils/activity-search";
 import {
+  type AppearancePreferences,
   appearanceView,
   applyNativeAppearance,
-  loadAppearanceState,
   type HomeModuleId,
+  loadAppearanceState,
   type ToolId,
 } from "../../utils/appearance";
+import { TOOL_DEFINITIONS, visibleToolIds } from "../../utils/tool-registry";
 
 type SessionData = {
   user: {
@@ -32,6 +34,7 @@ type Activity = {
   currentRegistrationStatus: string | null;
   level: string;
   venue: { name: string };
+  isOrganizer?: boolean;
 };
 type Venue = { id: string; name: string; address: string | null; verificationStatus: string };
 
@@ -40,28 +43,6 @@ type ActivityView = Activity & {
   shortDate: string;
   levelText: string;
   registrationText: string;
-};
-
-const TOOL_DATA: Record<
-  ToolId,
-  { id: ToolId; title: string; description: string; icon: string; tone: string; url: string }
-> = {
-  grouping: {
-    id: "grouping",
-    title: "快速分组",
-    description: "生成单打或双打分组",
-    icon: "组",
-    tone: "blue",
-    url: "/pages/tools/grouping",
-  },
-  scoring: {
-    id: "scoring",
-    title: "临时计分",
-    description: "21分制，支持撤回",
-    icon: "分",
-    tone: "green",
-    url: "/pages/tools/scoring",
-  },
 };
 
 const LEVEL_NAMES: Record<string, string> = {
@@ -87,8 +68,9 @@ function activityView(activity: Activity): ActivityView {
     ...activity,
     ...dateParts(activity.startAt),
     levelText: LEVEL_NAMES[activity.level] ?? "不限水平",
-    registrationText:
-      activity.currentRegistrationStatus === "WAITLISTED"
+    registrationText: activity.isOrganizer
+      ? "我发起的"
+      : activity.currentRegistrationStatus === "WAITLISTED"
         ? "候补中"
         : activity.currentRegistrationStatus === "CONFIRMED"
           ? "已报名"
@@ -99,19 +81,30 @@ function activityView(activity: Activity): ActivityView {
 }
 
 Page({
+  searchTimer: null as number | null,
+  homeRequestVersion: 0,
+  myActivitiesRequestVersion: 0,
+  recommendationsRequestVersion: 0,
+  venuesRequestVersion: 0,
+  unreadRequestVersion: 0,
+  pageActive: false,
   data: {
     greeting: "你好",
     userName: "球友",
     dateText: "",
     activities: [] as ActivityView[],
-    publicActivities: [] as ActivityView[],
+    myActivitiesLoading: true,
+    myActivitiesMessage: "",
     recommendedActivities: [] as ActivityView[],
     searchKeyword: "",
+    displayedSearchKeyword: "",
+    recommendationsNextOffset: null as number | null,
     recommendationsLoading: true,
     recommendationsMessage: "",
+    hasUnread: false,
     ...appearanceView(),
     homeModules: [] as Array<{ id: HomeModuleId }>,
-    homeTools: [] as Array<(typeof TOOL_DATA)[ToolId]>,
+    homeTools: [] as Array<(typeof TOOL_DEFINITIONS)[ToolId]>,
     favoriteVenues: [] as Venue[],
     venueMessage: "",
   },
@@ -127,50 +120,105 @@ Page({
   },
 
   onSearchInput(event: WechatMiniprogram.CustomEvent<{ value: string }>) {
-    const searchKeyword = event.detail.value;
+    const searchKeyword = event.detail.value.slice(0, 50);
+    this.recommendationsRequestVersion += 1;
+    const changed =
+      normalizeActivitySearchKeyword(searchKeyword) !== this.data.displayedSearchKeyword;
     this.setData({
       searchKeyword,
-      recommendedActivities: filterRecommendedActivities(this.data.publicActivities, searchKeyword),
+      recommendationsLoading: true,
+      recommendationsMessage: "",
+      ...(changed ? { recommendedActivities: [], recommendationsNextOffset: null } : {}),
     });
+    this.cancelPendingSearch();
+    this.searchTimer = setTimeout(() => {
+      this.searchTimer = null;
+      void this.loadRecommendations();
+    }, 300) as unknown as number;
   },
 
   clearSearch() {
-    this.setData({
-      searchKeyword: "",
-      recommendedActivities: filterRecommendedActivities(this.data.publicActivities, ""),
-    });
+    this.cancelPendingSearch();
+    this.recommendationsRequestVersion += 1;
+    this.setData({ searchKeyword: "" });
+    void this.loadRecommendations();
+  },
+
+  confirmSearch() {
+    this.cancelPendingSearch();
+    this.recommendationsRequestVersion += 1;
+    void this.loadRecommendations();
+  },
+
+  cancelPendingSearch() {
+    if (this.searchTimer !== null) clearTimeout(this.searchTimer);
+    this.searchTimer = null;
+  },
+
+  openAllSearchResults() {
+    wx.navigateTo({ url: activitySearchListUrl(this.data.searchKeyword) });
   },
 
   async retryRecommendations() {
     await this.loadRecommendations();
   },
 
+  async retryMyActivities() {
+    await this.loadMyActivities();
+  },
+
+  async loadMyActivities() {
+    const requestVersion = ++this.myActivitiesRequestVersion;
+    this.setData({ myActivitiesLoading: true, myActivitiesMessage: "" });
+    try {
+      const result = await callCloud<{ activities: Activity[] }>("activity.mine", { limit: 10 });
+      if (requestVersion !== this.myActivitiesRequestVersion) return;
+      this.setData({
+        activities: result.activities.map(activityView),
+        myActivitiesLoading: false,
+      });
+    } catch {
+      if (requestVersion !== this.myActivitiesRequestVersion) return;
+      this.setData({
+        myActivitiesLoading: false,
+        myActivitiesMessage: "请检查网络后重试",
+      });
+    }
+  },
+
   async loadRecommendations() {
+    this.cancelPendingSearch();
+    const requestVersion = ++this.recommendationsRequestVersion;
+    const keyword = normalizeActivitySearchKeyword(this.data.searchKeyword);
     this.setData({
       recommendationsLoading: true,
       recommendationsMessage: "",
-      recommendedActivities: [],
+      ...(keyword !== this.data.displayedSearchKeyword
+        ? { recommendedActivities: [], recommendationsNextOffset: null }
+        : {}),
     });
     try {
-      const activityData = await callCloud<{ activities: Activity[] }>("activity.list");
+      const activityData = await callCloud<{
+        activities: Activity[];
+        nextOffset: number | null;
+      }>("activity.list", {
+        limit: 10,
+        keyword,
+      });
+      if (
+        requestVersion !== this.recommendationsRequestVersion ||
+        keyword !== normalizeActivitySearchKeyword(this.data.searchKeyword)
+      )
+        return;
       const publicActivities = activityData.activities.map(activityView);
-      const activities = publicActivities
-        .filter(
-          (item) =>
-            item.currentRegistrationStatus === "CONFIRMED" ||
-            item.currentRegistrationStatus === "WAITLISTED",
-        )
-        .slice(0, 4);
       this.setData({
-        activities,
-        publicActivities,
-        recommendedActivities: filterRecommendedActivities(
-          publicActivities,
-          this.data.searchKeyword,
-        ),
+        recommendedActivities: publicActivities,
+        displayedSearchKeyword: keyword,
+        recommendationsNextOffset: activityData.nextOffset,
         recommendationsLoading: false,
       });
     } catch {
+      if (requestVersion !== this.recommendationsRequestVersion) return;
       this.setData({
         recommendationsLoading: false,
         recommendationsMessage: "请检查网络后重试",
@@ -178,42 +226,109 @@ Page({
     }
   },
 
+  async loadUnreadSummary() {
+    const requestVersion = ++this.unreadRequestVersion;
+    try {
+      const result = await callCloud<{ hasUnread: boolean }>("notification.unreadSummary");
+      if (!this.pageActive || requestVersion !== this.unreadRequestVersion) return;
+      this.setData({ hasUnread: result.hasUnread });
+    } catch {}
+  },
+
   async onShow() {
+    this.pageActive = true;
+    const requestVersion = ++this.homeRequestVersion;
     const state = loadAppearanceState();
     const preferences = state.preferences;
     applyNativeAppearance(preferences);
+    this.applyPreferences(preferences);
+    const recommendations = this.loadRecommendations();
+    const venues = this.loadFavoriteVenues(preferences);
+    try {
+      await callCloud<SessionData>("auth.session");
+      const [profileResult] = await Promise.allSettled([
+        callCloud<ProfileData>("user.getMe"),
+        this.loadMyActivities(),
+        this.loadUnreadSummary(),
+      ]);
+      if (requestVersion === this.homeRequestVersion && profileResult.status === "fulfilled") {
+        this.setData({ userName: profileResult.value.user.nickname ?? "球友" });
+      }
+    } catch {
+      if (requestVersion !== this.homeRequestVersion) return;
+      this.setData({
+        myActivitiesLoading: false,
+        myActivitiesMessage: "登录状态暂时不可用，请稍后重试",
+      });
+    }
+    await Promise.allSettled([recommendations, venues]);
+  },
+
+  async onPullDownRefresh() {
+    this.cancelPendingSearch();
+    this.recommendationsRequestVersion += 1;
+    const preferences = loadAppearanceState().preferences;
+    await Promise.allSettled([
+      this.loadMyActivities(),
+      this.loadRecommendations(),
+      this.loadUnreadSummary(),
+      this.loadFavoriteVenues(preferences),
+    ]);
+    wx.stopPullDownRefresh();
+  },
+
+  onUnload() {
+    this.onHide();
+  },
+
+  onHide() {
+    this.pageActive = false;
+    this.cancelPendingSearch();
+    this.unreadRequestVersion += 1;
+    this.homeRequestVersion += 1;
+    this.myActivitiesRequestVersion += 1;
+    this.recommendationsRequestVersion += 1;
+    this.venuesRequestVersion += 1;
+  },
+
+  onAppearanceSynced(preferences: AppearancePreferences) {
+    this.applyPreferences(preferences);
+    void this.loadFavoriteVenues(preferences);
+  },
+
+  applyPreferences(preferences: AppearancePreferences) {
     this.setData({
       ...appearanceView(preferences),
       homeModules: preferences.moduleOrder
         .filter((id) => preferences.visibleModules.includes(id))
         .map((id) => ({ id })),
-      homeTools: preferences.toolOrder.map((id) => TOOL_DATA[id]),
+      homeTools: visibleToolIds(preferences.toolOrder, preferences.homeToolIds).map(
+        (id) => TOOL_DEFINITIONS[id],
+      ),
       favoriteVenues: [],
       venueMessage: "",
     });
+  },
+
+  async loadFavoriteVenues(preferences = loadAppearanceState().preferences) {
+    const requestVersion = ++this.venuesRequestVersion;
+    if (!preferences.visibleModules.includes("venues") || preferences.favoriteVenueIds.length === 0)
+      return;
     try {
-      await callCloud<SessionData>("auth.session");
-    } catch {}
-    const [profileResult] = await Promise.allSettled([callCloud<ProfileData>("user.getMe")]);
-    if (profileResult.status === "fulfilled") {
-      this.setData({ userName: profileResult.value.user.nickname ?? "球友" });
-    }
-    await this.loadRecommendations();
-    if (preferences.visibleModules.includes("venues") && preferences.favoriteVenueIds.length > 0) {
-      try {
-        const result = await callCloud<{ venues: Venue[] }>("venue.list");
-        const byId = new Map(result.venues.map((venue) => [venue.id, venue]));
-        const favoriteVenues = preferences.favoriteVenueIds.flatMap((id) => {
-          const venue = byId.get(id);
-          return venue ? [venue] : [];
-        });
-        this.setData({
-          favoriteVenues,
-          venueMessage: favoriteVenues.length ? "" : "常用场馆已不可用，请到个性化设置中更新",
-        });
-      } catch {
-        this.setData({ venueMessage: "常用场馆加载失败，其他首页内容不受影响" });
-      }
+      const result = await callCloud<{ venues: Venue[] }>("venue.list");
+      if (requestVersion !== this.venuesRequestVersion) return;
+      const byId = new Map(result.venues.map((venue) => [venue.id, venue]));
+      const favoriteVenues = preferences.favoriteVenueIds.flatMap((id) => {
+        const venue = byId.get(id);
+        return venue ? [venue] : [];
+      });
+      this.setData({
+        favoriteVenues,
+        venueMessage: favoriteVenues.length ? "" : "常用场馆已不可用，请到个性化设置中更新",
+      });
+    } catch {
+      if (requestVersion !== this.venuesRequestVersion) return;
+      this.setData({ venueMessage: "常用场馆加载失败，其他首页内容不受影响" });
     }
   },
 });

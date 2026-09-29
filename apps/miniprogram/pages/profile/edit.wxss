@@ -4,8 +4,10 @@
 
 .card {
   padding: 32rpx;
-  border-radius: 24rpx;
-  background: #ffffff;
+  border: var(--surface-border-width) solid var(--border);
+  border-radius: var(--surface-radius);
+  background: var(--surface);
+  box-shadow: var(--surface-shadow);
 }
 
 .form,
@@ -35,7 +37,7 @@
   max-height: 168rpx;
   margin: 0;
   padding: 0;
-  border: 6rpx solid #ffffff;
+  border: 6rpx solid var(--surface);
   border-radius: 50%;
   background: linear-gradient(135deg, #cfe5ff, #2e8dff);
   box-shadow: 0 10rpx 28rpx rgba(0, 122, 255, 0.18);
@@ -84,7 +86,7 @@
 
 .avatar-help {
   margin-top: 14rpx;
-  color: #7b8581;
+  color: var(--muted);
   font-size: 22rpx;
 }
 
@@ -104,29 +106,41 @@
 
 .label {
   margin-bottom: 12rpx;
-  color: #53615c;
+  color: var(--text);
   font-size: 26rpx;
 }
 
 input,
 .picker-value {
+  box-sizing: border-box;
   min-height: 56rpx;
   padding: 18rpx 20rpx;
-  border: 1rpx solid #cad8d2;
+  border: 1rpx solid var(--border);
   border-radius: 14rpx;
-  background: #f8fbfa;
+  background: var(--page-bg);
+  color: var(--text);
   font-size: 30rpx;
+}
+
+.picker-value {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 92rpx;
+  text-align: center;
 }
 
 .save {
   margin-top: 40rpx;
-  background: #234e43;
+  border: 2rpx solid var(--button-primary-border);
+  background: var(--button-primary-bg);
   color: #ffffff;
+  box-shadow: var(--button-shadow);
 }
 
 .message {
   margin-top: 18rpx;
-  color: #66736e;
+  color: var(--muted);
   font-size: 24rpx;
   text-align: center;
 }

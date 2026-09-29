@@ -6,6 +6,7 @@ import {
   clearAppearanceState,
   loadAppearanceState,
 } from "../../utils/appearance";
+import { clearAllToolDrafts } from "../../utils/tool-storage";
 
 type Profile = {
   nickname: string | null;
@@ -85,6 +86,10 @@ Page({
     try {
       await callCloud("user.deleteMe", { confirmation: "DELETE_MY_ACCOUNT" });
       clearAppearanceState();
+      clearAllToolDrafts();
+      try {
+        wx.removeStorageSync("yulai:activity-form:v1");
+      } catch {}
       await wx.showModal({ title: "账号已注销", content: "个人资料已清除。", showCancel: false });
       wx.reLaunch({ url: "/pages/activities/list" });
     } catch (error) {

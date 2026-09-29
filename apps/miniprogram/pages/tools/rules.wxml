@@ -1,0 +1,6 @@
+<view class="tool-page {{appearanceClass}}">
+  <view class="tool-intro"><text class="tool-kicker">RULES GUIDE</text><text class="tool-title">规则速查</text><text class="tool-copy">面向日常球局的简明提示；正式比赛以当期竞赛规程和裁判判定为准。</text></view>
+  <view class="version-card"><view class="version-head"><text class="version-title">当前采用21分制</text><status-chip label="适用至2027-01-03" tone="primary" /></view><text class="version-copy">BWF 已公布新计分规则计划于 2027 年 1 月 4 日生效。羽来当前计分工具仍按现行21分制运行，临近生效日期前将再次核验并更新。</text></view>
+  <view wx:for="{{sections}}" wx:key="title" class="tool-card surface"><section-header title="{{item.title}}" description="{{item.description}}" index="{{item.index}}" /><view wx:for="{{item.items}}" wx:key="*this" class="rule-item"><view class="rule-dot"></view><text>{{item}}</text></view></view>
+  <view class="tool-card surface"><text class="result-title">资料来源</text><text class="version-copy">BWF Statutes, Section 4.1 — Laws of Badminton，2025年4月26日版本。</text><text class="source">中文内容为便于日常球局使用的归纳，不替代规则原文。最后核验：2026年9月19日。</text></view>
+</view>

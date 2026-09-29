@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "费用均摊",
+  "usingComponents": {
+    "section-header": "/components/section-header/index",
+    "status-chip": "/components/status-chip/index"
+  }
+}

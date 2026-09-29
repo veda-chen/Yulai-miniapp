@@ -1,7 +1,7 @@
 <view class="history-page {{appearanceClass}}">
   <view class="history-head"><text class="history-title">参加过的球局</text><text class="history-copy">这里保留你已开始或已结束的球局记录</text></view>
-  <view wx:if="{{loading}}" class="empty surface">正在加载参加记录</view>
-  <view wx:elif="{{message}}" class="empty surface">{{message}}</view>
+  <view wx:if="{{loading && activities.length === 0}}" class="empty surface">正在加载参加记录</view>
+  <view wx:elif="{{message && activities.length === 0}}" class="empty surface"><text>{{message}}</text><button class="retry-button" bindtap="retry">重新加载</button></view>
   <view wx:elif="{{activities.length === 0}}" class="empty surface"><text class="empty-title">还没有历史球局</text><text class="empty-copy">参加的球局开始后会显示在这里</text></view>
   <view wx:else class="history-list">
     <navigator wx:for="{{activities}}" wx:key="id" class="history-card surface" url="/pages/activities/detail?id={{item.id}}">
@@ -10,4 +10,6 @@
       <view class="card-foot"><text>{{item.timeText}}</text><text class="participation">{{item.participationText}} ›</text></view>
     </navigator>
   </view>
+  <view wx:if="{{message && activities.length}}" class="load-message">{{message}}</view>
+  <button wx:if="{{nextOffset !== null}}" class="load-more" loading="{{loadingMore}}" bindtap="onReachBottom">{{loadingMore ? '正在加载' : '加载更多记录'}}</button>
 </view>

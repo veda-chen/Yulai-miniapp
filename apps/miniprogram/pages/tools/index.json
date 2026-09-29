@@ -1,6 +1,7 @@
 {
   "navigationBarTitleText": "工具",
   "usingComponents": {
+    "section-header": "/components/section-header/index",
     "tool-card": "/components/tool-card/index"
   }
 }

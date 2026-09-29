@@ -1,3 +1,7 @@
 {
-  "navigationBarTitleText": "场馆"
+  "navigationBarTitleText": "场馆",
+  "usingComponents": {
+    "section-header": "/components/section-header/index",
+    "status-chip": "/components/status-chip/index"
+  }
 }

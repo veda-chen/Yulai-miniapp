@@ -1,9 +1,8 @@
 <view class="tools-page {{appearanceClass}}">
   <view class="tools-hero"><text class="hero-kicker">YULAI LAB</text><text class="hero-title">随开随用的球场工具</text><text class="hero-copy">无需创建球局，临时名单和比分只保留在当前页面。</text></view>
-  <view class="section-head"><text class="section-title">快捷工具</text><text class="section-note">无需发布球局</text></view>
+  <view class="section-head"><section-header title="快捷工具" description="无需发布球局" index="01" /></view>
   <view class="tool-list">
-    <tool-card title="快速分组" description="输入临时名单，生成单打或双打分组与候场名单" icon="组" tone="blue" badge="可用" url="/pages/tools/grouping" />
-    <tool-card title="临时计分" description="羽毛球21分制计分，支持撤回和重新开始" icon="分" tone="green" badge="可用" url="/pages/tools/scoring" />
+    <tool-card wx:for="{{tools}}" wx:key="id" title="{{item.title}}" description="{{item.description}}" icon="{{item.icon}}" tone="{{item.tone}}" badge="可用" url="{{item.url}}" />
   </view>
-  <view class="ideas"><text class="ideas-title">还可以继续增加</text><view class="idea-row"><text>轮转排场</text><text>按上场次数安排下一轮</text></view><view class="idea-row"><text>随机抽签</text><text>决定搭档、对手或发球顺序</text></view><view class="idea-row"><text>费用均摊器</text><text>只计算线下应付金额，不处理收款</text></view><view class="idea-row"><text>规则速查</text><text>常用计分、换边和发球规则</text></view></view>
+  <view class="ideas"><text class="ideas-title">本机临时数据</text><text class="draft-copy">公平组队、计分和费用草稿保留7天，不会上传云端。</text><button class="clear-drafts" bindtap="clearDrafts">清空全部临时数据</button></view>
 </view>

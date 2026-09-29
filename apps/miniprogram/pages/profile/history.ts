@@ -26,6 +26,8 @@ const REGISTRATION_STATUS: Record<string, string> = {
 Page({
   data: {
     loading: true,
+    loadingMore: false,
+    nextOffset: null as number | null,
     message: "",
     activities: [] as Array<
       Activity & { timeText: string; statusText: string; participationText: string }
@@ -37,31 +39,51 @@ Page({
     const state = loadAppearanceState();
     applyNativeAppearance(state.preferences);
     this.setData(appearanceView(state.preferences));
-    await this.load();
+    await this.load(true);
   },
 
   async onPullDownRefresh() {
-    await this.load();
+    await this.load(true);
     wx.stopPullDownRefresh();
   },
 
-  async load() {
+  async onReachBottom() {
+    if (this.data.nextOffset !== null && !this.data.loadingMore) await this.load(false);
+  },
+
+  async retry() {
+    await this.load(true);
+  },
+
+  async load(reset: boolean) {
+    const offset = reset ? 0 : this.data.nextOffset;
+    if (offset === null) return;
     try {
-      this.setData({ loading: true, message: "" });
-      const result = await callCloud<{ activities: Activity[] }>("activity.history");
+      this.setData(reset ? { loading: true, message: "" } : { loadingMore: true, message: "" });
+      const result = await callCloud<{ activities: Activity[]; nextOffset: number | null }>(
+        "activity.history",
+        { offset, limit: 20 },
+      );
+      const page = result.activities.map((activity) => ({
+        ...activity,
+        timeText: formatChinaDateTime(activity.startAt),
+        statusText: ACTIVITY_STATUS[activity.status] ?? "历史球局",
+        participationText:
+          REGISTRATION_STATUS[activity.currentRegistrationStatus ?? ""] ?? "参加记录",
+      }));
+      const activities = (reset ? page : [...this.data.activities, ...page]).sort(
+        (left, right) => Date.parse(right.startAt) - Date.parse(left.startAt),
+      );
       this.setData({
         loading: false,
-        activities: result.activities.map((activity) => ({
-          ...activity,
-          timeText: formatChinaDateTime(activity.startAt),
-          statusText: ACTIVITY_STATUS[activity.status] ?? "历史球局",
-          participationText:
-            REGISTRATION_STATUS[activity.currentRegistrationStatus ?? ""] ?? "参加记录",
-        })),
+        loadingMore: false,
+        activities,
+        nextOffset: result.nextOffset,
       });
     } catch (error) {
       this.setData({
         loading: false,
+        loadingMore: false,
         message: error instanceof Error ? error.message : "参加记录加载失败",
       });
     }

@@ -1,22 +1,30 @@
-import { callCloud, CloudApiError } from "../../services/cloud-api";
+import { CloudApiError, callCloud } from "../../services/cloud-api";
 import {
-  DEFAULT_APPEARANCE,
-  applyAppearancePreset,
+  type AppearancePreferences,
+  type AppearancePresetId,
   appearanceView,
+  applyAppearancePreset,
   applyNativeAppearance,
+  DEFAULT_APPEARANCE,
+  type HomeModuleId,
   loadAppearanceState,
   normalizeAppearance,
   saveAppearanceState,
-  type AppearancePreferences,
-  type AppearancePresetId,
-  type HomeModuleId,
   type ToolId,
 } from "../../utils/appearance";
+import { canonicalToolId, expandVisibleToolOrder, visibleToolIds } from "../../utils/tool-registry";
 
 type Venue = { id: string; name: string; verificationStatus: string };
 type CloudAppearance = { preferences: AppearancePreferences | null; version: number };
 const MODULE_LABELS: Record<HomeModuleId, string> = { tools: "快捷工具", venues: "常用场馆" };
-const TOOL_LABELS: Record<ToolId, string> = { grouping: "快速分组", scoring: "临时计分" };
+const TOOL_LABELS: Record<ToolId, string> = {
+  grouping: "公平组队",
+  scoring: "临时计分",
+  rotation: "公平组队",
+  draw: "公平组队",
+  expense: "费用均摊",
+  rules: "规则速查",
+};
 
 function preferenceSignature(preferences: AppearancePreferences): string {
   return JSON.stringify(normalizeAppearance(preferences));
@@ -28,7 +36,7 @@ Page({
     draft: { ...DEFAULT_APPEARANCE } as AppearancePreferences,
     savedPreferences: { ...DEFAULT_APPEARANCE } as AppearancePreferences,
     modules: [] as Array<{ id: HomeModuleId; label: string; visible: boolean }>,
-    tools: [] as Array<{ id: ToolId; label: string }>,
+    tools: [] as Array<{ id: ToolId; label: string; onHome: boolean }>,
     venues: [] as Array<Venue & { selected: boolean }>,
     saving: false,
     syncing: false,
@@ -77,7 +85,11 @@ Page({
         label: MODULE_LABELS[id],
         visible: draft.visibleModules.includes(id),
       })),
-      tools: draft.toolOrder.map((id) => ({ id, label: TOOL_LABELS[id] })),
+      tools: visibleToolIds(draft.toolOrder).map((id) => ({
+        id,
+        label: TOOL_LABELS[id],
+        onHome: draft.homeToolIds.map(canonicalToolId).includes(id),
+      })),
       venues: this.data.venues.map((venue) => ({
         ...venue,
         selected: draft.favoriteVenueIds.includes(venue.id),
@@ -127,11 +139,30 @@ Page({
   },
 
   moveTool(event: WechatMiniprogram.TouchEvent) {
-    this.move(
-      "toolOrder",
-      event.currentTarget.dataset.id,
-      Number(event.currentTarget.dataset.delta),
-    );
+    const id = event.currentTarget.dataset.id as ToolId;
+    const order = visibleToolIds(this.data.draft.toolOrder);
+    const index = order.indexOf(id);
+    const target = index + Number(event.currentTarget.dataset.delta);
+    if (index < 0 || target < 0 || target >= order.length) return;
+    const next = [...order];
+    [next[index], next[target]] = [next[target] as ToolId, next[index] as ToolId];
+    this.setData({ "draft.toolOrder": expandVisibleToolOrder(next) });
+    this.refreshDerived();
+  },
+
+  toggleHomeTool(event: WechatMiniprogram.SwitchChange) {
+    const id = event.currentTarget.dataset.id as ToolId;
+    const aliases: ToolId[] = id === "rotation" ? ["grouping", "rotation", "draw"] : [id];
+    const current = this.data.draft.homeToolIds.filter((item) => !aliases.includes(item));
+    if (event.detail.value && !current.includes(id) && current.length >= 4) {
+      wx.showToast({ title: "首页最多展示4项工具", icon: "none" });
+      this.refreshDerived();
+      return;
+    }
+    this.setData({
+      "draft.homeToolIds": event.detail.value ? [...new Set([...current, id])] : current,
+    });
+    this.refreshDerived();
   },
 
   move(field: "moduleOrder" | "toolOrder", id: string, delta: number) {
@@ -170,6 +201,7 @@ Page({
         moduleOrder: [...DEFAULT_APPEARANCE.moduleOrder],
         visibleModules: [],
         toolOrder: [...DEFAULT_APPEARANCE.toolOrder],
+        homeToolIds: [...DEFAULT_APPEARANCE.homeToolIds],
         favoriteVenueIds: [],
       },
     });

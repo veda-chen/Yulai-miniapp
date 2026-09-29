@@ -16,6 +16,7 @@ import {
   getActivity,
   listActivityHistory,
   listActivities,
+  listMyActivities,
   updateActivity,
 } from "./modules/activity.js";
 import { getHealth } from "./modules/health.js";
@@ -33,6 +34,7 @@ import {
   updateDraftMatch,
 } from "./modules/live.js";
 import {
+  getUnreadNotificationSummary,
   listNotifications,
   listSubscriptionPreferences,
   markNotificationRead,
@@ -69,6 +71,7 @@ const routes: Readonly<Record<string, Route>> = {
   "venue.list": { handler: listVenues, requiresAuth: false },
   "venue.get": { handler: getVenue, requiresAuth: false },
   "activity.list": { handler: listActivities, requiresAuth: false },
+  "activity.mine": { handler: listMyActivities, requiresAuth: true },
   "activity.history": { handler: listActivityHistory, requiresAuth: true },
   "activity.get": { handler: getActivity, requiresAuth: false },
   "activity.create": { handler: createActivity, requiresAuth: true },
@@ -93,6 +96,7 @@ const routes: Readonly<Record<string, Route>> = {
   "score.unlock": { handler: unlockScore, requiresAuth: true },
   "score.stats": { handler: getPlayerStats, requiresAuth: true },
   "notification.list": { handler: listNotifications, requiresAuth: true },
+  "notification.unreadSummary": { handler: getUnreadNotificationSummary, requiresAuth: true },
   "notification.markRead": { handler: markNotificationRead, requiresAuth: true },
   "notification.subscription.list": { handler: listSubscriptionPreferences, requiresAuth: true },
   "notification.subscription.save": { handler: saveSubscriptionPreferences, requiresAuth: true },

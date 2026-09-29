@@ -1,0 +1,12 @@
+<view class="tool-page {{appearanceClass}}">
+  <view class="tool-intro"><text class="tool-kicker">QUICK DRAW</text><text class="tool-title">随机抽签</text><text class="tool-copy">临时决定人选、发球顺序、搭档或对阵，结果只保存在本机。</text></view>
+  <view class="tool-card surface"><section-header title="抽签设置" description="名单自动去重" index="01" />
+    <text class="field-label">球友名单（2–100人）</text><textarea class="field-textarea" value="{{namesInput}}" placeholder="一行一个名字，也可用逗号分隔" maxlength="2000" bindinput="onNamesInput" />
+    <view class="mode-grid"><button wx:for="{{modes}}" wx:key="value" class="mode-button {{modeIndex === index ? 'active' : ''}}" data-index="{{index}}" bindtap="chooseMode">{{item.label}}</button></view>
+    <view wx:if="{{modeIndex === 0}}"><text class="field-label">抽出人数</text><input class="field-input" type="number" value="{{pickCount}}" bindinput="onPickCount" /></view>
+    <view wx:if="{{modeIndex === 3}}"><text class="field-label">对阵类型</text><picker range="{{matchTypes}}" range-key="label" value="{{matchTypeIndex}}" bindchange="onMatchType"><view class="picker-box">{{matchTypes[matchTypeIndex].label}} ›</view></picker></view>
+    <button class="primary-action" bindtap="generate">生成抽签结果</button>
+  </view>
+  <view wx:if="{{resultLines.length}}" class="tool-card surface"><section-header title="抽签结果" description="{{resultTime}}" index="02" /><text wx:for="{{resultLines}}" wx:key="*this" class="result-line">{{item}}</text><text class="result-note">本工具使用本机伪随机结果，仅供娱乐和临时分配，不作为正式抽奖凭证。</text><view class="button-row"><button class="secondary-action" bindtap="generate">重新抽签</button><button class="danger-action" bindtap="clearTool">清空本工具</button></view></view>
+  <button wx:else class="danger-action" bindtap="clearTool">清空本工具</button>
+</view>

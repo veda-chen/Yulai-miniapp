@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "规则速查",
+  "usingComponents": {
+    "section-header": "/components/section-header/index",
+    "status-chip": "/components/status-chip/index"
+  }
+}

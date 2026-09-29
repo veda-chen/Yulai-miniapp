@@ -2,6 +2,7 @@ import { callCloud } from "../../services/cloud-api";
 import { formatChinaDateTime } from "../../utils/date";
 import { levelLabel } from "../../utils/labels";
 import { appearanceView, applyNativeAppearance, loadAppearanceState } from "../../utils/appearance";
+import { normalizeActivitySearchKeyword } from "../../utils/activity-search";
 
 type Activity = {
   id: string;
@@ -91,9 +92,31 @@ function filterActivities(
   });
 }
 
+function activityView(activity: Activity): ActivityView {
+  const date = new Date(activity.startAt);
+  const now = new Date();
+  const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+  return {
+    ...activity,
+    timeText: formatChinaDateTime(activity.startAt),
+    levelText: levelLabel(activity.level),
+    registrationText: registrationLabel(activity.currentRegistrationStatus),
+    shortDay: isSameCalendarDay(date, now)
+      ? "今天"
+      : isSameCalendarDay(date, tomorrow)
+        ? "明天"
+        : `${String(date.getMonth() + 1)}/${String(date.getDate())}`,
+    shortClock: `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`,
+  };
+}
+
 Page({
+  searchTimer: null as number | null,
+  listRequestVersion: 0,
   data: {
     loading: true,
+    loadingMore: false,
+    nextOffset: null as number | null,
     activities: [] as ActivityView[],
     viewActivities: [] as ActivityView[],
     filters: FILTERS,
@@ -103,8 +126,16 @@ Page({
     ...appearanceView(),
   },
 
+  onLoad(options: Record<string, string | undefined>) {
+    const keyword = normalizeActivitySearchKeyword(
+      typeof options.keyword === "string" ? options.keyword : "",
+    );
+    if (keyword) this.setData({ keyword });
+  },
+
   onSearchInput(event: WechatMiniprogram.CustomEvent<{ value: string }>) {
-    const keyword = event.detail.value;
+    const keyword = event.detail.value.slice(0, 50);
+    this.listRequestVersion += 1;
     this.setData({
       keyword,
       viewActivities: filterActivities(
@@ -113,6 +144,18 @@ Page({
         this.data.activeFilter as FilterKey,
       ),
     });
+    if (this.searchTimer !== null) clearTimeout(this.searchTimer);
+    this.searchTimer = setTimeout(() => {
+      this.searchTimer = null;
+      void this.load(true);
+    }, 300) as unknown as number;
+  },
+
+  confirmSearch() {
+    if (this.searchTimer !== null) clearTimeout(this.searchTimer);
+    this.searchTimer = null;
+    this.listRequestVersion += 1;
+    void this.load(true);
   },
 
   onFilterTap(event: WechatMiniprogram.TouchEvent) {
@@ -128,34 +171,45 @@ Page({
     const appearance = loadAppearanceState();
     applyNativeAppearance(appearance.preferences);
     this.setData(appearanceView(appearance.preferences));
+    await this.load(true);
+  },
+
+  onUnload() {
+    if (this.searchTimer !== null) clearTimeout(this.searchTimer);
+  },
+
+  async onReachBottom() {
+    if (this.data.nextOffset !== null && !this.data.loadingMore) await this.load(false);
+  },
+
+  async retry() {
+    await this.load(true);
+  },
+
+  async load(reset: boolean) {
+    const offset = reset ? 0 : this.data.nextOffset;
+    if (offset === null) return;
+    const requestVersion = reset ? ++this.listRequestVersion : this.listRequestVersion;
+    const keyword = normalizeActivitySearchKeyword(this.data.keyword);
+    this.setData(reset ? { loading: true, message: "" } : { loadingMore: true, message: "" });
     try {
-      const result = await callCloud<{ activities: Activity[] }>("activity.list");
-      const activities = result.activities.map((activity) => {
-        const date = new Date(activity.startAt);
-        const now = new Date();
-        const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-        const sameDay = isSameCalendarDay(date, now);
-        const isTomorrow = isSameCalendarDay(date, tomorrow);
-        return {
-          ...activity,
-          timeText: formatChinaDateTime(activity.startAt),
-          levelText: levelLabel(activity.level),
-          registrationText: registrationLabel(activity.currentRegistrationStatus),
-          shortDay: sameDay
-            ? "今天"
-            : isTomorrow
-              ? "明天"
-              : `${String(date.getMonth() + 1)}/${String(date.getDate())}`,
-          shortClock:
-            String(date.getHours()).padStart(2, "0") +
-            ":" +
-            String(date.getMinutes()).padStart(2, "0"),
-        };
-      });
+      const result = await callCloud<{ activities: Activity[]; nextOffset: number | null }>(
+        "activity.list",
+        { offset, limit: 20, keyword },
+      );
+      if (
+        requestVersion !== this.listRequestVersion ||
+        keyword !== normalizeActivitySearchKeyword(this.data.keyword)
+      )
+        return;
+      const page = result.activities.map(activityView);
+      const activities = reset ? page : [...this.data.activities, ...page];
       this.setData({
         loading: false,
+        loadingMore: false,
         message: "",
         activities,
+        nextOffset: result.nextOffset,
         viewActivities: filterActivities(
           activities,
           this.data.keyword,
@@ -163,7 +217,12 @@ Page({
         ),
       });
     } catch {
-      this.setData({ loading: false, message: "球局加载失败，请稍后重试" });
+      if (requestVersion !== this.listRequestVersion) return;
+      this.setData({
+        loading: false,
+        loadingMore: false,
+        message: "球局加载失败，请稍后重试",
+      });
     }
   },
 });

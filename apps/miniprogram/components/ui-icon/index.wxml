@@ -1,0 +1,1 @@
+<view class="icon {{tone}}" style="width:{{size}}rpx;height:{{size}}rpx"><image wx:if="{{src}}" src="{{src}}" mode="aspectFit" /><text wx:else>{{text}}</text></view>

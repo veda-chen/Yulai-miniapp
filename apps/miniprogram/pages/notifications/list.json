@@ -1,1 +1,7 @@
-{ "navigationBarTitleText": "消息" }
+{
+  "navigationBarTitleText": "消息",
+  "usingComponents": {
+    "empty-state": "/components/empty-state/index",
+    "section-header": "/components/section-header/index"
+  }
+}

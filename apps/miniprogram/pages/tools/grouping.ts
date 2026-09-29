@@ -43,6 +43,9 @@ Page({
     waitingText: "",
     generated: false,
   },
+  onLoad() {
+    wx.redirectTo({ url: "/pages/tools/rotation" });
+  },
   onShow() {
     const state = loadAppearanceState();
     applyNativeAppearance(state.preferences);

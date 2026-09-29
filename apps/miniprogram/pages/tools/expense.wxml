@@ -1,0 +1,17 @@
+<view class="tool-page {{appearanceClass}}">
+  <view class="tool-intro"><text class="tool-kicker">FAIR SHARE</text><text class="tool-title">费用均摊</text><text class="tool-copy">记录场地、用球等线下费用和代付人，计算每人余额与最少转账方案。</text></view>
+  <view class="tool-card surface"><section-header title="参与者" description="2–20人，按名单顺序处理尾差" index="01" /><textarea class="field-textarea" value="{{namesInput}}" placeholder="一行一个名字，也可用逗号分隔" maxlength="500" bindinput="onNamesInput" /></view>
+  <view class="tool-card surface"><section-header title="费用明细" description="最多30笔" index="02" />
+    <view wx:for="{{expenses}}" wx:key="id" class="expense-row"><view class="expense-grid"><input class="field-input" placeholder="费用名称" value="{{item.label}}" data-index="{{index}}" data-field="label" bindinput="onExpenseInput" /><input class="field-input" type="digit" placeholder="金额" value="{{item.amountText}}" data-index="{{index}}" data-field="amountText" bindinput="onExpenseInput" /></view><view class="payer-row"><picker range="{{names}}" value="{{item.payerIndex}}" data-index="{{index}}" bindchange="onPayerChange"><text class="field-label">付款人</text><view class="picker-box">{{item.payer || '请选择付款人'}} ›</view></picker><button class="danger-action remove-row" data-index="{{index}}" bindtap="removeExpense">删除</button></view></view>
+    <view class="button-row"><button class="secondary-action" bindtap="addExpense">增加费用</button><button class="primary-action" bindtap="calculate">计算均摊</button></view>
+  </view>
+  <view wx:if="{{calculated}}" class="tool-card surface"><view class="total-row"><text>总费用</text><text>¥{{totalText}}</text></view><section-header title="个人明细" description="已付－应付＝余额" index="03" />
+    <view wx:for="{{memberResults}}" wx:key="name" class="member-row"><text>{{item.name}}</text><view class="member-values"><text>应付¥{{item.owedText}} · 已付¥{{item.paidText}}</text><text class="{{item.positive ? 'balance-positive' : (item.negative ? 'balance-negative' : '')}}"> · {{item.balanceText}}</text></view></view>
+    <text class="rounding-note">总额不能整除时，尾差按名单顺序每人增加0.01元，确保所有金额精确相等。</text>
+  </view>
+  <view wx:if="{{calculated}}" class="tool-card surface"><section-header title="最少转账方案" description="{{transfers.length}}笔" index="04" />
+    <view wx:if="{{transfers.length}}"><view wx:for="{{transfers}}" wx:key="key" class="transfer-row"><text class="transfer-main">{{item.from}} → {{item.to}}</text><text class="transfer-amount">¥{{item.amountText}}</text></view></view><text wx:else class="empty-copy">所有人的余额已经结清，无需转账</text>
+    <view class="button-row"><button class="secondary-action" bindtap="calculate">重新计算</button><button class="danger-action" bindtap="clearTool">清空本工具</button></view>
+  </view>
+  <button wx:else class="danger-action" bindtap="clearTool">清空本工具</button><text class="privacy-copy">本工具只计算线下应付金额，不提供收款、支付、订单或退款能力。</text>
+</view>

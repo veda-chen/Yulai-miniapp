@@ -1,0 +1,4 @@
+{
+  "navigationBarTitleText": "随机抽签",
+  "usingComponents": { "section-header": "/components/section-header/index" }
+}

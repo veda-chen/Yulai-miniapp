@@ -20,7 +20,7 @@
     "m4:verify": "node scripts/verify-m4.mjs",
     "test": "pnpm -r --if-present test",
     "typecheck": "pnpm -r --if-present typecheck",
-    "ui:verify": "node --experimental-strip-types scripts/verify-ui-customization.mjs",
+    "ui:verify": "node --experimental-strip-types scripts/verify-ui-customization.mjs && node --experimental-strip-types scripts/verify-tools.mjs && node --experimental-strip-types scripts/verify-core-experience.mjs",
     "backup:cloud": "node scripts/backup-cloudbase.mjs",
     "restore:plan": "node scripts/prepare-restore-plan.mjs",
     "m5:verify": "node scripts/verify-m5.mjs",

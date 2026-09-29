@@ -1,0 +1,32 @@
+<view class="tool-page fair-page {{appearanceClass}}">
+  <view class="tool-intro"><text class="tool-kicker">FAIR MATCHES</text><text class="tool-title">公平组队</text><text class="tool-copy">输入实际到场球友，一次生成整批双打对局。每批场数与人数相同，每人固定上场4次；5人及以上时，每次搭档都不同。</text></view>
+
+  <view class="tool-card surface">
+    <section-header title="参赛球友" description="4–40人，名字自动去重" index="01" />
+    <textarea class="field-textarea names-input" value="{{namesInput}}" placeholder="一行一个名字，也可用逗号分隔" maxlength="800" bindinput="onNamesInput" />
+    <view class="player-summary {{playerCount >= 4 ? 'ready' : ''}}"><view><text class="summary-count">{{playerCount}}</text><text class="summary-unit"> 人</text></view><text wx:if="{{playerCount >= 4}}">将公平生成 {{playerCount}} 场 · 每人上场 4 次</text><text wx:else>至少还需要 {{4 - playerCount}} 人</text></view>
+    <button class="primary-action create-action" bindtap="createSchedule" disabled="{{playerCount < 4}}">{{schedule.length ? '重新生成公平赛程' : '生成公平赛程'}}</button>
+  </view>
+
+  <view wx:if="{{schedule.length}}" class="tool-card surface saved-card">
+    <section-header title="已生成赛程" description="保存在本机7天" index="02" />
+    <view class="saved-summary"><view><text class="saved-number">{{schedule.length}}</text><text> 场双打</text></view><status-chip label="{{confirmed ? '已确认' : '待确认'}}" tone="{{confirmed ? 'success' : 'warning'}}" /></view>
+    <button class="secondary-action view-schedule" bindtap="openSchedule">查看完整赛程</button>
+    <button class="danger-action clear-action" bindtap="clearTool">清空名单和赛程</button>
+  </view>
+
+  <text class="privacy-copy">名单和赛程只保存在本机，不会写入球局或正式战绩。</text>
+
+  <view wx:if="{{previewVisible}}" class="sheet-mask" catchtouchmove="preventTouchMove" bindtap="closePreview">
+    <view class="schedule-sheet surface" catchtap="stopTap">
+      <view class="sheet-header"><view><text class="sheet-title">全赛程</text><text class="sheet-copy">{{playerCount}}人 · {{schedule.length}}场 · 每人上场4次</text></view><button class="sheet-close" bindtap="closePreview" aria-label="关闭">×</button></view>
+      <scroll-view class="schedule-scroll" scroll-y enhanced show-scrollbar="{{false}}">
+        <view wx:for="{{scheduleViews}}" wx:key="number" class="match-card">
+          <text class="match-number">第{{item.number}}场</text>
+          <view class="match-layout"><view class="match-team"><text class="player-badge">{{item.leftTop}}</text><text class="player-badge">{{item.leftBottom}}</text></view><text class="match-vs">VS</text><view class="match-team"><text class="player-badge">{{item.rightTop}}</text><text class="player-badge">{{item.rightBottom}}</text></view></view>
+        </view>
+      </scroll-view>
+      <view class="sheet-actions"><button class="secondary-action reroll-action" bindtap="rerollSchedule"><text class="action-icon">↻</text><text>重新随机</text></button><button class="primary-action confirm-action" bindtap="confirmSchedule"><text class="action-icon">✓</text><text>确定使用</text></button></view>
+    </view>
+  </view>
+</view>

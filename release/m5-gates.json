@@ -1,7 +1,7 @@
 {
   "version": 1,
   "milestone": "M5",
-  "updatedAt": "2026-09-12",
+  "updatedAt": "2026-09-28",
   "gates": [
     {
       "id": "wechat-platform",
@@ -29,7 +29,7 @@
       "title": "微信开发者工具与真机主流程冒烟",
       "owner": "测试负责人",
       "status": "PENDING",
-      "evidence": "2026-09-10：微信开发者工具 CLI preview 通过，AppID wx78ffd807b5bceb77，包体 331.6 KB；仍待至少两台真机完成主流程。"
+      "evidence": "2026-09-28：微信开发者工具 CLI preview 通过并上传开发版本 0.2.5，AppID wx78ffd807b5bceb77，代码包约 606.1 KB；已修复创建球局人数上限输入数字未居中，并通过 UI 行为校验。此前自动检查覆盖搜索防抖、过期响应与页面离开、详情保留重试、创建字段错误隔离、默认时间和发布后草稿保护。仍待在 Android 与 iOS 至少两台真机完成主流程、弱网和多尺寸视觉验收。"
     },
     {
       "id": "performance",

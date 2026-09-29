@@ -51,7 +51,10 @@ function subscriptionStatus(
 Page({
   data: {
     loading: true,
+    loadingMore: false,
     subscribing: false,
+    message: "",
+    nextOffset: null as number | null,
     notifications: [] as Array<Notification & { timeText: string }>,
     subscriptionState: "UNCONFIGURED",
     subscriptionTitle: "微信提醒待配置",
@@ -64,39 +67,75 @@ Page({
     const appearance = loadAppearanceState();
     applyNativeAppearance(appearance.preferences);
     this.setData(appearanceView(appearance.preferences));
-    const templates = configuredSubscriptionTemplates();
+    await Promise.allSettled([this.loadNotifications(true), this.loadSubscriptionState()]);
+  },
+
+  async onReachBottom() {
+    if (this.data.nextOffset !== null && !this.data.loadingMore)
+      await this.loadNotifications(false);
+  },
+
+  async loadNotifications(reset: boolean) {
+    const offset = reset ? 0 : this.data.nextOffset;
+    if (offset === null) return;
+    this.setData(reset ? { loading: true, message: "" } : { loadingMore: true, message: "" });
     try {
-      const notificationPromise = callCloud<{ notifications: Notification[] }>("notification.list");
-      const preferencePromise = templates.length
-        ? callCloud<{ preferences: SubscriptionPreference[] }>("notification.subscription.list")
-        : Promise.resolve({ preferences: [] as SubscriptionPreference[] });
-      const [notificationResult, preferenceResult] = await Promise.all([
-        notificationPromise,
-        preferencePromise,
-      ]);
-      const status = subscriptionStatus(templates.length, preferenceResult.preferences);
+      const result = await callCloud<{ notifications: Notification[]; nextOffset: number | null }>(
+        "notification.list",
+        { offset, limit: 20 },
+      );
+      const page = result.notifications.map((item) => ({
+        ...item,
+        timeText: formatChinaDateTime(item.createdAt),
+      }));
       this.setData({
         loading: false,
-        notifications: notificationResult.notifications.map((item) => ({
-          ...item,
-          timeText: formatChinaDateTime(item.createdAt),
-        })),
-        configuredTemplateCount: templates.length,
+        loadingMore: false,
+        notifications: reset ? page : [...this.data.notifications, ...page],
+        nextOffset: result.nextOffset,
+      });
+    } catch {
+      this.setData({
+        loading: false,
+        loadingMore: false,
+        message: "消息加载失败，请检查网络后重试",
+      });
+    }
+  },
+
+  async loadSubscriptionState() {
+    const templates = configuredSubscriptionTemplates();
+    this.setData({ configuredTemplateCount: templates.length });
+    if (templates.length === 0) {
+      const status = subscriptionStatus(0, []);
+      this.setData({
+        subscriptionState: status.state,
+        subscriptionTitle: status.title,
+        subscriptionCopy: status.copy,
+      });
+      return;
+    }
+    try {
+      const result = await callCloud<{ preferences: SubscriptionPreference[] }>(
+        "notification.subscription.list",
+      );
+      const status = subscriptionStatus(templates.length, result.preferences);
+      this.setData({
         subscriptionState: status.state,
         subscriptionTitle: status.title,
         subscriptionCopy: status.copy,
       });
     } catch {
-      const status = subscriptionStatus(templates.length, []);
       this.setData({
-        loading: false,
-        notifications: [],
-        configuredTemplateCount: templates.length,
-        subscriptionState: status.state,
-        subscriptionTitle: status.title,
-        subscriptionCopy: status.copy,
+        subscriptionState: "AVAILABLE",
+        subscriptionTitle: "微信提醒状态暂不可用",
+        subscriptionCopy: "稍后可重新进入查看；站内消息不受影响。",
       });
     }
+  },
+
+  async retryNotifications() {
+    await this.loadNotifications(true);
   },
 
   async requestSubscription() {
@@ -146,8 +185,16 @@ Page({
 
   async openNotification(event: WechatMiniprogram.TouchEvent) {
     const { id, activityId } = event.currentTarget.dataset as { id: string; activityId?: string };
-    await callCloud("notification.markRead", { id });
+    try {
+      await callCloud("notification.markRead", { id });
+      this.setData({
+        notifications: this.data.notifications.map((item) =>
+          item.id === id ? { ...item, isRead: true } : item,
+        ),
+      });
+    } catch {
+      wx.showToast({ title: "已打开消息，已读状态稍后重试", icon: "none" });
+    }
     if (activityId) wx.navigateTo({ url: `/pages/activities/detail?id=${activityId}` });
-    else await this.onShow();
   },
 });

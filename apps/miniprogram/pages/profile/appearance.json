@@ -3,7 +3,10 @@
   "usingComponents": {
     "activity-card": "/components/activity-card/index",
     "hero-banner": "/components/hero-banner/index",
+    "section-header": "/components/section-header/index",
     "score-board": "/components/score-board/index",
+    "status-chip": "/components/status-chip/index",
+    "ui-icon": "/components/ui-icon/index",
     "ui-button": "/components/ui-button/index"
   }
 }

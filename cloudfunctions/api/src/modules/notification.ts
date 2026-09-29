@@ -177,16 +177,24 @@ export async function createNotification(
     });
 }
 
-export const listNotifications: Handler = async (_payload, context) => {
+export const listNotifications: Handler = async (payload, context) => {
   const user = await findCurrentUser(context);
+  const source = isRecord(payload) ? payload : {};
+  const offset = Number.isInteger(source.offset) ? Number(source.offset) : 0;
+  const limit = Number.isInteger(source.limit) ? Number(source.limit) : 20;
+  if (offset < 0 || limit < 1 || limit > 50) {
+    throw new AppError("INVALID_ARGUMENT", "分页参数无效");
+  }
   const result = (await db
     .collection("notificationJobs")
     .where({ userId: user._id, status: db.command.in(["READY", "READ"]) })
     .orderBy("createdAt", "desc")
-    .limit(50)
+    .skip(offset)
+    .limit(limit + 1)
     .get()) as unknown as { data: NotificationDocument[] };
+  const page = result.data.slice(0, limit);
   return {
-    notifications: result.data.map((item) => ({
+    notifications: page.map((item) => ({
       id: item._id,
       activityId: item.activityId,
       type: item.type,
@@ -195,7 +203,18 @@ export const listNotifications: Handler = async (_payload, context) => {
       isRead: item.status === "READ",
       createdAt: item.createdAt instanceof Date ? item.createdAt.toISOString() : item.createdAt,
     })),
+    nextOffset: result.data.length > limit ? offset + limit : null,
   };
+};
+
+export const getUnreadNotificationSummary: Handler = async (_payload, context) => {
+  const user = await findCurrentUser(context);
+  const result = (await db
+    .collection("notificationJobs")
+    .where({ userId: user._id, status: "READY" })
+    .limit(1)
+    .get()) as unknown as { data: NotificationDocument[] };
+  return { hasUnread: result.data.length > 0 };
 };
 
 export const listSubscriptionPreferences: Handler = async (_payload, context) => {

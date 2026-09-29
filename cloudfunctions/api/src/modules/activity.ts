@@ -255,6 +255,13 @@ async function getVenue(id: string): Promise<VenueDocument> {
   return venue;
 }
 
+async function isVenueAvailable(id: string): Promise<boolean> {
+  const result = (await db.collection("venues").where({ _id: id }).limit(1).get()) as unknown as {
+    data: VenueDocument[];
+  };
+  return ["ACTIVE", "PENDING_VERIFICATION"].includes(result.data[0]?.status ?? "");
+}
+
 async function optionalCurrentUser(context: RequestContext) {
   if (!context.openid) return null;
   try {
@@ -264,21 +271,56 @@ async function optionalCurrentUser(context: RequestContext) {
   }
 }
 
-export const listActivities: Handler = async (_payload, context) => {
-  const result = (await db
+function parsePagination(payload: unknown, defaultLimit: number) {
+  const source = isRecord(payload) ? payload : {};
+  const offset = Number.isInteger(source.offset) ? Number(source.offset) : 0;
+  const requestedLimit = Number.isInteger(source.limit) ? Number(source.limit) : defaultLimit;
+  if (offset < 0 || requestedLimit < 1 || requestedLimit > 50) {
+    throw new AppError("INVALID_ARGUMENT", "分页参数无效");
+  }
+  return { offset, limit: requestedLimit };
+}
+
+export const listActivities: Handler = async (payload, context) => {
+  const { offset, limit } = parsePagination(payload, 50);
+  const source = isRecord(payload) ? payload : {};
+  const keyword = typeof source.keyword === "string" ? source.keyword.trim().toLowerCase() : "";
+  if (keyword.length > 50) throw new AppError("INVALID_ARGUMENT", "搜索关键词过长");
+  const query = db
     .collection("activities")
     .where({ status: "OPEN", visibility: "PUBLIC", startAt: db.command.gt(new Date()) })
     .orderBy("startAt", "asc")
-    .limit(50)
-    .get()) as unknown as { data: ActivityDocument[] };
+    .skip(offset);
+  const result = (await query.limit(keyword ? 100 : limit + 1).get()) as unknown as {
+    data: ActivityDocument[];
+  };
+  let consumed = Math.min(result.data.length, limit);
+  let page = result.data.slice(0, limit);
+  let nextOffset: number | null = result.data.length > limit ? offset + limit : null;
+  if (keyword) {
+    const matches: ActivityDocument[] = [];
+    consumed = 0;
+    for (const activity of result.data) {
+      consumed += 1;
+      const searchText = [activity.title, activity.venueName, activity.locationHint, activity.level]
+        .filter((value): value is string => typeof value === "string")
+        .join(" ")
+        .toLowerCase();
+      if (searchText.includes(keyword)) matches.push(activity);
+      if (matches.length === limit) break;
+    }
+    page = matches;
+    nextOffset =
+      consumed < result.data.length || result.data.length === 100 ? offset + consumed : null;
+  }
   const user = await optionalCurrentUser(context);
   const registrationByActivity = new Map<string, string>();
-  if (user && result.data.length > 0) {
+  if (user && page.length > 0) {
     const registrations = (await db
       .collection("registrations")
       .where({
         userId: user._id,
-        activityId: db.command.in(result.data.map((activity) => activity._id)),
+        activityId: db.command.in(page.map((activity) => activity._id)),
       })
       .limit(50)
       .get()) as unknown as { data: Array<RegistrationDocument & { activityId: string }> };
@@ -287,27 +329,80 @@ export const listActivities: Handler = async (_payload, context) => {
     }
   }
   return {
-    activities: result.data.map((activity) => ({
+    activities: page.map((activity) => ({
       ...mapActivity(activity, {
         includeContact: activity.contactVisibility === "PUBLIC",
         isOrganizer: user?._id === activity.organizerId,
       }),
       currentRegistrationStatus: registrationByActivity.get(activity._id) ?? null,
     })),
+    nextOffset,
   };
 };
 
-export const listActivityHistory: Handler = async (_payload, context) => {
+export const listMyActivities: Handler = async (payload, context) => {
   const user = await findCurrentUser(context);
-  const registrationResult = (await db
+  const { limit } = parsePagination(payload, 10);
+  const registrations = (await db
     .collection("registrations")
     .where({ userId: user._id })
     .limit(100)
     .get()) as unknown as { data: Array<RegistrationDocument & { activityId: string }> };
-  const registrations = registrationResult.data.filter((registration) =>
+  const activeRegistrations = registrations.data.filter((registration) =>
+    ["CONFIRMED", "WAITLISTED"].includes(registration.status),
+  );
+  if (activeRegistrations.length === 0) return { activities: [] };
+  const registrationByActivity = new Map(
+    activeRegistrations.map((registration) => [registration.activityId, registration.status]),
+  );
+  const result = (await db
+    .collection("activities")
+    .where({ _id: db.command.in([...registrationByActivity.keys()]) })
+    .limit(100)
+    .get()) as unknown as { data: ActivityDocument[] };
+  const now = Date.now();
+  return {
+    activities: result.data
+      .filter(
+        (activity) =>
+          !["CANCELLED", "HIDDEN", "ENDED"].includes(activity.status) &&
+          Date.parse(toIso(activity.endAt) ?? toIso(activity.startAt) ?? "") > now,
+      )
+      .sort(
+        (left, right) =>
+          Date.parse(toIso(left.startAt) ?? "") - Date.parse(toIso(right.startAt) ?? ""),
+      )
+      .slice(0, limit)
+      .map((activity) => ({
+        ...mapActivity(activity, {
+          includeContact:
+            activity.contactVisibility !== "NONE" || activity.organizerId === user._id,
+          isOrganizer: activity.organizerId === user._id,
+        }),
+        currentRegistrationStatus: registrationByActivity.get(activity._id) ?? null,
+      })),
+  };
+};
+
+export const listActivityHistory: Handler = async (payload, context) => {
+  const user = await findCurrentUser(context);
+  const { offset, limit } = parsePagination(payload, 20);
+  const registrationResult = (await db
+    .collection("registrations")
+    .where({ userId: user._id })
+    .skip(offset)
+    .limit(limit + 1)
+    .get()) as unknown as { data: Array<RegistrationDocument & { activityId: string }> };
+  const page = registrationResult.data.slice(0, limit);
+  const registrations = page.filter((registration) =>
     ["CONFIRMED", "ATTENDED", "NO_SHOW"].includes(registration.status),
   );
-  if (registrations.length === 0) return { activities: [] };
+  if (registrations.length === 0) {
+    return {
+      activities: [],
+      nextOffset: registrationResult.data.length > limit ? offset + limit : null,
+    };
+  }
 
   const registrationByActivity = new Map(
     registrations.map((registration) => [registration.activityId, registration.status]),
@@ -331,7 +426,10 @@ export const listActivityHistory: Handler = async (_payload, context) => {
       }),
       currentRegistrationStatus: registrationByActivity.get(activity._id) ?? null,
     }));
-  return { activities };
+  return {
+    activities,
+    nextOffset: registrationResult.data.length > limit ? offset + limit : null,
+  };
 };
 
 export const getActivity: Handler = async (payload, context) => {
@@ -409,11 +507,15 @@ export const getActivity: Handler = async (payload, context) => {
     .limit(10)
     .get()) as unknown as { data: ActivityChangeDocument[] };
   const changeVersion = activity.changeVersion ?? 0;
+  const venueAvailable = await isVenueAvailable(activity.venueId);
   return {
-    activity: mapActivity(activity, {
-      isOrganizer,
-      includeContact: isOrganizer || isParticipant || activity.contactVisibility === "PUBLIC",
-    }),
+    activity: {
+      ...mapActivity(activity, {
+        isOrganizer,
+        includeContact: isOrganizer || isParticipant || activity.contactVisibility === "PUBLIC",
+      }),
+      venueAvailable,
+    },
     currentRegistration: currentRegistration
       ? {
           status: currentRegistration.status,

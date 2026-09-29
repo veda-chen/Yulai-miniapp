@@ -1,0 +1,7 @@
+<view class="section-header">
+  <view class="marker"></view><view class="number">{{index}}</view>
+  <view class="copy"><text class="title">{{title}}</text><text wx:if="{{description}}" class="description">{{description}}</text></view>
+  <navigator wx:if="{{actionText && url && !readonly}}" class="action" url="{{url}}">{{actionText}}</navigator>
+  <button wx:elif="{{actionText && !readonly}}" class="action button-reset" bindtap="activate">{{actionText}}</button>
+  <text wx:elif="{{actionText}}" class="action">{{actionText}}</text>
+</view>

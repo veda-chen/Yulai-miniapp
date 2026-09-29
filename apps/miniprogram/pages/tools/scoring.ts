@@ -1,6 +1,31 @@
 import { appearanceView, applyNativeAppearance, loadAppearanceState } from "../../utils/appearance";
+import { loadToolDraft, saveToolDraft } from "../../utils/tool-storage";
 
 type ScoreSnapshot = { scoreA: number; scoreB: number };
+type ScoreDraft = {
+  nameA: string;
+  nameB: string;
+  scoreA: number;
+  scoreB: number;
+  history: ScoreSnapshot[];
+};
+const isScoreDraft = (value: unknown): value is ScoreDraft => {
+  if (!value || typeof value !== "object") return false;
+  const item = value as Partial<ScoreDraft>;
+  const validScore = (score: unknown) =>
+    Number.isInteger(score) && Number(score) >= 0 && Number(score) <= 30;
+  return (
+    typeof item.nameA === "string" &&
+    item.nameA.length <= 20 &&
+    typeof item.nameB === "string" &&
+    item.nameB.length <= 20 &&
+    validScore(item.scoreA) &&
+    validScore(item.scoreB) &&
+    Array.isArray(item.history) &&
+    item.history.length <= 100 &&
+    item.history.every((snapshot) => validScore(snapshot.scoreA) && validScore(snapshot.scoreB))
+  );
+};
 function resultText(scoreA: number, scoreB: number, nameA: string, nameB: string): string {
   const winner = Math.max(scoreA, scoreB);
   const loser = Math.min(scoreA, scoreB);
@@ -23,6 +48,19 @@ Page({
     ...appearanceView(),
   },
 
+  onLoad() {
+    const draft = loadToolDraft("scoring", isScoreDraft);
+    if (!draft) return;
+    this.history = draft.history;
+    this.setData({
+      nameA: draft.nameA,
+      nameB: draft.nameB,
+      scoreA: draft.scoreA,
+      scoreB: draft.scoreB,
+    });
+    this.refreshStatus();
+  },
+
   onShow() {
     const state = loadAppearanceState();
     applyNativeAppearance(state.preferences);
@@ -33,6 +71,7 @@ Page({
     const field = event.detail.side === "A" ? "nameA" : "nameB";
     this.setData({ [field]: event.detail.value });
     this.refreshStatus();
+    this.saveDraft();
   },
 
   onBoardScoreChange(event: WechatMiniprogram.CustomEvent<{ side: string; delta: number }>) {
@@ -49,6 +88,7 @@ Page({
     this.history.push({ scoreA: this.data.scoreA, scoreB: this.data.scoreB });
     this.setData({ [field]: next });
     this.refreshStatus();
+    this.saveDraft();
   },
 
   undo() {
@@ -59,6 +99,7 @@ Page({
     }
     this.setData(previous);
     this.refreshStatus();
+    this.saveDraft();
   },
 
   async reset() {
@@ -67,6 +108,7 @@ Page({
     this.history = [];
     this.setData({ scoreA: 0, scoreB: 0 });
     this.refreshStatus();
+    this.saveDraft();
   },
 
   refreshStatus() {
@@ -74,5 +116,15 @@ Page({
     const nameB = this.data.nameB.trim() || "B方";
     const statusText = resultText(this.data.scoreA, this.data.scoreB, nameA, nameB);
     this.setData({ statusText, finished: statusText.endsWith("获胜") });
+  },
+
+  saveDraft() {
+    saveToolDraft("scoring", {
+      nameA: this.data.nameA,
+      nameB: this.data.nameB,
+      scoreA: this.data.scoreA,
+      scoreB: this.data.scoreB,
+      history: this.history.slice(-100),
+    });
   },
 });

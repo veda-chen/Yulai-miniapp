@@ -4,6 +4,8 @@ const database = vi.hoisted(() => {
   const activitySet = vi.fn(async () => ({}));
   const registrationSet = vi.fn(async () => ({}));
   const participantSet = vi.fn(async () => ({}));
+  const registrations: unknown[] = [];
+  const activities: unknown[] = [];
   const transactionCollection = (name: string) => {
     if (name === "activities") {
       return {
@@ -40,9 +42,21 @@ const database = vi.hoisted(() => {
             }),
           };
         }
+        if (name === "registrations") {
+          return {
+            where: () => ({ limit: () => ({ get: async () => ({ data: registrations }) }) }),
+          };
+        }
+        if (name === "activities") {
+          return {
+            where: () => ({ limit: () => ({ get: async () => ({ data: activities }) }) }),
+          };
+        }
         throw new Error(`Unexpected collection: ${name}`);
       },
     },
+    registrations,
+    activities,
   };
 });
 
@@ -60,6 +74,8 @@ import {
   createActivity,
   criticalChangedFields,
   isHistoricalActivity,
+  listActivities,
+  listMyActivities,
   parseActivityInput,
 } from "./activity.js";
 
@@ -67,6 +83,8 @@ beforeEach(() => {
   database.activitySet.mockClear();
   database.registrationSet.mockClear();
   database.participantSet.mockClear();
+  database.registrations.length = 0;
+  database.activities.length = 0;
 });
 
 const valid = {
@@ -168,5 +186,58 @@ describe("parseActivityInput", () => {
     expect(result).toMatchObject({
       activity: { id: expect.any(String), isOrganizer: true, registeredCount: 1 },
     });
+  });
+
+  it("lists private and in-progress activities for the current participant", async () => {
+    database.registrations.push(
+      { activityId: "link-only", status: "CONFIRMED" },
+      { activityId: "playing", status: "WAITLISTED" },
+      { activityId: "cancelled", status: "CONFIRMED" },
+    );
+    const baseActivity = {
+      organizerId: "other-user",
+      organizerName: "组织者",
+      venueId: "venue-1",
+      venueName: "测试球馆",
+      startAt: "2099-01-01T10:00:00.000Z",
+      endAt: "2099-01-01T12:00:00.000Z",
+      registrationDeadline: "2099-01-01T09:00:00.000Z",
+      capacity: 8,
+      registeredCount: 4,
+      waitlistCount: 0,
+      level: "ANY",
+      locationHint: null,
+      feeNote: null,
+      contact: null,
+      contactVisibility: "PARTICIPANTS",
+      details: null,
+      visibility: "LINK_ONLY",
+      groupingEnabled: false,
+      scoringEnabled: false,
+      version: 1,
+      changeVersion: 0,
+    };
+    database.activities.push(
+      { ...baseActivity, _id: "link-only", title: "仅链接球局", status: "OPEN" },
+      { ...baseActivity, _id: "playing", title: "进行中球局", status: "IN_PROGRESS" },
+      { ...baseActivity, _id: "cancelled", title: "取消球局", status: "CANCELLED" },
+    );
+
+    const result = (await listMyActivities(
+      { limit: 10 },
+      { requestId: "mine-1", openid: "openid-1" },
+    )) as { activities: Array<{ id: string; currentRegistrationStatus: string }> };
+
+    expect(result.activities.map((activity) => activity.id)).toEqual(["link-only", "playing"]);
+    expect(result.activities.map((activity) => activity.currentRegistrationStatus)).toEqual([
+      "CONFIRMED",
+      "WAITLISTED",
+    ]);
+  });
+
+  it("rejects oversized activity pages before querying the database", async () => {
+    await expect(
+      listActivities({ limit: 51 }, { requestId: "page-1", openid: "openid-1" }),
+    ).rejects.toThrow("分页参数无效");
   });
 });

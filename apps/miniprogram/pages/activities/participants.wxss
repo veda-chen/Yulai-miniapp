@@ -1,6 +1,6 @@
 .page { padding:32rpx; }
-.member, .empty { display:flex; justify-content:space-between; margin-bottom:16rpx; padding:26rpx; border-radius:18rpx; background:#fff; }
+.member, .empty { display:flex; justify-content:space-between; margin-bottom:16rpx; padding:26rpx; border-radius:18rpx; background:var(--surface); }
 .status { color:#2d755e; }
 .tip { color:#66736e; font-size:24rpx; }
 .section-title { margin:30rpx 0 16rpx; font-size:30rpx; font-weight:600; }
-.promote-button { flex:none; width:112rpx; height:60rpx; margin:0; padding:0; border:0; border-radius:999rpx; background:#007aff; color:#fff; font-size:22rpx; }.promote-button::after { border:0; }
+.promote-button { flex:none; width:112rpx; height:60rpx; margin:0; padding:0; border:0; border-radius:999rpx; background:var(--primary); color:#fff; font-size:22rpx; }.promote-button::after { border:0; }

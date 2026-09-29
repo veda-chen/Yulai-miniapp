@@ -1,3 +1,6 @@
 {
-  "navigationBarTitleText": "找球局"
+  "navigationBarTitleText": "找球局",
+  "usingComponents": {
+    "status-chip": "/components/status-chip/index"
+  }
 }

@@ -12,6 +12,18 @@ page {
   --font-body: 25rpx;
   --font-small: 23rpx;
   --hero-end: #203a56;
+  --page-background: linear-gradient(180deg, var(--primary-soft) 0, var(--page-bg) 420rpx);
+  --surface-shadow: 0 10rpx 28rpx rgba(30, 55, 84, 0.08);
+  --surface-border-width: 1rpx;
+  --button-primary-bg: var(--primary);
+  --button-primary-color: #ffffff;
+  --button-primary-border: transparent;
+  --button-shadow: 0 8rpx 20rpx rgba(30, 55, 84, 0.14);
+  --section-marker-display: block;
+  --section-number-display: none;
+  --icon-radius: 18rpx;
+  --motion-duration: 160ms;
+  --court-line: rgba(0, 122, 255, 0.12);
   background: var(--page-bg);
   color: var(--text);
   font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
@@ -35,9 +47,13 @@ button {
 
 .surface {
   background: var(--surface);
-  border: 1rpx solid var(--border);
+  border: var(--surface-border-width) solid var(--border);
   border-radius: var(--surface-radius);
-  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.04);
+  box-shadow: var(--surface-shadow);
+  transition:
+    transform var(--motion-duration) ease,
+    box-shadow var(--motion-duration) ease,
+    background-color var(--motion-duration) ease;
 }
 
 .pill {
@@ -48,16 +64,24 @@ button {
 }
 
 .primary-button {
-  border: 0;
+  border: 2rpx solid var(--button-primary-border);
   border-radius: 999rpx;
-  background: var(--primary);
-  color: #ffffff;
+  background: var(--button-primary-bg);
+  color: var(--button-primary-color);
   font-size: 30rpx;
   font-weight: 600;
+  box-shadow: var(--button-shadow);
+  transition:
+    transform var(--motion-duration) ease,
+    opacity var(--motion-duration) ease;
 }
 
-.theme-green { --primary:#11866f; --primary-soft:#e1f5ef; --hero-end:#173e37; }
-.theme-orange { --primary:#d65f27; --primary-soft:#fff0e8; --hero-end:#66331f; }
+.primary-button:active {
+  transform: scale(0.98);
+}
+
+.theme-green { --primary:#11866f; --primary-soft:#e1f5ef; --hero-end:#173e37; --court-line:rgba(17,134,111,.12); }
+.theme-orange { --primary:#d65f27; --primary-soft:#fff0e8; --hero-end:#66331f; --court-line:rgba(214,95,39,.12); }
 .corner-compact { --surface-radius:20rpx; --control-radius:14rpx; }
 .text-large { --font-title:31rpx; --font-body:28rpx; --font-small:25rpx; }
 .mode-dark { --page-bg:#0f1114; --surface:#1b1e22; --text:#f5f5f7; --muted:#a4a7ad; --border:#30343a; color:var(--text); }
@@ -74,3 +98,35 @@ button {
 .primary-button::after {
   border: 0;
 }
+
+.background-plain { --page-background:var(--page-bg); background:var(--page-background) !important; }
+.background-soft-gradient { --page-background:linear-gradient(180deg,var(--primary-soft) 0,var(--page-bg) 440rpx); background:var(--page-background) !important; }
+.background-court-lines { --page-background:linear-gradient(90deg,transparent 49.7%,var(--court-line) 50%,transparent 50.3%),linear-gradient(0deg,transparent 64.7%,var(--court-line) 65%,transparent 65.3%),linear-gradient(180deg,var(--primary-soft),var(--page-bg) 520rpx); background:var(--page-background) !important; background-size:100% 100%,100% 100%,100% 100% !important; }
+.mode-dark.background-soft-gradient { --page-background:linear-gradient(180deg,#17212b 0,var(--page-bg) 520rpx); }
+.mode-dark.background-court-lines { --page-background:linear-gradient(90deg,transparent 49.7%,rgba(255,255,255,.055) 50%,transparent 50.3%),linear-gradient(0deg,transparent 64.7%,rgba(255,255,255,.045) 65%,transparent 65.3%),linear-gradient(180deg,#17212b,var(--page-bg) 560rpx); }
+
+.surface-elevated { --surface-shadow:0 12rpx 30rpx rgba(30,55,84,.1); --surface-border-width:1rpx; }
+.surface-flat { --surface-shadow:none; --surface-border-width:0rpx; }
+.surface-outline { --surface-shadow:none; --surface-border-width:2rpx; }
+.surface-elevated .venue-card,.surface-elevated .activity-row,.surface-elevated .item,.surface-elevated .card,.surface-elevated .form-card,.surface-elevated .info-card,.surface-elevated .roster-card,.surface-elevated .organizer-actions,.surface-elevated .notice-card,.surface-elevated .subscription-card,.surface-elevated .match-card,.surface-elevated .feedback-card,.surface-elevated .verification-card,.surface-elevated .ideas { border-width:var(--surface-border-width) !important; box-shadow:var(--surface-shadow) !important; }
+.surface-flat .venue-card,.surface-flat .activity-row,.surface-flat .item,.surface-flat .card,.surface-flat .form-card,.surface-flat .info-card,.surface-flat .roster-card,.surface-flat .organizer-actions,.surface-flat .notice-card,.surface-flat .subscription-card,.surface-flat .match-card,.surface-flat .feedback-card,.surface-flat .verification-card,.surface-flat .ideas { border-width:0 !important; box-shadow:none !important; }
+.surface-outline .venue-card,.surface-outline .activity-row,.surface-outline .item,.surface-outline .card,.surface-outline .form-card,.surface-outline .info-card,.surface-outline .roster-card,.surface-outline .organizer-actions,.surface-outline .notice-card,.surface-outline .subscription-card,.surface-outline .match-card,.surface-outline .feedback-card,.surface-outline .verification-card,.surface-outline .ideas { border:2rpx solid var(--border) !important; box-shadow:none !important; }
+
+.button-filled { --button-primary-bg:var(--primary); --button-primary-color:#fff; --button-primary-border:transparent; --button-shadow:0 8rpx 20rpx rgba(30,55,84,.14); }
+.button-soft { --button-primary-bg:var(--primary-soft); --button-primary-color:var(--primary); --button-primary-border:transparent; --button-shadow:none; }
+.button-outline { --button-primary-bg:var(--surface); --button-primary-color:var(--primary); --button-primary-border:var(--primary); --button-shadow:none; }
+.button-soft .publish,.button-soft .submit,.button-soft .subscription-button,.button-soft .join-action,.button-soft .save,.button-soft .generate,.button-soft .tool-button,.button-soft .promote-button,.button-soft .small.primary { border-color:transparent !important; background:var(--primary-soft) !important; color:var(--primary) !important; box-shadow:none !important; }
+.button-outline .publish,.button-outline .submit,.button-outline .subscription-button,.button-outline .join-action,.button-outline .save,.button-outline .generate,.button-outline .tool-button,.button-outline .promote-button,.button-outline .small.primary { border:2rpx solid var(--primary) !important; background:var(--surface) !important; color:var(--primary) !important; box-shadow:none !important; }
+
+.section-marker { --section-marker-display:block; --section-number-display:none; }
+.section-numbered { --section-marker-display:none; --section-number-display:flex; }
+.section-plain { --section-marker-display:none; --section-number-display:none; }
+
+.icon-tile { --icon-radius:18rpx; }
+.icon-circle { --icon-radius:50%; }
+.icon-bare { --icon-radius:0; --icon-background:transparent; }
+.icon-circle .menu-icon,.icon-circle .info-icon,.icon-circle .group-icon { border-radius:50% !important; }
+.icon-bare .menu-icon,.icon-bare .info-icon,.icon-bare .group-icon { background:transparent !important; box-shadow:none !important; }
+
+.motion-subtle { --motion-duration:160ms; }
+.motion-reduced { --motion-duration:0ms; --press-scale:1; }
