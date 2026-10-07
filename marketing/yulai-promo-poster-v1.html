@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1024, initial-scale=1" />
+    <title>羽来宣传海报</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        width: 1024px;
+        height: 1536px;
+        margin: 0;
+        overflow: hidden;
+        font-family: "Microsoft YaHei UI", "Microsoft YaHei", sans-serif;
+      }
+
+      .poster {
+        position: relative;
+        width: 1024px;
+        height: 1536px;
+        overflow: hidden;
+        background: #063f64;
+        color: #fff;
+      }
+
+      .background,
+      .top-shade,
+      .bottom-glow {
+        position: absolute;
+        inset: 0;
+      }
+
+      .background {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .top-shade {
+        background:
+          linear-gradient(180deg, rgba(3, 37, 69, 0.82) 0, rgba(3, 49, 78, 0.4) 30%, transparent 58%),
+          linear-gradient(90deg, rgba(1, 46, 84, 0.64) 0, transparent 55%);
+      }
+
+      .bottom-glow {
+        background: linear-gradient(180deg, transparent 62%, rgba(11, 105, 91, 0.26));
+      }
+
+      .content {
+        position: relative;
+        z-index: 2;
+        height: 100%;
+        padding: 72px 58px 46px;
+      }
+
+      .brand-row {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+      }
+
+      .brand-mark {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 74px;
+        height: 74px;
+        border: 2px solid rgba(255, 255, 255, 0.42);
+        border-radius: 24px;
+        background: rgba(255, 255, 255, 0.18);
+        font-size: 42px;
+        font-weight: 800;
+        box-shadow: 0 14px 34px rgba(3, 32, 62, 0.18);
+        backdrop-filter: blur(12px);
+      }
+
+      .brand-name {
+        font-size: 38px;
+        font-weight: 800;
+        letter-spacing: 3px;
+      }
+
+      .brand-subtitle {
+        margin-top: 5px;
+        color: rgba(255, 255, 255, 0.76);
+        font-size: 19px;
+        letter-spacing: 1px;
+      }
+
+      .headline {
+        margin-top: 82px;
+        font-size: 86px;
+        font-weight: 900;
+        line-height: 1.08;
+        letter-spacing: -3px;
+        text-shadow: 0 10px 34px rgba(1, 36, 67, 0.28);
+      }
+
+      .headline em {
+        color: #9ff8e1;
+        font-style: normal;
+      }
+
+      .slogan {
+        margin-top: 28px;
+        color: rgba(255, 255, 255, 0.92);
+        font-size: 27px;
+        font-weight: 600;
+        letter-spacing: 1px;
+      }
+
+      .mascot-note {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 32px;
+        padding: 13px 22px;
+        border: 1px solid rgba(255, 255, 255, 0.36);
+        border-radius: 999px;
+        background: rgba(5, 73, 108, 0.42);
+        color: #fff;
+        font-size: 20px;
+        font-weight: 650;
+        backdrop-filter: blur(12px);
+      }
+
+      .dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: #80f2d1;
+        box-shadow: 0 0 0 6px rgba(128, 242, 209, 0.18);
+      }
+
+      .info-card {
+        position: absolute;
+        right: 48px;
+        bottom: 42px;
+        left: 48px;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 342px;
+        gap: 28px;
+        min-height: 430px;
+        padding: 40px 38px 30px 44px;
+        border: 1px solid rgba(255, 255, 255, 0.72);
+        border-radius: 44px;
+        background: rgba(255, 255, 255, 0.94);
+        color: #12304a;
+        box-shadow: 0 26px 60px rgba(0, 54, 67, 0.24);
+        backdrop-filter: blur(20px);
+      }
+
+      .card-kicker {
+        color: #087d70;
+        font-size: 20px;
+        font-weight: 800;
+        letter-spacing: 2px;
+      }
+
+      .card-title {
+        margin-top: 12px;
+        font-size: 43px;
+        font-weight: 900;
+        line-height: 1.2;
+      }
+
+      .features {
+        display: grid;
+        gap: 14px;
+        margin-top: 25px;
+      }
+
+      .feature {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        font-size: 22px;
+        font-weight: 650;
+      }
+
+      .check {
+        display: flex;
+        flex: none;
+        align-items: center;
+        justify-content: center;
+        width: 29px;
+        height: 29px;
+        border-radius: 50%;
+        background: #e0f8f0;
+        color: #078a73;
+        font-size: 18px;
+        font-weight: 900;
+      }
+
+      .pilot {
+        margin-top: 24px;
+        padding-top: 18px;
+        border-top: 1px solid #dbe8e7;
+        color: #607485;
+        font-size: 17px;
+        line-height: 1.55;
+      }
+
+      .code-area {
+        text-align: center;
+      }
+
+      .code-shell {
+        width: 320px;
+        height: 320px;
+        margin: 0 auto;
+        padding: 8px;
+        border: 1px solid #dce8e7;
+        border-radius: 28px;
+        background: #fff;
+        box-shadow: 0 12px 34px rgba(22, 67, 82, 0.1);
+      }
+
+      .code-shell img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        border-radius: 20px;
+        object-fit: contain;
+      }
+
+      .scan-title {
+        margin-top: 15px;
+        color: #0e6f66;
+        font-size: 21px;
+        font-weight: 800;
+      }
+
+      .scan-copy {
+        margin-top: 4px;
+        color: #788896;
+        font-size: 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="poster">
+      <img class="background" src="./yulai-poster-background-v1.png" alt="" />
+      <div class="top-shade"></div>
+      <div class="bottom-glow"></div>
+      <div class="content">
+        <div class="brand-row">
+          <div class="brand-mark">羽</div>
+          <div>
+            <div class="brand-name">羽来</div>
+            <div class="brand-subtitle">广州大学城羽毛球约局小程序</div>
+          </div>
+        </div>
+
+        <div class="headline">想打球<br /><em>羽来就来</em></div>
+        <div class="slogan">从一个人想打，到一群人开局</div>
+        <div class="mascot-note"><span class="dot"></span>球友一叫，羽仔就到</div>
+
+        <section class="info-card">
+          <div>
+            <div class="card-kicker">YULAI · 一起上场</div>
+            <div class="card-title">找到球友<br />开下一场球</div>
+            <div class="features">
+              <div class="feature"><span class="check">✓</span>发现并报名附近公开球局</div>
+              <div class="feature"><span class="check">✓</span>候补递补与活动消息提醒</div>
+              <div class="feature"><span class="check">✓</span>公平组队、临时计分与实用工具</div>
+            </div>
+            <div class="pilot">首个试点场馆<br /><strong>广东工业大学大学城校区体育馆</strong></div>
+          </div>
+          <div class="code-area">
+            <div class="code-shell"><img src="./yulai-miniprogram-code.jpg" alt="羽来小程序码" /></div>
+            <div class="scan-title">微信扫码进入「羽来」</div>
+            <div class="scan-copy">加入你的下一场球局</div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </body>
+</html>
