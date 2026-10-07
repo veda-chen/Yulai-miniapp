@@ -1,6 +1,6 @@
 <view class="venue-detail-page {{appearanceClass}}">
-  <view wx:if="{{loading}}" class="state-card">正在加载场馆</view>
-  <view wx:elif="{{message}}" class="state-card muted">{{message}}</view>
+  <empty-state wx:if="{{loading}}" title="正在加载场馆" description="请稍候" />
+  <view wx:elif="{{message}}" class="detail-error"><empty-state title="暂时无法查看场馆" description="{{message}}" action-text="重新加载" bind:action="retry" /><button class="back-home" bindtap="goHome">返回首页</button></view>
   <block wx:else>
     <view class="venue-hero">
       <image class="hero-image" src="{{detail.venue.coverFileId || '/assets/venue-header-v2.jpg'}}" mode="aspectFill" />
@@ -26,7 +26,7 @@
         <view class="info-row"><text class="info-label">开放说明</text><text class="copy">{{detail.venue.openingHours || '暂无资料'}}</text></view>
         <view class="info-row"><text class="info-label">入场要求</text><text class="copy">{{detail.venue.accessPolicy || '暂无资料'}}</text></view>
         <view class="info-row"><text class="info-label">预约方式</text><text class="copy">{{detail.venue.bookingInstructions || '暂无资料'}}</text></view>
-        <view class="info-row"><text class="info-label">场馆电话</text><text class="copy phone" bindtap="copyVenuePhone">{{detail.venue.contactPhone || '暂无资料'}}</text></view>
+        <view class="info-row"><text class="info-label">场馆电话</text><view wx:if="{{detail.venue.contactPhone}}" class="phone-action" bindtap="copyVenuePhone"><text class="copy">{{detail.venue.contactPhone}}</text><text class="copy-label">复制号码</text></view><text wx:else class="copy">暂无资料</text></view>
       </view>
       <view wx:else class="empty-courts"><text>到馆信息仍待现场核验</text><text class="empty-copy">核验前不会展示推测的入口、开放时间或联系方式。</text></view>
     </view>

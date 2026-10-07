@@ -2,11 +2,13 @@
   <view class="card">
     <text class="form-title">{{pageTitle}}</text>
     <text class="form-copy">你提交的信息将进入运营审核，不会直接修改公开内容。</text>
+    <text wx:if="{{targetError}}" class="form-error target-error">{{targetError}}</text>
     <text class="label">{{reasonLabel}}</text>
     <picker range="{{reasons}}" range-key="label" value="{{reasonIndex}}" bindchange="onReasonChange"><view class="picker">{{reasons[reasonIndex].label}} <text>›</text></view></picker>
     <text class="label">{{detailsLabel}}</text>
-    <textarea maxlength="500" value="{{details}}" placeholder="{{placeholder}}" bindinput="onDetailsInput" />
+    <textarea class="{{detailsError ? 'invalid' : ''}}" maxlength="500" value="{{details}}" placeholder="{{placeholder}}" bindinput="onDetailsInput" bindblur="onDetailsBlur" />
+    <text wx:if="{{detailsError}}" class="form-error">{{detailsError}}</text>
     <text class="counter">{{details.length}} / 500</text>
-    <button class="submit" loading="{{saving}}" bindtap="submit">{{submitText}}</button>
+    <button class="submit" loading="{{saving}}" disabled="{{saving || submitted || !canSubmit}}" bindtap="submit">{{submitted ? '已提交' : submitText}}</button>
   </view>
 </view>

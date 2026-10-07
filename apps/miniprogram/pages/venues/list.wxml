@@ -5,9 +5,9 @@
     <view class="venue-banner-content"><text class="venue-kicker">场馆指南</text><text class="venue-title">先找到馆，再找到场</text><text class="venue-subtitle">大学城羽毛球馆资料与场地信息</text></view>
   </view>
   <view class="venue-section-head"><section-header title="附近场馆" description="首个试点 · 广东工业大学大学城校区" action-text="{{venues.length + ' 家'}}" index="01" readonly="{{true}}" /></view>
-  <view wx:if="{{loading}}" class="empty">正在加载场馆</view>
-  <view wx:elif="{{message}}" class="empty">{{message}}</view>
-  <view wx:elif="{{venues.length === 0}}" class="empty">暂无场馆资料</view>
+  <empty-state wx:if="{{loading}}" title="正在加载场馆" description="请稍候" />
+  <empty-state wx:elif="{{message}}" title="暂时无法加载场馆" description="{{message}}" action-text="重新加载" bind:action="retry" />
+  <empty-state wx:elif="{{venues.length === 0}}" title="暂无场馆资料" description="核验完成后会在这里展示" />
   <navigator wx:for="{{venues}}" wx:key="id" class="venue-card" url="/pages/venues/detail?id={{item.id}}">
     <view class="venue-mark"><view class="venue-pin"><view></view></view></view>
     <view class="venue-main"><view class="venue-head"><text class="venue-name">{{item.name}}</text><status-chip wx:if="{{item.verificationStatus === 'PENDING_VERIFICATION'}}" label="待核验" tone="warning" /></view><text class="venue-address">{{item.address || '暂无地址资料'}}</text><view class="venue-more"><text>查看场地与设施</text><text>›</text></view></view>

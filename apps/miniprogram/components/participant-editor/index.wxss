@@ -1,0 +1,25 @@
+:host { display:block; min-width:0; }
+.participant-editor { min-width:0; }
+.participant-row { display:grid; grid-template-columns:52rpx minmax(0,1fr) 92rpx; align-items:start; gap:12rpx; padding:12rpx 0; border-bottom:1rpx solid var(--border); }
+.participant-row:last-of-type { border-bottom:0; }
+.participant-number { display:flex; align-items:center; justify-content:center; width:52rpx; height:72rpx; color:var(--primary); font-size:22rpx; font-weight:750; }
+.participant-field { min-width:0; }
+.participant-input { box-sizing:border-box; width:100%; height:72rpx; padding:0 18rpx; border:1rpx solid var(--border); border-radius:var(--control-radius); background:var(--page-bg); color:var(--text); font-size:24rpx; line-height:72rpx; }
+.invalid .participant-input { border-color:#d93025; background:rgba(217,48,37,.05); }
+.participant-error { display:block; margin-top:7rpx; color:#d93025; font-size:19rpx; line-height:1.35; }
+.participant-remove { display:flex; align-items:center; justify-content:center; box-sizing:border-box; width:92rpx; height:72rpx; margin:0; padding:0; border:0; border-radius:var(--control-radius); background:transparent; color:#d93025; font-size:20rpx; line-height:1.2; }
+.participant-remove::after,.participant-action::after,.batch-actions button::after { border:0; }
+.participant-actions { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:14rpx; margin-top:18rpx; }
+.participant-action { box-sizing:border-box; width:100%; min-width:0; height:76rpx; margin:0; padding:0 12rpx; border:1rpx solid var(--primary); border-radius:var(--control-radius); background:var(--surface); color:var(--primary); font-size:22rpx; line-height:1.2; }
+.participant-action[disabled],.participant-remove[disabled] { border-color:var(--border); color:var(--muted); opacity:.65; }
+.participant-limit { display:block; margin-top:12rpx; color:var(--muted); font-size:19rpx; text-align:center; }
+.batch-mask { position:fixed; z-index:1200; top:0; right:0; bottom:0; left:0; display:flex; align-items:flex-end; background:rgba(0,0,0,.56); }
+.batch-sheet { box-sizing:border-box; width:100%; padding:32rpx 36rpx calc(28rpx + env(safe-area-inset-bottom)); border-radius:36rpx 36rpx 0 0; background:var(--surface); color:var(--text); }
+.batch-title { display:block; font-size:31rpx; font-weight:780; }
+.batch-copy { display:block; margin-top:9rpx; color:var(--muted); font-size:21rpx; line-height:1.5; }
+.batch-input { box-sizing:border-box; width:100%; height:260rpx; margin-top:20rpx; padding:20rpx; border:1rpx solid var(--border); border-radius:var(--control-radius); background:var(--page-bg); color:var(--text); font-size:24rpx; line-height:1.5; }
+.batch-actions { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:14rpx; margin-top:20rpx; }
+.batch-actions button { box-sizing:border-box; width:100%; min-width:0; height:80rpx; margin:0; padding:0 12rpx; border-radius:var(--control-radius); font-size:23rpx; line-height:1.2; }
+.batch-cancel { border:1rpx solid var(--border); background:var(--surface); color:var(--text); }
+.batch-confirm { border:1rpx solid var(--primary); background:var(--primary); color:#fff; }
+@media (max-width:360px) { .participant-row { grid-template-columns:42rpx minmax(0,1fr) 76rpx; gap:8rpx; }.participant-number { width:42rpx; }.participant-remove { width:76rpx; font-size:18rpx; }.participant-actions,.batch-actions { grid-template-columns:1fr; }.batch-sheet { padding-right:24rpx; padding-left:24rpx; } }

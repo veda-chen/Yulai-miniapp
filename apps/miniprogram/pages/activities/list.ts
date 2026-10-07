@@ -15,6 +15,7 @@ type Activity = {
   currentRegistrationStatus: string | null;
   level: string;
   locationHint: string | null;
+  organizer: { nickname: string };
 };
 
 type ActivityView = Activity & {
@@ -121,6 +122,7 @@ Page({
     viewActivities: [] as ActivityView[],
     filters: FILTERS,
     activeFilter: "all" as FilterKey,
+    activeFilterLabel: "全部",
     keyword: "",
     message: "",
     ...appearanceView(),
@@ -158,11 +160,36 @@ Page({
     void this.load(true);
   },
 
+  clearSearch() {
+    if (this.searchTimer !== null) clearTimeout(this.searchTimer);
+    this.searchTimer = null;
+    this.listRequestVersion += 1;
+    this.setData({
+      keyword: "",
+      viewActivities: filterActivities(this.data.activities, "", this.data.activeFilter),
+    });
+    void this.load(true);
+  },
+
+  resetFilters() {
+    if (this.searchTimer !== null) clearTimeout(this.searchTimer);
+    this.searchTimer = null;
+    this.listRequestVersion += 1;
+    this.setData({
+      keyword: "",
+      activeFilter: "all",
+      activeFilterLabel: "全部",
+      viewActivities: this.data.activities,
+    });
+    void this.load(true);
+  },
+
   onFilterTap(event: WechatMiniprogram.TouchEvent) {
     const activeFilter = String(event.currentTarget.dataset.key) as FilterKey;
     if (!FILTERS.some((filter) => filter.key === activeFilter)) return;
     this.setData({
       activeFilter,
+      activeFilterLabel: FILTERS.find((filter) => filter.key === activeFilter)?.label ?? "全部",
       viewActivities: filterActivities(this.data.activities, this.data.keyword, activeFilter),
     });
   },

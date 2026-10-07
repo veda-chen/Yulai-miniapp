@@ -8,10 +8,34 @@ import {
   shuffled,
   uniqueNames,
 } from "../apps/miniprogram/utils/tool-domain.ts";
+import {
+  duplicateParticipantErrors,
+  mergeParticipantValues,
+  participantValues,
+  removeParticipantValue,
+} from "../apps/miniprogram/utils/participant-editor.ts";
 import { expandVisibleToolOrder, visibleToolIds } from "../apps/miniprogram/utils/tool-registry.ts";
 import { clearAllToolDrafts, isFreshToolDraft } from "../apps/miniprogram/utils/tool-storage.ts";
 
 assert.deepEqual(uniqueNames("阿羽\n阿来，阿羽"), ["阿羽", "阿来"]);
+assert.deepEqual(participantValues("", 4, 40), ["", "", "", ""]);
+assert.deepEqual(participantValues("阿羽\n阿来", 4, 40), ["阿羽", "阿来", "", ""]);
+assert.deepEqual(duplicateParticipantErrors(["阿羽", "阿来", "阿羽", ""]), [
+  "与第3位球友重名",
+  "",
+  "与第1位球友重名",
+  "",
+]);
+assert.deepEqual(removeParticipantValue(["A", "B", "C", "D"], 1, 4), ["A", "C", "D", ""]);
+assert.deepEqual(mergeParticipantValues(["A", "", "C", ""], "B，C；D\nE", 5), {
+  values: ["A", "B", "C", "D", "E"],
+  imported: 3,
+  skipped: 1,
+});
+assert.equal(
+  participantValues(Array.from({ length: 45 }, (_, index) => `P${index}`).join("\n"), 4, 40).length,
+  40,
+);
 for (const count of [4, 5, 6, 8, 12, 40]) {
   const names = Array.from({ length: count }, (_, index) => `球友${index + 1}`);
   const schedule = generateFairRotationBatch({ names, seed: `batch-${count}` });

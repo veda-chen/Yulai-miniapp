@@ -89,6 +89,7 @@ beforeEach(() => {
 
 const valid = {
   venueId: "venue-1",
+  title: "周五晚羽毛球局",
   startAt: "2026-09-10T11:00:00.000Z",
   endAt: "2026-09-10T13:00:00.000Z",
   registrationDeadline: "2026-09-10T09:00:00.000Z",
@@ -114,6 +115,10 @@ describe("parseActivityInput", () => {
 
   it("allows school-independent creation fields", () => {
     expect(parseActivityInput(valid, now)).not.toHaveProperty("schoolId");
+  });
+
+  it("requires a recognizable activity name", () => {
+    expect(() => parseActivityInput({ ...valid, title: "   " }, now)).toThrow("球局名称格式不正确");
   });
 
   it("recognizes past participation while excluding cancelled activities", () => {

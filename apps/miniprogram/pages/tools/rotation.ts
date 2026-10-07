@@ -20,6 +20,20 @@ type ScheduleView = {
   rightBottom: string;
 };
 
+type ParticipantChangeEvent = WechatMiniprogram.CustomEvent<{
+  value: string;
+  names: string[];
+  hasDuplicates: boolean;
+}>;
+
+function listedNames(value: string): string[] {
+  return value
+    .split(/[\n,，;；]+/)
+    .map((name) => name.trim())
+    .filter(Boolean)
+    .slice(0, 40);
+}
+
 const isNameList = (value: unknown, length: number) =>
   Array.isArray(value) &&
   value.length === length &&
@@ -72,6 +86,7 @@ Page({
     ...appearanceView(),
     namesInput: "",
     playerCount: 0,
+    hasDuplicates: false,
     schedule: [] as RotationRound[],
     scheduleViews: [] as ScheduleView[],
     previewVisible: false,
@@ -84,6 +99,8 @@ Page({
     this.setData({
       ...draft,
       playerCount: uniqueNames(draft.namesInput, 40).length,
+      hasDuplicates:
+        listedNames(draft.namesInput).length !== uniqueNames(draft.namesInput, 40).length,
       scheduleViews: scheduleViews(draft.schedule),
     });
   },
@@ -102,21 +119,24 @@ Page({
     });
   },
 
-  onNamesInput(event: WechatMiniprogram.CustomEvent<{ value: string }>) {
-    const namesInput = event.detail.value;
-    this.setData({
-      namesInput,
-      playerCount: uniqueNames(namesInput, 40).length,
-      schedule: [],
-      scheduleViews: [],
-      previewVisible: false,
-      confirmed: false,
-    });
-    this.saveDraft();
+  onParticipantsChange(event: ParticipantChangeEvent) {
+    this.setData(
+      {
+        namesInput: event.detail.value,
+        playerCount: event.detail.names.length,
+        hasDuplicates: event.detail.hasDuplicates,
+        schedule: [],
+        scheduleViews: [],
+        previewVisible: false,
+        confirmed: false,
+      },
+      () => this.saveDraft(),
+    );
   },
 
   createSchedule() {
     try {
+      if (this.data.hasDuplicates) throw new Error("请先修改重复姓名");
       const names = uniqueNames(this.data.namesInput, 40);
       const schedule = generateFairRotationBatch({
         names,
@@ -156,6 +176,25 @@ Page({
     this.setData({ previewVisible: false });
   },
 
+  async unlockRoster() {
+    if (this.data.schedule.length === 0) return;
+    const result = await wx.showModal({
+      title: "修改球友名单？",
+      content: "修改名单会清除当前赛程，需要重新生成。",
+      confirmText: "修改名单",
+    });
+    if (!result.confirm) return;
+    this.setData(
+      {
+        schedule: [],
+        scheduleViews: [],
+        previewVisible: false,
+        confirmed: false,
+      },
+      () => this.saveDraft(),
+    );
+  },
+
   stopTap() {},
 
   preventTouchMove() {},
@@ -169,6 +208,7 @@ Page({
     this.setData({
       namesInput: "",
       playerCount: 0,
+      hasDuplicates: false,
       schedule: [],
       scheduleViews: [],
       previewVisible: false,

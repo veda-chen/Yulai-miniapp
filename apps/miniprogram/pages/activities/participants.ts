@@ -17,6 +17,8 @@ Page({
     waitlist: [] as WaitingMember[],
     canManage: false,
     loading: true,
+    message: "",
+    submittingUserId: "",
     ...appearanceView(),
   },
   onLoad(options: Record<string, string | undefined>) {
@@ -29,6 +31,11 @@ Page({
     await this.load();
   },
   async load() {
+    if (!this.activityId) {
+      this.setData({ loading: false, message: "球局链接无效" });
+      return;
+    }
+    this.setData({ loading: this.data.participants.length === 0, message: "" });
     try {
       const result = await callCloud<{
         participants: Participant[];
@@ -37,6 +44,7 @@ Page({
       }>("participant.list", { id: this.activityId });
       this.setData({
         loading: false,
+        message: "",
         canManage: result.canManage,
         waitlist: result.waitlist,
         participants: result.participants.map((item) => ({
@@ -44,26 +52,42 @@ Page({
           statusText: LABELS[item.attendanceStatus] ?? item.attendanceStatus,
         })),
       });
-    } catch {
-      this.setData({ loading: false, participants: [] });
+    } catch (error) {
+      this.setData({
+        loading: false,
+        message: error instanceof Error ? error.message : "成员名单加载失败，请稍后重试",
+      });
     }
   },
-  async changeAttendance(event: WechatMiniprogram.TouchEvent) {
-    if (!this.data.canManage) return;
-    const userId = String(event.currentTarget.dataset.userId);
-    const selection = await wx.showActionSheet({
-      itemList: ["已到场", "未到场", "已离场", "待确认"],
-    });
-    const statuses = ["CHECKED_IN", "ABSENT", "LEFT", "PENDING"];
-    await callCloud("participant.setAttendance", {
-      activityId: this.activityId,
-      userId,
-      attendanceStatus: statuses[selection.tapIndex],
-    });
+  async retry() {
     await this.load();
   },
-  async promote(event: WechatMiniprogram.TouchEvent) {
+  async changeAttendance(event: WechatMiniprogram.TouchEvent) {
+    if (!this.data.canManage || this.data.submittingUserId) return;
     const userId = String(event.currentTarget.dataset.userId);
+    try {
+      const selection = await wx.showActionSheet({
+        itemList: ["已到场", "未到场", "已离场", "待确认"],
+      });
+      const statuses = ["CHECKED_IN", "ABSENT", "LEFT", "PENDING"];
+      this.setData({ submittingUserId: userId });
+      await callCloud("participant.setAttendance", {
+        activityId: this.activityId,
+        userId,
+        attendanceStatus: statuses[selection.tapIndex],
+      });
+      await this.load();
+    } catch (error) {
+      if (error instanceof Error && !error.message.includes("cancel"))
+        wx.showToast({ title: error.message || "修改失败", icon: "none" });
+    } finally {
+      this.setData({ submittingUserId: "" });
+    }
+  },
+  async promote(event: WechatMiniprogram.TouchEvent) {
+    if (this.data.submittingUserId) return;
+    const userId = String(event.currentTarget.dataset.userId);
+    this.setData({ submittingUserId: userId });
     try {
       await callCloud("registration.promote", { activityId: this.activityId, userId });
       wx.showToast({ title: "已补入正式名单", icon: "success" });
@@ -73,6 +97,8 @@ Page({
         title: error instanceof Error ? error.message : "递补失败",
         icon: "none",
       });
+    } finally {
+      this.setData({ submittingUserId: "" });
     }
   },
 });

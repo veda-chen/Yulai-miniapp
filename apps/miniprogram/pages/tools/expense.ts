@@ -9,6 +9,18 @@ import { clearToolDraft, loadToolDraft, saveToolDraft } from "../../utils/tool-s
 
 type ExpenseRow = ExpenseInput & { id: string; payerIndex: number };
 type ExpenseDraft = { namesInput: string; expenses: ExpenseInput[] };
+type ParticipantChangeEvent = WechatMiniprogram.CustomEvent<{
+  value: string;
+  names: string[];
+  hasDuplicates: boolean;
+}>;
+
+const listedNames = (value: string) =>
+  value
+    .split(/[\n,，;；]+/)
+    .map((name) => name.trim())
+    .filter(Boolean)
+    .slice(0, 20);
 const isExpenseDraft = (value: unknown): value is ExpenseDraft => {
   if (!value || typeof value !== "object") return false;
   const item = value as Partial<ExpenseDraft>;
@@ -43,6 +55,7 @@ Page({
     ...appearanceView(),
     namesInput: "",
     names: [] as string[],
+    hasDuplicates: false,
     expenses: [newExpense(0)] as ExpenseRow[],
     calculated: false,
     totalText: "0.00",
@@ -90,12 +103,28 @@ Page({
       const payer = names.includes(item.payer) ? item.payer : "";
       return { ...item, payer, payerIndex: Math.max(0, names.indexOf(payer)) };
     });
-    this.setData({ names, expenses, calculated: false });
+    this.setData({
+      names,
+      expenses,
+      calculated: false,
+      hasDuplicates: listedNames(this.data.namesInput).length !== names.length,
+    });
   },
-  onNamesInput(event: WechatMiniprogram.CustomEvent<{ value: string }>) {
-    this.setData({ namesInput: event.detail.value });
-    this.refreshNames();
-    this.saveDraft();
+  onParticipantsChange(event: ParticipantChangeEvent) {
+    const expenses = this.data.expenses.map((item) => {
+      const payer = event.detail.names.includes(item.payer) ? item.payer : "";
+      return { ...item, payer, payerIndex: Math.max(0, event.detail.names.indexOf(payer)) };
+    });
+    this.setData(
+      {
+        namesInput: event.detail.value,
+        names: event.detail.names,
+        hasDuplicates: event.detail.hasDuplicates,
+        expenses,
+        calculated: false,
+      },
+      () => this.saveDraft(),
+    );
   },
   onExpenseInput(event: WechatMiniprogram.CustomEvent<{ value: string }>) {
     const index = Number(event.currentTarget.dataset.index);
@@ -141,6 +170,7 @@ Page({
   },
   calculate() {
     try {
+      if (this.data.hasDuplicates) throw new Error("请先修改重复姓名");
       const result = settleExpenses(this.data.names, this.data.expenses);
       this.setData({
         calculated: true,
@@ -180,6 +210,7 @@ Page({
     this.setData({
       namesInput: "",
       names: [],
+      hasDuplicates: false,
       expenses: [newExpense(0)],
       calculated: false,
       totalText: "0.00",

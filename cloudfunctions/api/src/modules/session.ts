@@ -33,6 +33,7 @@ export const getSession: Handler = async (_payload, context) => {
         nickname: null,
         avatarFileId: null,
         schoolId: null,
+        schoolName: null,
         level: "UNKNOWN",
         status: "ACTIVE",
         role: "USER",

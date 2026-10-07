@@ -1,1 +1,6 @@
-{ "navigationBarTitleText": "到场管理" }
+{
+  "navigationBarTitleText": "到场管理",
+  "usingComponents": {
+    "empty-state": "/components/empty-state/index"
+  }
+}

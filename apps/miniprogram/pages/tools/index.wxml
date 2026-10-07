@@ -1,5 +1,5 @@
 <view class="tools-page {{appearanceClass}}">
-  <view class="tools-hero"><text class="hero-kicker">YULAI LAB</text><text class="hero-title">随开随用的球场工具</text><text class="hero-copy">无需创建球局，临时名单和比分只保留在当前页面。</text></view>
+  <view class="tools-hero"><text class="hero-kicker">YULAI LAB</text><text class="hero-title">随开随用的球场工具</text><text class="hero-copy">无需创建球局，临时名单、赛程与比分保存在本机7天。</text></view>
   <view class="section-head"><section-header title="快捷工具" description="无需发布球局" index="01" /></view>
   <view class="tool-list">
     <tool-card wx:for="{{tools}}" wx:key="id" title="{{item.title}}" description="{{item.description}}" icon="{{item.icon}}" tone="{{item.tone}}" badge="可用" url="{{item.url}}" />

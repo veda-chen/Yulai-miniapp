@@ -21,7 +21,11 @@ Page({
     reasons: GENERAL_REASONS,
     reasonIndex: 0,
     details: "",
+    detailsError: "",
+    targetError: "",
+    canSubmit: false,
     saving: false,
+    submitted: false,
     pageTitle: "提交举报",
     reasonLabel: "举报原因",
     detailsLabel: "补充说明",
@@ -35,6 +39,7 @@ Page({
     this.setData(appearanceView(appearance.preferences));
     this.targetType = options.type === "VENUE" ? "VENUE" : (options.type ?? "ACTIVITY");
     this.targetId = options.id ?? "";
+    if (!this.targetId) this.setData({ targetError: "链接缺少提交对象，请返回后重新进入" });
     if (this.targetType === "VENUE") {
       this.setData({
         reasons: VENUE_REASONS,
@@ -51,16 +56,25 @@ Page({
     this.setData({ reasonIndex: Number(event.detail.value) });
   },
   onDetailsInput(event: ValueEvent) {
-    this.setData({ details: event.detail.value });
+    const details = event.detail.value;
+    this.setData({
+      details,
+      detailsError: "",
+      canSubmit: Boolean(this.targetId && details.trim()),
+    });
+  },
+  onDetailsBlur() {
+    if (!this.data.details.trim()) this.setData({ detailsError: "请填写具体说明" });
   },
   async submit() {
-    if (this.data.saving) return;
+    if (this.data.saving || this.data.submitted) return;
     if (!this.targetId) {
-      wx.showToast({ title: "缺少对象编号", icon: "none" });
+      this.setData({ targetError: "链接缺少提交对象，请返回后重新进入" });
       return;
     }
-    if (!this.data.details.trim()) {
-      wx.showToast({ title: "请填写具体说明", icon: "none" });
+    const details = this.data.details.trim();
+    if (!details) {
+      this.setData({ detailsError: "请填写具体说明", canSubmit: false });
       return;
     }
     this.setData({ saving: true });
@@ -69,8 +83,9 @@ Page({
         targetType: this.targetType,
         targetId: this.targetId,
         reason: this.data.reasons[this.data.reasonIndex]?.value,
-        details: this.data.details,
+        details,
       });
+      this.setData({ submitted: true, canSubmit: false });
       const isVenue = this.targetType === "VENUE";
       await wx.showModal({
         title: isVenue ? "纠错已提交" : "举报已提交",

@@ -1,3 +1,6 @@
 {
-  "navigationBarTitleText": "场馆详情"
+  "navigationBarTitleText": "场馆详情",
+  "usingComponents": {
+    "empty-state": "/components/empty-state/index"
+  }
 }

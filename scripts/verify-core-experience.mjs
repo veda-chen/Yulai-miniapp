@@ -41,6 +41,7 @@ assert.equal(
 );
 
 const validForm = {
+  title: "周五晚羽毛球局",
   venueId: "venue-1",
   venueUnavailable: false,
   startDate: "2099-01-02",
@@ -52,6 +53,7 @@ const validForm = {
   capacity: "12",
 };
 assert.ok(validateActivityForm(validForm, 0).values);
+assert.equal(validateActivityForm({ ...validForm, title: "  " }, 0).errors.title, "请填写球局名称");
 assert.equal(
   validateActivityForm({ ...validForm, capacity: "3" }, 0).errors.capacity,
   "人数上限需为4至40人",

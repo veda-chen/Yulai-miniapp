@@ -27,6 +27,7 @@ export function activityStatusView(
 }
 
 export type ActivityFormValidationInput = {
+  title: string;
   venueId: string;
   venueUnavailable: boolean;
   startDate: string;
@@ -39,7 +40,7 @@ export type ActivityFormValidationInput = {
 };
 
 export type ActivityFormErrors = Partial<
-  Record<"venue" | "startAt" | "endAt" | "deadline" | "capacity", string>
+  Record<"title" | "venue" | "startAt" | "endAt" | "deadline" | "capacity", string>
 >;
 
 function chinaIso(date: string, time: string): string | null {
@@ -49,6 +50,9 @@ function chinaIso(date: string, time: string): string | null {
 
 export function validateActivityForm(input: ActivityFormValidationInput, now = Date.now()) {
   const errors: ActivityFormErrors = {};
+  const title = input.title.trim();
+  if (!title) errors.title = "请填写球局名称";
+  else if (title.length > 60) errors.title = "球局名称不能超过60个字符";
   if (!input.venueId || input.venueUnavailable) errors.venue = "请选择当前可用的场馆";
 
   const startAt = chinaIso(input.startDate, input.startTime);
@@ -75,7 +79,7 @@ export function validateActivityForm(input: ActivityFormValidationInput, now = D
     errors,
     values:
       Object.keys(errors).length === 0 && startAt && endAt && registrationDeadline
-        ? { startAt, endAt, registrationDeadline, capacity }
+        ? { title, startAt, endAt, registrationDeadline, capacity }
         : null,
   };
 }

@@ -1,0 +1,24 @@
+<view class="participant-editor">
+  <view wx:for="{{rows}}" wx:key="id" id="participant-row-{{item.id}}" class="participant-row {{item.error ? 'invalid' : ''}}">
+    <text class="participant-number">{{index + 1}}</text>
+    <view class="participant-field">
+      <input class="participant-input" value="{{item.value}}" maxlength="40" disabled="{{disabled}}" focus="{{item.focus}}" confirm-type="{{index === rows.length - 1 ? 'done' : 'next'}}" placeholder="填写球友姓名" data-index="{{index}}" aria-label="第{{index + 1}}位球友姓名" bindinput="onInput" bindfocus="onFocus" bindconfirm="onConfirm" />
+      <text wx:if="{{item.error}}" class="participant-error">{{item.error}}</text>
+    </view>
+    <button class="participant-remove" disabled="{{disabled}}" data-index="{{index}}" aria-label="删除第{{index + 1}}位球友" bindtap="removeRow">删除</button>
+  </view>
+  <view wx:if="{{!disabled}}" class="participant-actions">
+    <button class="participant-action" disabled="{{rows.length >= maxParticipants}}" bindtap="addRow">＋ {{addLabel}}</button>
+    <button wx:if="{{batchEnabled}}" class="participant-action" bindtap="openBatch">批量粘贴</button>
+  </view>
+  <text wx:if="{{rows.length >= maxParticipants}}" class="participant-limit">已达到{{maxParticipants}}人上限</text>
+
+  <view wx:if="{{batchVisible}}" class="batch-mask" catchtouchmove="preventTouchMove" bindtap="closeBatch">
+    <view class="batch-sheet" catchtap="stopTap">
+      <text class="batch-title">批量粘贴名单</text>
+      <text class="batch-copy">支持换行、逗号或分号分隔；已有姓名会保留。</text>
+      <textarea class="batch-input" value="{{batchText}}" maxlength="2000" placeholder="例如：&#10;小羽&#10;阿来&#10;小陈" focus="{{batchVisible}}" bindinput="onBatchInput" />
+      <view class="batch-actions"><button class="batch-cancel" bindtap="closeBatch">取消</button><button class="batch-confirm" disabled="{{!batchHasText}}" bindtap="importBatch">导入名单</button></view>
+    </view>
+  </view>
+</view>

@@ -41,6 +41,19 @@ describe("parseProfileUpdate", () => {
     expect(parseProfileUpdate({ schoolId: null })).toEqual({ schoolId: null });
   });
 
+  it("accepts a trimmed optional school name", () => {
+    expect(parseProfileUpdate({ schoolName: "  广东工业大学  " })).toEqual({
+      schoolName: "广东工业大学",
+    });
+    expect(parseProfileUpdate({ schoolName: "   " })).toEqual({ schoolName: null });
+  });
+
+  it("limits a custom school name to 40 characters", () => {
+    expect(() => parseProfileUpdate({ schoolName: "校".repeat(41) })).toThrow(
+      "学校名称不能超过40个字符",
+    );
+  });
+
   it("trims a valid nickname and accepts the unknown level", () => {
     expect(parseProfileUpdate({ nickname: "  小羽  ", level: "UNKNOWN" })).toEqual({
       nickname: "小羽",
@@ -75,6 +88,26 @@ describe("parseProfileUpdate", () => {
       },
     });
     expect(result).toMatchObject({ user: { school: null, needsProfile: false } });
+  });
+
+  it("persists a custom school name and clears the old school id", async () => {
+    const result = await updateMe(
+      { nickname: "小羽", schoolName: "广东工业大学", level: "BEGINNER" },
+      { requestId: "request-2", openid: "openid-1" },
+    );
+
+    expect(database.update).toHaveBeenCalledWith({
+      data: {
+        nickname: "小羽",
+        schoolName: "广东工业大学",
+        schoolId: null,
+        level: "BEGINNER",
+        updatedAt: "SERVER_DATE",
+      },
+    });
+    expect(result).toMatchObject({
+      user: { school: { id: "custom", name: "广东工业大学" }, needsProfile: false },
+    });
   });
 });
 

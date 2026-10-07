@@ -7,3 +7,5 @@
 .adjust-button { margin-top:20rpx; border:1rpx solid var(--primary); border-radius:999rpx; background:var(--surface); color:var(--primary); font-size:23rpx; }.adjust-button::after { border:0; }
 .match-type-label { margin-left:12rpx; padding:5rpx 10rpx; border-radius:999rpx; background:var(--page-bg); color:var(--muted); font-size:18rpx; font-weight:600; }
 .tool-button { box-sizing:border-box; padding:0 24rpx; }.publish { box-sizing:border-box; height:64rpx; padding:0 24rpx; }.outline-button { box-sizing:border-box; height:80rpx; padding:0 24rpx; }.adjust-button { box-sizing:border-box; height:72rpx; padding:0 20rpx; }.small { box-sizing:border-box; height:60rpx; padding:0 20rpx; }
+.tool-button,.outline-button,.adjust-button { width:100%; max-width:100%; }.round > view { min-width:0; }
+@media (max-width:360px) { .live-page { padding-right:24rpx; padding-left:24rpx; }.round { align-items:stretch; flex-direction:column; gap:14rpx; }.publish { width:100%; }.match-actions .small { flex:1 1 calc(50% - 12rpx); }.match-head { gap:12rpx; flex-wrap:wrap; } }

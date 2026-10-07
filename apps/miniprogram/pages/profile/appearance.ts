@@ -116,6 +116,14 @@ Page({
     this.refreshDerived();
   },
 
+  previewPrimaryAction() {
+    wx.showToast({ title: "主要操作预览", icon: "none" });
+  },
+
+  previewSecondaryAction() {
+    wx.showToast({ title: "次要操作预览", icon: "none" });
+  },
+
   toggleHero(event: WechatMiniprogram.SwitchChange) {
     this.setData({ "draft.showHero": event.detail.value });
     this.refreshDerived();

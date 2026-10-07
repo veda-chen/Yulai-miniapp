@@ -39,7 +39,13 @@ type Registration = {
   hasPendingChange: boolean;
 };
 
-type Member = { nickname: string; status: string; queueNo: number; initial?: string };
+type Member = {
+  nickname: string;
+  status: string;
+  queueNo: number;
+  initial?: string;
+  statusText?: string;
+};
 type ActivityChange = { id: string; version: number; changedFields: string[]; createdAt: string };
 
 type ActivityView = Activity & {
@@ -63,6 +69,12 @@ const CHANGE_LABELS: Record<string, string> = {
   locationHint: "场号或位置",
   capacity: "人数上限",
   status: "活动状态",
+};
+
+const MEMBER_STATUS_LABELS: Record<string, string> = {
+  CONFIRMED: "已报名",
+  ATTENDED: "已到场",
+  NO_SHOW: "未到场",
 };
 
 function requestKey(action: string, activityId: string): string {
@@ -203,6 +215,7 @@ Page({
               confirmed: result.roster.confirmed.map((member) => ({
                 ...member,
                 initial: member.nickname.slice(0, 1),
+                statusText: MEMBER_STATUS_LABELS[member.status] ?? "参与球友",
               })),
               waitlist: result.roster.waitlist.map((member) => ({
                 ...member,

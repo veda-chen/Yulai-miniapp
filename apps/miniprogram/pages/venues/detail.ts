@@ -37,6 +37,7 @@ type DisplayVenueDetail = VenueDetail & {
 };
 
 Page({
+  venueId: "",
   data: {
     loading: true,
     detail: null as DisplayVenueDetail | null,
@@ -48,8 +49,26 @@ Page({
     const appearance = loadAppearanceState();
     applyNativeAppearance(appearance.preferences);
     this.setData(appearanceView(appearance.preferences));
+    this.venueId = options.id ?? "";
+    await this.loadVenue();
+  },
+
+  async retry() {
+    await this.loadVenue();
+  },
+
+  goHome() {
+    wx.switchTab({ url: "/pages/index/index" });
+  },
+
+  async loadVenue() {
+    if (!this.venueId) {
+      this.setData({ loading: false, message: "场馆链接无效" });
+      return;
+    }
+    this.setData({ loading: true, message: "" });
     try {
-      const detail = await callCloud<VenueDetail>("venue.get", { id: options.id });
+      const detail = await callCloud<VenueDetail>("venue.get", { id: this.venueId });
       const hasVisitInfo = Boolean(
         detail.venue.entranceGuide ||
           detail.venue.openingHours ||

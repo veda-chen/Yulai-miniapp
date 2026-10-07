@@ -17,11 +17,9 @@ const CRITICAL_FIELDS = [
   "locationHint",
   "capacity",
 ] as const;
-const SHANGHAI_OFFSET = 8 * 60 * 60 * 1000;
-
 type ActivityInput = {
   venueId: string;
-  title: string | null;
+  title: string;
   startAt: Date;
   endAt: Date;
   registrationDeadline: Date;
@@ -162,7 +160,7 @@ export function parseActivityInput(payload: unknown, now = new Date()): Activity
 
   return {
     venueId: requiredString(payload.venueId, "场馆", 64),
-    title: optionalString(payload.title, "标题", 60),
+    title: requiredString(payload.title, "球局名称", 60),
     startAt,
     endAt,
     registrationDeadline,
@@ -183,11 +181,6 @@ function toIso(value: unknown): string | null {
   if (value instanceof Date) return value.toISOString();
   if (typeof value === "string") return new Date(value).toISOString();
   return null;
-}
-
-function defaultTitle(startAt: Date, venueName: string): string {
-  const chinaTime = new Date(startAt.getTime() + SHANGHAI_OFFSET);
-  return `${chinaTime.getUTCMonth() + 1}月${chinaTime.getUTCDate()}日 ${venueName}羽毛球局`;
 }
 
 export function criticalChangedFields(
@@ -548,7 +541,7 @@ export const createActivity: Handler = async (payload, context) => {
   const idempotencyKey = requiredString(payload.idempotencyKey, "请求标识", 64);
   const input = parseActivityInput(payload);
   const venue = await getVenue(input.venueId);
-  const title = input.title ?? defaultTitle(input.startAt, venue.name);
+  const title = input.title;
   const activityId = stableId(`activity:${user._id}:${idempotencyKey}`);
   const organizerRegistrationId = stableId(`${activityId}:${user._id}`);
   const activity = await db.runTransaction(async (transaction: CloudTransaction) => {
@@ -638,7 +631,7 @@ export const updateActivity: Handler = async (payload, context) => {
     throw new AppError("CAPACITY_TOO_SMALL", "人数上限不能低于当前报名人数");
   }
   const venue = await getVenue(input.venueId);
-  const title = input.title ?? defaultTitle(input.startAt, venue.name);
+  const title = input.title;
   const next = { ...input, title, venueName: venue.name };
   const changedFields = criticalChangedFields(current, next);
   const nextVersion = Number(payload.version) + 1;

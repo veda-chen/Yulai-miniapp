@@ -283,15 +283,17 @@ Page({
     const field = event.currentTarget.dataset.field;
     if (typeof field === "string") {
       const errorKeys: Array<keyof ActivityFormErrors> =
-        field === "capacity"
-          ? ["capacity"]
-          : field === "startDate" || field === "startTime"
-            ? ["startAt", "endAt", "deadline"]
-            : field === "endDate" || field === "endTime"
-              ? ["endAt"]
-              : field === "deadlineDate" || field === "deadlineTime"
-                ? ["deadline"]
-                : [];
+        field === "title"
+          ? ["title"]
+          : field === "capacity"
+            ? ["capacity"]
+            : field === "startDate" || field === "startTime"
+              ? ["startAt", "endAt", "deadline"]
+              : field === "endDate" || field === "endTime"
+                ? ["endAt"]
+                : field === "deadlineDate" || field === "deadlineTime"
+                  ? ["deadline"]
+                  : [];
       this.setData({ [field]: event.detail.value, fieldErrors: this.clearErrors(errorKeys) }, () =>
         this.saveDraft(),
       );
@@ -444,11 +446,12 @@ Page({
   },
 
   scrollToFirstError(errors: ActivityFormErrors) {
-    const selector = errors.venue
-      ? "#section-basic"
-      : errors.startAt || errors.endAt || errors.deadline
-        ? "#section-time"
-        : "#section-participants";
+    const selector =
+      errors.title || errors.venue
+        ? "#section-basic"
+        : errors.startAt || errors.endAt || errors.deadline
+          ? "#section-time"
+          : "#section-participants";
     wx.pageScrollTo({ selector, duration: 250 });
   },
 
@@ -468,6 +471,7 @@ Page({
     const contactVisibility = this.data.contactVisibilities[this.data.contactVisibilityIndex];
     if (!venue || !level || !visibility || !contactVisibility) return;
     const validation = validateActivityForm({
+      title: this.data.title,
       venueId: venue.id,
       venueUnavailable: venue.unavailable === true,
       startDate: this.data.startDate,
@@ -484,7 +488,7 @@ Page({
       return;
     }
     const payload = {
-      title: this.data.title,
+      title: validation.values.title,
       venueId: venue.id,
       startAt: validation.values.startAt,
       endAt: validation.values.endAt,

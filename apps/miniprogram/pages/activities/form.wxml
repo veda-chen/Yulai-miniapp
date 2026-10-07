@@ -22,11 +22,13 @@
 
     <view id="section-basic" class="group-heading"><view class="group-icon">羽</view><view><text class="group-title">基本信息</text><text class="group-copy">告诉球友在哪里、打什么局</text></view><text class="step">01</text></view>
     <view class="form-card surface accent-blue">
-      <label class="field"><text class="label">标题</text><input class="control" data-field="title" maxlength="60" value="{{title}}" placeholder="留空自动生成" placeholder-class="placeholder" bindinput="onTextInput" /></label>
+      <label class="field"><text class="label">球局名称（必填）</text><input class="control" data-field="title" maxlength="60" value="{{title}}" placeholder="例如：周五晚广工进阶局" placeholder-class="placeholder" confirm-type="next" bindinput="onTextInput" /></label>
+      <text class="field-count">{{title.length}} / 60</text>
+      <text wx:if="{{fieldErrors.title}}" class="field-error">{{fieldErrors.title}}</text>
       <label class="field"><text class="label">场馆</text><picker class="control" range="{{venues}}" range-key="name" value="{{venueIndex}}" bindchange="onVenueChange"><view class="picker-value">{{venues[venueIndex].name}} <text>›</text></view></picker></label>
       <text wx:if="{{fieldErrors.venue}}" class="field-error">{{fieldErrors.venue}}</text>
       <text wx:if="{{venueUnavailable}}" class="venue-warning">原场馆当前不可用，请选择新的场馆后再保存修改。</text>
-      <label class="field"><text class="label">场号或位置</text><input class="control" data-field="locationHint" maxlength="100" value="{{locationHint}}" placeholder="例如 7 号场（可不填）" placeholder-class="placeholder" bindinput="onTextInput" /></label>
+      <label class="field"><text class="label">场号或位置</text><input class="control" data-field="locationHint" maxlength="100" value="{{locationHint}}" placeholder="例如 7 号场（可不填）" placeholder-class="placeholder" confirm-type="done" bindinput="onTextInput" /></label>
     </view>
 
     <view id="section-time" class="group-heading"><view class="group-icon warm">时</view><view><text class="group-title">时间安排</text><text class="group-copy">设置开打、结束与报名截止时间</text></view><text class="step">02</text></view>
@@ -41,7 +43,7 @@
 
     <view id="section-participants" class="group-heading"><view class="group-icon green">人</view><view><text class="group-title">参与要求</text><text class="group-copy">控制规模、水平与可见范围</text></view><text class="step">03</text></view>
     <view class="form-card surface accent-green">
-      <label class="field"><text class="label">人数上限</text><view class="number-control"><input data-field="capacity" type="number" value="{{capacity}}" bindinput="onTextInput" /><text>人</text></view></label>
+      <label class="field"><text class="label">人数上限</text><view class="number-control"><input data-field="capacity" type="number" value="{{capacity}}" confirm-type="done" bindinput="onTextInput" /><text>人</text></view></label>
       <text wx:if="{{fieldErrors.capacity}}" class="field-error">{{fieldErrors.capacity}}</text>
       <label class="field"><text class="label">水平要求</text><picker class="control" range="{{levels}}" range-key="label" value="{{levelIndex}}" bindchange="onLevelChange"><view class="picker-value">{{levels[levelIndex].label}} <text>›</text></view></picker></label>
       <label class="field"><text class="label">球局可见范围</text><picker class="control" range="{{visibilities}}" range-key="label" value="{{visibilityIndex}}" bindchange="onVisibilityChange"><view class="picker-value">{{visibilities[visibilityIndex].label}} <text>›</text></view></picker></label>
@@ -49,10 +51,10 @@
 
     <view class="group-heading"><view class="group-icon purple">言</view><view><text class="group-title">说明与联系</text><text class="group-copy">补充费用、联系方式与活动规则</text></view><text class="step">04</text></view>
     <view class="form-card surface accent-purple">
-      <label class="field"><text class="label">费用说明</text><input class="control" data-field="feeNote" maxlength="200" value="{{feeNote}}" placeholder="线下沟通，可不填" placeholder-class="placeholder" bindinput="onTextInput" /></label>
-      <label class="field"><text class="label">联系方式</text><input class="control" data-field="contact" maxlength="100" value="{{contact}}" placeholder="可不填" placeholder-class="placeholder" bindinput="onTextInput" /></label>
+      <label class="field"><text class="label">费用说明</text><input class="control" data-field="feeNote" maxlength="200" value="{{feeNote}}" placeholder="线下沟通，可不填" placeholder-class="placeholder" confirm-type="next" bindinput="onTextInput" /></label>
+      <label class="field"><text class="label">联系方式</text><input class="control" data-field="contact" maxlength="100" value="{{contact}}" placeholder="可不填" placeholder-class="placeholder" confirm-type="done" bindinput="onTextInput" /></label>
       <label class="field"><text class="label">联系方式可见范围</text><picker class="control" range="{{contactVisibilities}}" range-key="label" value="{{contactVisibilityIndex}}" bindchange="onContactVisibilityChange"><view class="picker-value">{{contactVisibilities[contactVisibilityIndex].label}} <text>›</text></view></picker></label>
-      <label class="textarea-field"><text class="label">详细说明</text><textarea data-field="details" maxlength="1000" value="{{details}}" placeholder="补充活动规则、用球等信息" placeholder-class="placeholder" bindinput="onTextInput" /></label>
+      <label class="textarea-field"><text class="label">详细说明</text><textarea data-field="details" maxlength="1000" value="{{details}}" placeholder="补充活动规则、用球等信息" placeholder-class="placeholder" bindinput="onTextInput" /></label><text class="field-count">{{details.length}} / 1000</text>
     </view>
 
     <view class="group-heading"><view class="group-icon cyan">具</view><view><text class="group-title">现场工具</text><text class="group-copy">可选功能，不影响普通组局</text></view><text class="step optional">可选</text></view>

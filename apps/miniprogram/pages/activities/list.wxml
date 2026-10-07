@@ -5,8 +5,9 @@
     <view class="banner-content"><text class="banner-kicker">YULAI · 羽来</text><text class="page-title">找到今晚的球局</text><text class="banner-copy">和附近球友，一起上场</text></view>
     <navigator class="create-round" url="/pages/activities/form">＋</navigator>
   </view>
-  <view class="search-wrap"><view class="search-icon"></view><input value="{{keyword}}" maxlength="50" confirm-type="search" placeholder="搜索球局、场馆、学校" bindinput="onSearchInput" bindconfirm="confirmSearch" /></view>
+  <view class="search-wrap"><view class="search-icon"></view><input value="{{keyword}}" maxlength="50" confirm-type="search" placeholder="搜索球局、场馆、学校" bindinput="onSearchInput" bindconfirm="confirmSearch" /><button wx:if="{{keyword}}" class="search-clear" aria-label="清空搜索" bindtap="clearSearch">×</button></view>
   <scroll-view class="chips" scroll-x show-scrollbar="{{false}}"><view class="chip-track"><text wx:for="{{filters}}" wx:key="key" class="chip {{activeFilter === item.key ? 'active' : ''}}" data-key="{{item.key}}" bindtap="onFilterTap">{{item.label}}</text></view></scroll-view>
+  <view class="result-summary"><text>{{loading ? '正在更新' : ('已展示 ' + viewActivities.length + ' 场')}}{{keyword ? (' · 搜索“' + keyword + '”') : ''}}{{activeFilter !== 'all' ? (' · ' + activeFilterLabel) : ''}}</text><button wx:if="{{keyword || activeFilter !== 'all'}}" bindtap="resetFilters">重置</button></view>
   <view wx:if="{{loading && activities.length === 0}}" class="empty surface">正在加载球局</view>
   <view wx:elif="{{message && activities.length === 0}}" class="empty surface"><text>{{message}}</text><button class="retry-button" bindtap="retry">重新加载</button></view>
   <view wx:elif="{{viewActivities.length === 0 && nextOffset !== null}}" class="empty surface"><text>当前批次暂无匹配，可继续查看</text><button class="retry-button" bindtap="onReachBottom">继续查看</button></view>
@@ -14,7 +15,7 @@
   <view wx:else class="activity-list">
     <navigator wx:for="{{viewActivities}}" wx:key="id" class="activity-row surface" url="/pages/activities/detail?id={{item.id}}">
       <view class="time-col"><text class="day">{{item.shortDay}}</text><text class="clock">{{item.shortClock}}</text></view>
-      <view class="info-col"><text class="row-title">{{item.title}}</text><text class="venue">⌖ {{item.venue.name}}</text>
+      <view class="info-col"><text class="row-title">{{item.title}}</text><text class="venue">⌖ {{item.venue.name}}</text><view class="organizer-row"><view class="organizer-mark">发</view><text>{{item.organizer.nickname}} 发起</text></view>
         <view class="row-footer"><view><status-chip label="{{item.levelText}}" tone="primary" /><status-chip wx:if="{{item.registrationText}}" label="{{item.registrationText}}" tone="success" /></view><text class="count">{{item.registeredCount}}/{{item.capacity}} 人 ›</text></view>
       </view>
     </navigator>

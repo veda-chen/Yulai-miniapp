@@ -1,5 +1,6 @@
 <view class="page {{appearanceClass}}">
-  <view wx:if="{{loading}}" class="card">正在加载资料</view>
+  <empty-state wx:if="{{loading}}" title="正在加载资料" description="请稍候" />
+  <empty-state wx:elif="{{loadError}}" title="暂时无法加载资料" description="{{loadError}}" action-text="重新加载" bind:action="retryLoad" />
   <view wx:else class="card form">
     <view class="avatar-field">
       <button class="avatar-picker" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar" loading="{{uploadingAvatar}}">
@@ -12,13 +13,12 @@
     </view>
     <label class="field">
       <text class="label">昵称</text>
-      <input maxlength="24" value="{{nickname}}" placeholder="请输入昵称" bindinput="onNicknameInput" />
+      <input class="{{nicknameError ? 'invalid' : ''}}" maxlength="24" value="{{nickname}}" placeholder="请输入昵称" confirm-type="next" bindinput="onNicknameInput" />
+      <text wx:if="{{nicknameError}}" class="field-error">{{nicknameError}}</text>
     </label>
     <label class="field">
       <text class="label">学校（可选）</text>
-      <picker range="{{schools}}" range-key="name" value="{{schoolIndex}}" bindchange="onSchoolChange">
-        <view class="picker-value">{{schools[schoolIndex].name}}</view>
-      </picker>
+      <input maxlength="40" value="{{schoolName}}" placeholder="例如：广东工业大学" confirm-type="done" bindinput="onSchoolInput" />
     </label>
     <label class="field">
       <text class="label">水平</text>
@@ -26,7 +26,7 @@
         <view class="picker-value">{{levels[levelIndex].label}}</view>
       </picker>
     </label>
-    <button class="save" loading="{{saving}}" bindtap="onSave">保存资料</button>
+    <button class="save" loading="{{saving}}" disabled="{{saving || !dirty}}" bindtap="onSave">{{saving ? '正在保存' : (dirty ? '保存资料' : '资料已保存')}}</button>
     <text class="message">{{message}}</text>
   </view>
 </view>

@@ -7,9 +7,11 @@
     <navigator wx:for="{{activities}}" wx:key="id" class="history-card surface" url="/pages/activities/detail?id={{item.id}}">
       <view class="card-head"><text class="card-title">{{item.title}}</text><text class="status">{{item.statusText}}</text></view>
       <text class="venue">⌖ {{item.venue.name}}</text>
+      <view class="organizer"><view class="organizer-mark">发</view><text>{{item.organizer.nickname}} 发起</text></view>
       <view class="card-foot"><text>{{item.timeText}}</text><text class="participation">{{item.participationText}} ›</text></view>
     </navigator>
   </view>
+  <view wx:if="{{loading && activities.length}}" class="load-message">正在更新参加记录…</view>
   <view wx:if="{{message && activities.length}}" class="load-message">{{message}}</view>
   <button wx:if="{{nextOffset !== null}}" class="load-more" loading="{{loadingMore}}" bindtap="onReachBottom">{{loadingMore ? '正在加载' : '加载更多记录'}}</button>
 </view>

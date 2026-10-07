@@ -29,9 +29,9 @@
   </view>
 
   <view class="section preview-section surface"><view class="section-heading"><view class="section-mark"></view><view><text class="section-title">实时预览</text><text class="section-copy">以下均为示例，不会报名或修改比分</text></view></view>
-    <view class="preview-block"><text class="preview-label">组件画廊</text><section-header title="本周推荐" description="真实组件的只读预览" action-text="查看更多" index="01" readonly="{{true}}" /><view class="gallery-row"><ui-icon text="羽" tone="primary" /><ui-icon text="场" tone="green" /><status-chip label="报名中" tone="success" /><status-chip label="候补" tone="warning" /></view><view class="gallery-actions"><ui-button label="主要操作" variant="primary" /><ui-button label="次要操作" variant="secondary" /></view></view>
+    <view class="preview-block"><text class="preview-label">组件画廊</text><section-header title="本周推荐" description="真实组件的只读预览" action-text="查看更多" index="01" readonly="{{true}}" /><view class="gallery-row"><ui-icon text="羽" tone="primary" /><ui-icon text="场" tone="green" /><status-chip label="报名中" tone="success" /><status-chip label="候补" tone="warning" /></view><view class="gallery-actions"><ui-button label="主要操作" variant="primary" bind:action="previewPrimaryAction" /><ui-button label="次要操作" variant="secondary" bind:action="previewSecondaryAction" /></view></view>
     <view wx:if="{{draft.showHero}}" class="preview-block"><text class="preview-label">首页封面</text><hero-banner hero-style="{{draft.heroStyle}}" readonly="{{true}}" /></view>
-    <view class="preview-block"><text class="preview-label">球局卡片</text><activity-card title="周五晚羽毛球局" time="周五 19:00" date="9月18日" venue="广东工业大学大学城校区体育馆 7 号场" level="进阶局" count-text="4/6 人" status="已报名" density="{{draft.activityDensity}}" readonly="{{true}}" /></view>
+    <view class="preview-block"><text class="preview-label">球局卡片</text><activity-card title="周五晚羽毛球局" time="周五 19:00" date="9月18日" venue="广东工业大学大学城校区体育馆 7 号场" organizer="羽仔" level="进阶局" count-text="4/6 人" status="已报名" density="{{draft.activityDensity}}" readonly="{{true}}" /></view>
     <view class="preview-block"><text class="preview-label">计分板</text><score-board name-a="A方" name-b="B方" score-a="18" score-b="16" score-theme="{{draft.scoreTheme}}" readonly="{{true}}" /></view>
   </view>
 

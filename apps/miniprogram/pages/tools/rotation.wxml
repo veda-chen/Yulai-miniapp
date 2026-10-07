@@ -2,10 +2,11 @@
   <view class="tool-intro"><text class="tool-kicker">FAIR MATCHES</text><text class="tool-title">公平组队</text><text class="tool-copy">输入实际到场球友，一次生成整批双打对局。每批场数与人数相同，每人固定上场4次；5人及以上时，每次搭档都不同。</text></view>
 
   <view class="tool-card surface">
-    <section-header title="参赛球友" description="4–40人，名字自动去重" index="01" />
-    <textarea class="field-textarea names-input" value="{{namesInput}}" placeholder="一行一个名字，也可用逗号分隔" maxlength="800" bindinput="onNamesInput" />
-    <view class="player-summary {{playerCount >= 4 ? 'ready' : ''}}"><view><text class="summary-count">{{playerCount}}</text><text class="summary-unit"> 人</text></view><text wx:if="{{playerCount >= 4}}">将公平生成 {{playerCount}} 场 · 每人上场 4 次</text><text wx:else>至少还需要 {{4 - playerCount}} 人</text></view>
-    <button class="primary-action create-action" bindtap="createSchedule" disabled="{{playerCount < 4}}">{{schedule.length ? '重新生成公平赛程' : '生成公平赛程'}}</button>
+    <section-header title="参赛球友" description="4–40人，名字不可重复" index="01" />
+    <participant-editor value="{{namesInput}}" min-slots="4" max-participants="40" batch-enabled="{{true}}" disabled="{{schedule.length > 0}}" bind:change="onParticipantsChange" />
+    <view class="player-summary {{playerCount >= 4 && !hasDuplicates ? 'ready' : ''}}"><view><text class="summary-count">{{playerCount}}</text><text class="summary-unit"> 人</text></view><text wx:if="{{hasDuplicates}}">请修改标出的重复姓名</text><text wx:elif="{{playerCount >= 4}}">将公平生成 {{playerCount}} 场 · 每人上场 4 次</text><text wx:else>至少还需要 {{4 - playerCount}} 人</text></view>
+    <button wx:if="{{schedule.length}}" class="secondary-action edit-roster" bindtap="unlockRoster">修改名单并重新编排</button>
+    <button wx:else class="primary-action create-action" bindtap="createSchedule" disabled="{{playerCount < 4 || hasDuplicates}}">生成公平赛程</button>
   </view>
 
   <view wx:if="{{schedule.length}}" class="tool-card surface saved-card">
@@ -19,7 +20,7 @@
 
   <view wx:if="{{previewVisible}}" class="sheet-mask" catchtouchmove="preventTouchMove" bindtap="closePreview">
     <view class="schedule-sheet surface" catchtap="stopTap">
-      <view class="sheet-header"><view><text class="sheet-title">全赛程</text><text class="sheet-copy">{{playerCount}}人 · {{schedule.length}}场 · 每人上场4次</text></view><button class="sheet-close" bindtap="closePreview" aria-label="关闭">×</button></view>
+      <view class="sheet-header"><view><text class="sheet-title">全赛程</text><text class="sheet-copy">{{playerCount}}人 · {{schedule.length}}场 · 每人上场4次 · 搭档尽量不重复</text></view><button class="sheet-close" bindtap="closePreview" aria-label="关闭赛程预览">×</button></view>
       <scroll-view class="schedule-scroll" scroll-y enhanced show-scrollbar="{{false}}">
         <view wx:for="{{scheduleViews}}" wx:key="number" class="match-card">
           <text class="match-number">第{{item.number}}场</text>

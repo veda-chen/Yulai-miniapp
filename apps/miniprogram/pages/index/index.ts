@@ -34,6 +34,7 @@ type Activity = {
   currentRegistrationStatus: string | null;
   level: string;
   venue: { name: string };
+  organizer: { nickname: string };
   isOrganizer?: boolean;
 };
 type Venue = { id: string; name: string; address: string | null; verificationStatus: string };

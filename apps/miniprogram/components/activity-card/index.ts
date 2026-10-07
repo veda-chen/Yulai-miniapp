@@ -5,6 +5,7 @@ Component({
     time: { type: String, value: "" },
     date: { type: String, value: "" },
     venue: { type: String, value: "" },
+    organizer: { type: String, value: "" },
     level: { type: String, value: "不限水平" },
     countText: { type: String, value: "" },
     status: { type: String, value: "报名中" },

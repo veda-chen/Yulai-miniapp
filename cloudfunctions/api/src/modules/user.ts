@@ -4,7 +4,7 @@ import { hashOpenId } from "../identity.js";
 import type { Handler, RequestContext } from "../types.js";
 
 const USER_LEVELS = new Set(["UNKNOWN", "CASUAL", "BEGINNER", "IMPROVING", "COMPETITIVE"]);
-const UPDATE_FIELDS = new Set(["nickname", "schoolId", "level"]);
+const UPDATE_FIELDS = new Set(["nickname", "schoolId", "schoolName", "level"]);
 
 export type UserDocument = {
   _id: string;
@@ -12,6 +12,7 @@ export type UserDocument = {
   nickname: string | null;
   avatarFileId: string | null;
   schoolId: string | null;
+  schoolName?: string | null;
   level: string;
   status: string;
   role?: string;
@@ -27,6 +28,7 @@ type SchoolDocument = {
 type ProfileUpdate = {
   nickname?: string;
   schoolId?: string | null;
+  schoolName?: string | null;
   level?: string;
 };
 
@@ -69,6 +71,19 @@ export function parseProfileUpdate(payload: unknown): ProfileUpdate {
       update.schoolId = payload.schoolId;
     } else {
       throw new AppError("INVALID_ARGUMENT", "学校选择无效");
+    }
+  }
+  if ("schoolName" in payload) {
+    if (payload.schoolName === null) {
+      update.schoolName = null;
+    } else if (typeof payload.schoolName === "string") {
+      const schoolName = payload.schoolName.trim();
+      if (schoolName.length > 40) {
+        throw new AppError("INVALID_ARGUMENT", "学校名称不能超过40个字符");
+      }
+      update.schoolName = schoolName || null;
+    } else {
+      throw new AppError("INVALID_ARGUMENT", "学校名称格式不正确");
     }
   }
   if ("level" in payload) {
@@ -128,7 +143,10 @@ export async function findCurrentUser(context: RequestContext): Promise<UserDocu
 
 async function mapProfile(user: UserDocument) {
   let school: SchoolDocument | null = null;
-  if (user.schoolId) {
+  const customSchoolName = user.schoolName?.trim();
+  if (customSchoolName) {
+    school = { _id: "custom", name: customSchoolName };
+  } else if (user.schoolId) {
     const result = (await db
       .collection("schools")
       .where({ _id: user.schoolId, status: "ACTIVE" })
@@ -140,7 +158,7 @@ async function mapProfile(user: UserDocument) {
     id: user._id,
     nickname: user.nickname,
     avatarFileId: user.avatarFileId,
-    school,
+    school: school ? { id: school._id, name: school.name } : null,
     level: user.level,
     status: user.status,
     role: user.role ?? "USER",
@@ -159,10 +177,14 @@ export const updateMe: Handler = async (payload, context) => {
   }
   const update = parseProfileUpdate(payload);
 
-  if (update.schoolId) {
+  const persistedUpdate: ProfileUpdate = { ...update };
+  if ("schoolName" in update) persistedUpdate.schoolId = null;
+  else if ("schoolId" in update && user.schoolName) persistedUpdate.schoolName = null;
+
+  if (persistedUpdate.schoolId) {
     const school = (await db
       .collection("schools")
-      .where({ _id: update.schoolId, status: "ACTIVE" })
+      .where({ _id: persistedUpdate.schoolId, status: "ACTIVE" })
       .limit(1)
       .get()) as unknown as { data: SchoolDocument[] };
     if (!school.data[0]) {
@@ -173,8 +195,8 @@ export const updateMe: Handler = async (payload, context) => {
   await db
     .collection("users")
     .doc(user._id)
-    .update({ data: { ...update, updatedAt: db.serverDate() } });
-  return { user: await mapProfile({ ...user, ...update }) };
+    .update({ data: { ...persistedUpdate, updatedAt: db.serverDate() } });
+  return { user: await mapProfile({ ...user, ...persistedUpdate }) };
 };
 
 export const updateAvatar: Handler = async (payload, context) => {
@@ -232,6 +254,7 @@ export const deleteMe: Handler = async (payload, context) => {
           nickname: null,
           avatarFileId: null,
           schoolId: null,
+          schoolName: null,
           level: "UNKNOWN",
           status: "DELETED",
           deletedAt,

@@ -1,6 +1,9 @@
 .page { padding:32rpx; }
-.member, .empty { display:flex; justify-content:space-between; margin-bottom:16rpx; padding:26rpx; border-radius:18rpx; background:var(--surface); }
+.member, .empty { display:flex; align-items:center; justify-content:space-between; gap:16rpx; margin-bottom:16rpx; padding:26rpx; border-radius:18rpx; background:var(--surface); }
 .status { color:#2d755e; }
 .tip { color:#66736e; font-size:24rpx; }
 .section-title { margin:30rpx 0 16rpx; font-size:30rpx; font-weight:600; }
 .promote-button { flex:none; width:112rpx; height:60rpx; margin:0; padding:0; border:0; border-radius:999rpx; background:var(--primary); color:#fff; font-size:22rpx; }.promote-button::after { border:0; }
+.inline-message { display:flex; align-items:center; justify-content:space-between; gap:16rpx; margin-bottom:16rpx; padding:18rpx 20rpx; border-radius:var(--control-radius); background:var(--primary-soft); color:var(--primary); font-size:21rpx; }.inline-message text { flex:1; }.inline-message button { flex:none; height:60rpx; margin:0; padding:0 18rpx; border:0; border-radius:999rpx; background:var(--surface); color:var(--primary); font-size:20rpx; }.inline-message button::after { border:0; }
+.member > text:first-child { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+@media (max-width:360px) { .page { padding-right:24rpx; padding-left:24rpx; }.member { align-items:flex-start; flex-wrap:wrap; }.promote-button { width:100%; } }

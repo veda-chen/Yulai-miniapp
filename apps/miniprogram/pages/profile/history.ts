@@ -6,6 +6,7 @@ type Activity = {
   id: string;
   title: string;
   venue: { name: string };
+  organizer: { nickname: string };
   startAt: string;
   status: string;
   currentRegistrationStatus: string | null;

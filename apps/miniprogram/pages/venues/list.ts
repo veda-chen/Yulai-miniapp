@@ -23,9 +23,18 @@ Page({
   },
 
   async onLoad() {
+    await this.loadVenues();
+  },
+
+  async retry() {
+    await this.loadVenues();
+  },
+
+  async loadVenues() {
+    this.setData({ loading: true, message: "" });
     try {
       const result = await callCloud<{ venues: Venue[] }>("venue.list");
-      this.setData({ loading: false, venues: result.venues });
+      this.setData({ loading: false, venues: result.venues, message: "" });
     } catch {
       this.setData({ loading: false, message: "场馆加载失败，请稍后重试" });
     }
