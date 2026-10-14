@@ -2,11 +2,13 @@
 
 ## 环境
 
-M1 开发环境为 `cloud1-d1g8z3590d3768cbb`，小程序已显式绑定该环境，避免开发者工具选中错误环境。正式发布前另建生产环境，并通过发布配置切换，开发和生产不能共用数据。复制 `.env.example` 为 `.env`，填入环境 ID 和随机密钥，然后运行 `pnpm cloud:check`。
+M1 开发环境为 `cloud1-d1g8z3590d3768cbb`。小程序按微信版本选择开发、体验或正式环境；体验和正式环境 ID 必须显式配置，缺失时启动会失败。正式发布前另建生产环境，开发和生产不能共用数据。复制 `.env.example` 为 `.env`，填入环境 ID 和随机密钥，然后运行 `pnpm cloud:check`。
 
 ## 数据库
 
 根据 `collections.json` 创建集合和索引。所有集合的客户端权限设为 `ADMINONLY`，业务数据只允许通过 `api` 云函数访问。这样可见性、正式参与者和管理员权限始终由服务端判断。
+
+“打球鸭”邀请上线前，执行 `play-invitation-commands.json` 创建 `playInvitations` 与 `playInvitationReplies` 集合及索引，客户端权限均设为 `ADMINONLY`。先部署包含邀请接口的云函数，再上传小程序版本；老环境缺少这两个集合时，创建和回应会失败。注销账号会删除其邀请回应，并匿名化其发起的邀请。
 
 已有环境升级个性化设置功能时，先执行 `u5-appearance-commands.json` 创建 `appearancePreferences` 集合及用户唯一索引，再部署新版 `api` 云函数。客户端在集合和接口部署完成前会保留本机设置，不会丢失外观偏好。
 
@@ -18,7 +20,15 @@ M1 开发环境为 `cloud1-d1g8z3590d3768cbb`，小程序已显式绑定该环�
 
 ## 云函数
 
+体验优化版本新增 `activity.latestCreated` 和服务端组合找局筛选。已有开发环境先执行 `experience-index-commands.json`，再部署兼容云函数，最后上传客户端开发版本。索引包含组织者最近创建球局查询，以及公开球局按场馆、水平和开始时间查询；关键词与余位由服务端在分页前匹配，单次扫描达到上限时返回继续位置。
+
+本轮优化在部署新版云函数前还需执行 `optimization-index-commands.json`。它支持本人球局统计、通知重试和租约回收。旧通知任务仍以 `PENDING` 处理；`VERIFY_REQUIRED` 表示发送结果需要人工核对，不能直接重发。
+
+同时执行 `file-cleanup-commands.json` 创建 `fileCleanupJobs` 集合和索引，并将客户端权限设为 `ADMINONLY`。注销时在事务内写入头像清理任务；每日维护触发器重试失败的文件删除。未创建此集合前不要部署包含注销改动的云函数。
+
 为 `api` 云函数配置 `OPENID_HASH_SECRET`，不少于 32 个随机字符。开发和生产使用不同值。`cloudbaserc.json` 已固定 Node.js 20.19、入口、超时和内存，运行 `pnpm cloud:deploy` 可先构建再部署。
+
+小程序环境 ID 由 `scripts/generate-cloud-env.mjs` 根据 `.env` 生成。开发版本默认使用 M1 环境；体验和正式版本必须分别设置 `TRIAL_CLOUDBASE_ENV_ID`、`PRODUCTION_CLOUDBASE_ENV_ID`。正式云函数部署使用 `pnpm cloud:deploy:release`，该命令先运行发布门槛并确认正式环境 ID、`WECHAT_MINIPROGRAM_STATE=formal`，以及 `RELEASE_VERSION` 与 `package.json` 一致。上传微信版本时也应使用该版本号并记录在发布清单旁。
 
 ## 验收
 

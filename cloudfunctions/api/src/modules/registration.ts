@@ -81,6 +81,11 @@ export const joinRegistration: Handler = async (payload, context) => {
   if (!user.nickname) throw new AppError("PROFILE_REQUIRED", "请先设置昵称再报名");
 
   const result = await db.runTransaction(async (transaction: CloudTransaction) => {
+    const currentUser = documentData<{ status: string }>(
+      await transaction.collection("users").where({ _id: user._id }).limit(1).get(),
+    );
+    if (currentUser?.status !== "ACTIVE")
+      throw new AppError("ACCOUNT_RESTRICTED", "当前账号暂不能报名");
     const activities = transaction.collection("activities");
     const registrations = transaction.collection("registrations");
     const participants = transaction.collection("participants");
@@ -122,6 +127,13 @@ export const joinRegistration: Handler = async (payload, context) => {
 
     const joined = joinParticipation(state, user._id);
     const now = db.serverDate();
+    // Share a write with account deletion so concurrent join/delete cannot both commit.
+    await transaction
+      .collection("users")
+      .doc(user._id)
+      .update({
+        data: { accountMutationVersion: db.command.inc(1), updatedAt: now },
+      });
     await activityRef.update({
       data: {
         confirmedUserIds: joined.state.confirmedUserIds,

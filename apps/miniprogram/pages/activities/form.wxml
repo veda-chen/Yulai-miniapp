@@ -19,6 +19,7 @@
       <view class="alert-copy"><text class="profile-alert-title">发布前请先设置昵称</text><text class="profile-alert-copy">昵称用于展示球局组织者；学校和头像可以不填。</text></view>
       <button bindtap="goToProfile">去设置</button>
     </view>
+    <button wx:if="{{!activityId}}" class="copy-latest surface" loading="{{copying}}" disabled="{{copying || saving}}" bindtap="copyLatestActivity">↺ 复制上次球局</button>
 
     <view id="section-basic" class="group-heading"><view class="group-icon">羽</view><view><text class="group-title">基本信息</text><text class="group-copy">告诉球友在哪里、打什么局</text></view><text class="step">01</text></view>
     <view class="form-card surface accent-blue">
@@ -28,7 +29,6 @@
       <label class="field"><text class="label">场馆</text><picker class="control" range="{{venues}}" range-key="name" value="{{venueIndex}}" bindchange="onVenueChange"><view class="picker-value">{{venues[venueIndex].name}} <text>›</text></view></picker></label>
       <text wx:if="{{fieldErrors.venue}}" class="field-error">{{fieldErrors.venue}}</text>
       <text wx:if="{{venueUnavailable}}" class="venue-warning">原场馆当前不可用，请选择新的场馆后再保存修改。</text>
-      <label class="field"><text class="label">场号或位置</text><input class="control" data-field="locationHint" maxlength="100" value="{{locationHint}}" placeholder="例如 7 号场（可不填）" placeholder-class="placeholder" confirm-type="done" bindinput="onTextInput" /></label>
     </view>
 
     <view id="section-time" class="group-heading"><view class="group-icon warm">时</view><view><text class="group-title">时间安排</text><text class="group-copy">设置开打、结束与报名截止时间</text></view><text class="step">02</text></view>
@@ -45,6 +45,12 @@
     <view class="form-card surface accent-green">
       <label class="field"><text class="label">人数上限</text><view class="number-control"><input data-field="capacity" type="number" value="{{capacity}}" confirm-type="done" bindinput="onTextInput" /><text>人</text></view></label>
       <text wx:if="{{fieldErrors.capacity}}" class="field-error">{{fieldErrors.capacity}}</text>
+    </view>
+
+    <button class="more-toggle surface" bindtap="toggleMore" aria-label="{{moreOpen ? '收起更多设置' : '展开更多设置'}}"><text>更多设置</text><text>{{moreOpen ? '收起 ⌃' : '水平、费用、联系与工具 ⌄'}}</text></button>
+    <block wx:if="{{moreOpen}}">
+    <view class="form-card surface accent-green more-card">
+      <label class="field"><text class="label">场号或位置</text><input class="control" data-field="locationHint" maxlength="100" value="{{locationHint}}" placeholder="例如 7 号场（可不填）" placeholder-class="placeholder" confirm-type="done" bindinput="onTextInput" /></label>
       <label class="field"><text class="label">水平要求</text><picker class="control" range="{{levels}}" range-key="label" value="{{levelIndex}}" bindchange="onLevelChange"><view class="picker-value">{{levels[levelIndex].label}} <text>›</text></view></picker></label>
       <label class="field"><text class="label">球局可见范围</text><picker class="control" range="{{visibilities}}" range-key="label" value="{{visibilityIndex}}" bindchange="onVisibilityChange"><view class="picker-value">{{visibilities[visibilityIndex].label}} <text>›</text></view></picker></label>
     </view>
@@ -62,6 +68,7 @@
       <view class="toggle-row"><view class="tool-copy"><view class="mini-icon">组</view><view><text class="toggle-title">启用组队</text><text class="toggle-copy">到场后辅助生成单打或双打分组</text></view></view><switch checked="{{groupingEnabled}}" color="{{primaryColor}}" bindchange="onGroupingChange" /></view>
       <view class="toggle-row"><view class="tool-copy"><view class="mini-icon score">分</view><view><text class="toggle-title">启用计分</text><text class="toggle-copy">参与球局的人都可以录入比分</text></view></view><switch checked="{{scoringEnabled}}" color="{{primaryColor}}" bindchange="onScoringChange" /></view>
     </view>
+    </block>
 
     <text wx:if="{{draftMessage && !activityId}}" class="draft-message">{{draftMessage}}</text>
     <button wx:if="{{!activityId && !publishedActivityId}}" class="clear-draft" disabled="{{saving}}" bindtap="clearDraft">清空创建草稿</button>

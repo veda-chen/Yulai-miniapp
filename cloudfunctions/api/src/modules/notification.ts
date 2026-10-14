@@ -32,6 +32,8 @@ type NotificationDocument = NotificationInput & {
   subscriptionTemplateKey?: SubscriptionTemplateKey;
   subscriptionStatus?: string;
   subscriptionAttempts?: number;
+  nextAttemptAt?: Date | string;
+  leaseUntil?: Date | string;
 };
 
 type SubscriptionPreferenceDocument = {
@@ -171,6 +173,7 @@ export async function createNotification(
         subscriptionTemplateKey: templateKey,
         subscriptionStatus: templateKey ? "PENDING" : "NOT_APPLICABLE",
         subscriptionAttempts: 0,
+        nextAttemptAt: createdAt,
         createdAt,
         updatedAt: createdAt,
       },
@@ -281,6 +284,34 @@ async function markSubscriptionJob(id: string, data: Record<string, unknown>) {
     });
 }
 
+async function claimSubscriptionJob(job: NotificationDocument, now: Date) {
+  return db.runTransaction(async (transaction: CloudTransaction) => {
+    const collection = transaction.collection("notificationJobs");
+    const result = (await collection.where({ _id: job._id }).limit(1).get()) as unknown as {
+      data: NotificationDocument[];
+    };
+    const fresh = result.data[0];
+    if (!fresh) return null;
+    const status = fresh.subscriptionStatus;
+    const dueAt = fresh.nextAttemptAt ? new Date(fresh.nextAttemptAt).getTime() : 0;
+    const leaseUntil = fresh.leaseUntil ? new Date(fresh.leaseUntil).getTime() : 0;
+    const ready =
+      status === "PENDING" ||
+      (status === "RETRY_WAIT" && dueAt <= now.getTime()) ||
+      (status === "PROCESSING" && leaseUntil <= now.getTime());
+    if (!ready) return null;
+    await collection.doc(job._id).update({
+      data: {
+        subscriptionStatus: "PROCESSING",
+        leaseUntil: new Date(now.getTime() + 3 * 60_000),
+        subscriptionUpdatedAt: db.serverDate(),
+        updatedAt: db.serverDate(),
+      },
+    });
+    return fresh;
+  });
+}
+
 async function deliverSubscriptionMessage(job: NotificationDocument) {
   const templateKey = job.subscriptionTemplateKey;
   if (!templateKey || !job.activityId) {
@@ -310,6 +341,8 @@ async function deliverSubscriptionMessage(job: NotificationDocument) {
   }
 
   const attempts = (job.subscriptionAttempts ?? 0) + 1;
+  await markSubscriptionJob(job._id, { subscriptionStatus: "SENDING" });
+  let platformAccepted = false;
   try {
     const result = (await cloud.openapi.subscribeMessage.send({
       touser: decryptSubscriptionOpenId(preference.recipientOpenIdEncrypted),
@@ -321,27 +354,45 @@ async function deliverSubscriptionMessage(job: NotificationDocument) {
     })) as Record<string, unknown>;
     const resultCode = result.errCode ?? result.errcode ?? 0;
     if (resultCode !== 0) throw result;
+    platformAccepted = true;
     await markSubscriptionJob(job._id, {
       subscriptionStatus: "SENT",
+      leaseUntil: null,
       subscriptionAttempts: attempts,
       subscriptionSentAt: db.serverDate(),
       subscriptionErrorCode: null,
       subscriptionErrorMessage: null,
     });
-    await db
-      .collection("subscriptionPreferences")
-      .doc(preference._id)
-      .update({
-        data: { status: "consumed", consumedAt: db.serverDate(), updatedAt: db.serverDate() },
-      });
+    try {
+      await db
+        .collection("subscriptionPreferences")
+        .doc(preference._id)
+        .update({
+          data: { status: "consumed", consumedAt: db.serverDate(), updatedAt: db.serverDate() },
+        });
+    } catch {
+      console.error(JSON.stringify({ jobId: job._id, code: "SUBSCRIPTION_CONSUME_FAILED" }));
+    }
     return "sent" as const;
   } catch (error) {
     const details = errorDetails(error);
+    if (platformAccepted) {
+      await markSubscriptionJob(job._id, {
+        subscriptionStatus: "VERIFY_REQUIRED",
+        subscriptionAttempts: attempts,
+        leaseUntil: null,
+        subscriptionErrorCode: "STATUS_SAVE_FAILED",
+        subscriptionErrorMessage: "平台已接受，需人工核对状态",
+      });
+      return "failed" as const;
+    }
     const permanentCodes = new Set([40003, 40037, 41030, 43101, 47003]);
     const permanent = permanentCodes.has(Number(details.code)) || attempts >= 3;
     await markSubscriptionJob(job._id, {
-      subscriptionStatus: permanent ? "FAILED_PERMANENT" : "PENDING",
+      subscriptionStatus: permanent ? "FAILED_PERMANENT" : "RETRY_WAIT",
       subscriptionAttempts: attempts,
+      nextAttemptAt: permanent ? null : new Date(Date.now() + 60_000 * 2 ** attempts),
+      leaseUntil: null,
       subscriptionErrorCode: details.code,
       subscriptionErrorMessage: details.message,
     });
@@ -361,23 +412,56 @@ async function deliverSubscriptionMessage(job: NotificationDocument) {
 }
 
 export async function processPendingSubscriptionMessages() {
-  const result = (await db
-    .collection("notificationJobs")
-    .where({ subscriptionStatus: "PENDING" })
-    .orderBy("createdAt", "asc")
-    .limit(5)
-    .get()) as unknown as { data: NotificationDocument[] };
+  const now = new Date();
+  const collection = db.collection("notificationJobs");
+  const [pending, retrying, expired, uncertain] = (await Promise.all([
+    collection.where({ subscriptionStatus: "PENDING" }).orderBy("createdAt", "asc").limit(20).get(),
+    collection
+      .where({ subscriptionStatus: "RETRY_WAIT", nextAttemptAt: db.command.lte(now) })
+      .orderBy("nextAttemptAt", "asc")
+      .limit(20)
+      .get(),
+    collection
+      .where({ subscriptionStatus: "PROCESSING", leaseUntil: db.command.lte(now) })
+      .orderBy("leaseUntil", "asc")
+      .limit(20)
+      .get(),
+    collection
+      .where({ subscriptionStatus: "SENDING", leaseUntil: db.command.lte(now) })
+      .limit(20)
+      .get(),
+  ])) as unknown as Array<{ data: NotificationDocument[] }>;
+  for (const job of uncertain?.data ?? []) {
+    await markSubscriptionJob(job._id, { subscriptionStatus: "VERIFY_REQUIRED", leaseUntil: null });
+  }
+  const candidates = [...(pending?.data ?? []), ...(retrying?.data ?? []), ...(expired?.data ?? [])]
+    .filter((job, index, all) => all.findIndex((item) => item._id === job._id) === index)
+    .slice(0, 20);
   const counts: Record<"processed" | "sent" | "skipped" | "failed", number> = {
-    processed: result.data.length,
+    processed: 0,
     sent: 0,
     skipped: 0,
     failed: 0,
   };
-  for (const job of result.data) {
-    const outcome = await deliverSubscriptionMessage(job);
-    counts[outcome] += 1;
+  for (const job of candidates) {
+    try {
+      const claimed = await claimSubscriptionJob(job, now);
+      if (!claimed) continue;
+      counts.processed += 1;
+      const outcome = await deliverSubscriptionMessage(claimed);
+      counts[outcome] += 1;
+    } catch (error) {
+      counts.failed += 1;
+      console.error(
+        JSON.stringify({
+          jobId: job._id,
+          code: "SUBSCRIPTION_JOB_FAILED",
+          message: errorDetails(error).message,
+        }),
+      );
+    }
   }
-  return counts;
+  return { ...counts, verifyRequired: uncertain?.data.length ?? 0 };
 }
 
 export const markNotificationRead: Handler = async (payload, context) => {

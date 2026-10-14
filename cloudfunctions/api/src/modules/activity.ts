@@ -237,6 +237,18 @@ function mapActivity(
   };
 }
 
+export function canViewActivityContact(
+  visibility: string,
+  isOrganizer: boolean,
+  registrationStatus: string | null,
+): boolean {
+  if (isOrganizer || visibility === "PUBLIC") return true;
+  return (
+    visibility === "PARTICIPANTS" &&
+    ["CONFIRMED", "ATTENDED", "NO_SHOW"].includes(registrationStatus ?? "")
+  );
+}
+
 async function getVenue(id: string): Promise<VenueDocument> {
   const result = (await db
     .collection("venues")
@@ -279,33 +291,90 @@ export const listActivities: Handler = async (payload, context) => {
   const source = isRecord(payload) ? payload : {};
   const keyword = typeof source.keyword === "string" ? source.keyword.trim().toLowerCase() : "";
   if (keyword.length > 50) throw new AppError("INVALID_ARGUMENT", "搜索关键词过长");
-  const query = db
-    .collection("activities")
-    .where({ status: "OPEN", visibility: "PUBLIC", startAt: db.command.gt(new Date()) })
-    .orderBy("startAt", "asc")
-    .skip(offset);
-  const result = (await query.limit(keyword ? 100 : limit + 1).get()) as unknown as {
-    data: ActivityDocument[];
+  const readDate = (value: unknown, label: string) => {
+    if (value === undefined) return null;
+    if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}T/.test(value))
+      throw new AppError("INVALID_ARGUMENT", `${label}格式不正确`);
+    const parsed = Date.parse(value);
+    if (!Number.isFinite(parsed)) throw new AppError("INVALID_ARGUMENT", `${label}格式不正确`);
+    return parsed;
   };
-  let consumed = Math.min(result.data.length, limit);
-  let page = result.data.slice(0, limit);
-  let nextOffset: number | null = result.data.length > limit ? offset + limit : null;
-  if (keyword) {
-    const matches: ActivityDocument[] = [];
-    consumed = 0;
+  const startAtFrom = readDate(source.startAtFrom, "开始时间");
+  const startAtBefore = readDate(source.startAtBefore, "结束时间");
+  if (startAtFrom !== null && startAtBefore !== null && startAtFrom >= startAtBefore)
+    throw new AppError("INVALID_ARGUMENT", "时间范围无效");
+  if (
+    source.venueId !== undefined &&
+    (typeof source.venueId !== "string" || source.venueId.length > 64)
+  )
+    throw new AppError("INVALID_ARGUMENT", "场馆条件无效");
+  if (source.level !== undefined && (typeof source.level !== "string" || !LEVELS.has(source.level)))
+    throw new AppError("INVALID_ARGUMENT", "水平条件无效");
+  if (source.hasSpots !== undefined && typeof source.hasSpots !== "boolean")
+    throw new AppError("INVALID_ARGUMENT", "名额条件无效");
+  const where: Record<string, unknown> = {
+    status: "OPEN",
+    visibility: "PUBLIC",
+    startAt:
+      startAtFrom === null
+        ? db.command.gt(new Date())
+        : db.command.gte(new Date(Math.max(Date.now(), startAtFrom))),
+  };
+  if (startAtBefore !== null)
+    where.startAt = (where.startAt as ReturnType<typeof db.command.gt>).and(
+      db.command.lt(new Date(startAtBefore)),
+    );
+  if (source.venueId) where.venueId = source.venueId;
+  if (source.level) where.level = source.level;
+  const page: ActivityDocument[] = [];
+  let consumed = 0;
+  let exhausted = false;
+  const needsScan = !!keyword || source.hasSpots === true;
+  // One request has a bounded scan; nextOffset is the position in the candidate stream,
+  // including records rejected by keyword, date or remaining-capacity filters.
+  while (page.length < limit && consumed < 500) {
+    const batchSize = Math.min(needsScan ? 100 : limit + 1, 500 - consumed);
+    const result = (await db
+      .collection("activities")
+      .where(where)
+      .orderBy("startAt", "asc")
+      .skip(offset + consumed)
+      .limit(batchSize)
+      .get()) as unknown as { data: ActivityDocument[] };
     for (const activity of result.data) {
       consumed += 1;
-      const searchText = [activity.title, activity.venueName, activity.locationHint, activity.level]
+      const start = new Date(activity.startAt).getTime();
+      const levelText: Record<string, string> = {
+        ANY: "不限",
+        CASUAL: "休闲",
+        BEGINNER: "新手",
+        IMPROVING: "进阶",
+        COMPETITIVE: "对抗",
+      };
+      const searchText = [
+        activity.title,
+        activity.venueName,
+        activity.locationHint,
+        activity.level,
+        levelText[activity.level],
+      ]
         .filter((value): value is string => typeof value === "string")
         .join(" ")
         .toLowerCase();
-      if (searchText.includes(keyword)) matches.push(activity);
-      if (matches.length === limit) break;
+      if (
+        (startAtFrom !== null && start < startAtFrom) ||
+        (startAtBefore !== null && start >= startAtBefore) ||
+        (source.hasSpots === true && activity.registeredCount >= activity.capacity) ||
+        (keyword && !searchText.includes(keyword))
+      )
+        continue;
+      page.push(activity);
+      if (page.length === limit) break;
     }
-    page = matches;
-    nextOffset =
-      consumed < result.data.length || result.data.length === 100 ? offset + consumed : null;
+    if (result.data.length < batchSize) exhausted = true;
+    if (exhausted || page.length === limit) break;
   }
+  const nextOffset = exhausted ? null : offset + consumed;
   const user = await optionalCurrentUser(context);
   const registrationByActivity = new Map<string, string>();
   if (user && page.length > 0) {
@@ -324,7 +393,11 @@ export const listActivities: Handler = async (payload, context) => {
   return {
     activities: page.map((activity) => ({
       ...mapActivity(activity, {
-        includeContact: activity.contactVisibility === "PUBLIC",
+        includeContact: canViewActivityContact(
+          activity.contactVisibility,
+          user?._id === activity.organizerId,
+          registrationByActivity.get(activity._id) ?? null,
+        ),
         isOrganizer: user?._id === activity.organizerId,
       }),
       currentRegistrationStatus: registrationByActivity.get(activity._id) ?? null,
@@ -333,29 +406,53 @@ export const listActivities: Handler = async (payload, context) => {
   };
 };
 
+export const getLatestCreatedActivity: Handler = async (_payload, context) => {
+  const user = await findCurrentUser(context);
+  const result = (await db
+    .collection("activities")
+    .where({ organizerId: user._id })
+    .orderBy("createdAt", "desc")
+    .limit(1)
+    .get()) as unknown as { data: ActivityDocument[] };
+  const activity = result.data[0];
+  return {
+    activity: activity ? mapActivity(activity, { includeContact: true, isOrganizer: true }) : null,
+  };
+};
+
 export const listMyActivities: Handler = async (payload, context) => {
   const user = await findCurrentUser(context);
   const { limit } = parsePagination(payload, 10);
-  const registrations = (await db
-    .collection("registrations")
-    .where({ userId: user._id })
-    .limit(100)
-    .get()) as unknown as { data: Array<RegistrationDocument & { activityId: string }> };
-  const activeRegistrations = registrations.data.filter((registration) =>
-    ["CONFIRMED", "WAITLISTED"].includes(registration.status),
-  );
+  const activeRegistrations: Array<RegistrationDocument & { activityId: string }> = [];
+  let offset = 0;
+  while (true) {
+    const registrations = (await db
+      .collection("registrations")
+      .where({ userId: user._id, status: db.command.in(["CONFIRMED", "WAITLISTED"]) })
+      .skip(offset)
+      .limit(100)
+      .get()) as unknown as { data: Array<RegistrationDocument & { activityId: string }> };
+    activeRegistrations.push(...registrations.data);
+    if (registrations.data.length < 100) break;
+    offset += 100;
+  }
   if (activeRegistrations.length === 0) return { activities: [] };
   const registrationByActivity = new Map(
     activeRegistrations.map((registration) => [registration.activityId, registration.status]),
   );
-  const result = (await db
-    .collection("activities")
-    .where({ _id: db.command.in([...registrationByActivity.keys()]) })
-    .limit(100)
-    .get()) as unknown as { data: ActivityDocument[] };
+  const allActivities: ActivityDocument[] = [];
+  const activityIds = [...registrationByActivity.keys()];
+  for (let index = 0; index < activityIds.length; index += 100) {
+    const result = (await db
+      .collection("activities")
+      .where({ _id: db.command.in(activityIds.slice(index, index + 100)) })
+      .limit(100)
+      .get()) as unknown as { data: ActivityDocument[] };
+    allActivities.push(...result.data);
+  }
   const now = Date.now();
   return {
-    activities: result.data
+    activities: allActivities
       .filter(
         (activity) =>
           !["CANCELLED", "HIDDEN", "ENDED"].includes(activity.status) &&
@@ -368,13 +465,54 @@ export const listMyActivities: Handler = async (payload, context) => {
       .slice(0, limit)
       .map((activity) => ({
         ...mapActivity(activity, {
-          includeContact:
-            activity.contactVisibility !== "NONE" || activity.organizerId === user._id,
+          includeContact: canViewActivityContact(
+            activity.contactVisibility,
+            activity.organizerId === user._id,
+            registrationByActivity.get(activity._id) ?? null,
+          ),
           isOrganizer: activity.organizerId === user._id,
         }),
         currentRegistrationStatus: registrationByActivity.get(activity._id) ?? null,
       })),
   };
+};
+
+export const getMyActivitySummary: Handler = async (_payload, context) => {
+  const user = await findCurrentUser(context);
+  const now = new Date();
+  const organized = (await db
+    .collection("activities")
+    .where({
+      organizerId: user._id,
+      status: db.command.in(["OPEN", "IN_PROGRESS"]),
+    })
+    .count()) as unknown as { total: number };
+  let upcomingCount = 0;
+  let offset = 0;
+  while (true) {
+    const registrations = (await db
+      .collection("registrations")
+      .where({ userId: user._id, status: "CONFIRMED" })
+      .skip(offset)
+      .limit(100)
+      .get()) as unknown as { data: Array<{ activityId: string }> };
+    const activityIds = [...new Set(registrations.data.map((item) => item.activityId))];
+    if (activityIds.length > 0) {
+      const activities = (await db
+        .collection("activities")
+        .where({
+          _id: db.command.in(activityIds),
+          status: "OPEN",
+          startAt: db.command.gt(now),
+        })
+        .limit(100)
+        .get()) as unknown as { data: ActivityDocument[] };
+      upcomingCount += activities.data.length;
+    }
+    if (registrations.data.length < 100) break;
+    offset += 100;
+  }
+  return { upcomingCount, organizingCount: organized.total };
 };
 
 export const listActivityHistory: Handler = async (payload, context) => {
@@ -414,7 +552,11 @@ export const listActivityHistory: Handler = async (payload, context) => {
     )
     .map((activity) => ({
       ...mapActivity(activity, {
-        includeContact: true,
+        includeContact: canViewActivityContact(
+          activity.contactVisibility,
+          activity.organizerId === user._id,
+          registrationByActivity.get(activity._id) ?? null,
+        ),
         isOrganizer: activity.organizerId === user._id,
       }),
       currentRegistrationStatus: registrationByActivity.get(activity._id) ?? null,
@@ -505,7 +647,11 @@ export const getActivity: Handler = async (payload, context) => {
     activity: {
       ...mapActivity(activity, {
         isOrganizer,
-        includeContact: isOrganizer || isParticipant || activity.contactVisibility === "PUBLIC",
+        includeContact: canViewActivityContact(
+          activity.contactVisibility,
+          isOrganizer,
+          currentRegistration?.status ?? null,
+        ),
       }),
       venueAvailable,
     },
@@ -643,6 +789,10 @@ export const updateActivity: Handler = async (payload, context) => {
     );
     if (!fresh) throw new AppError("ACTIVITY_NOT_FOUND", "球局不存在");
     if (fresh.organizerId !== user._id) throw new AppError("FORBIDDEN", "只有组织者可以修改球局");
+    if (fresh.status !== "OPEN") throw new AppError("INVALID_STATE", "当前状态不能修改球局");
+    if (input.capacity < fresh.registeredCount) {
+      throw new AppError("CAPACITY_TOO_SMALL", "人数上限不能低于当前报名人数");
+    }
     if (fresh.version !== Number(payload.version)) {
       throw new AppError("VERSION_CONFLICT", "球局已被更新，请刷新后重试");
     }
@@ -823,20 +973,23 @@ export const cancelActivity: Handler = async (payload, context) => {
       .collection("participants")
       .where({ activityId: id, status: "ACTIVE" })
       .update({ data: { status: "CANCELLED", updatedAt: now } });
+    await transaction
+      .collection("registrations")
+      .where({ activityId: id, status: db.command.in(["CONFIRMED", "WAITLISTED", "PROMOTED"]) })
+      .update({ data: { status: "CANCELLED", statusChangedAt: now, updatedAt: now } });
     const matchSnapshot = documentList<{ _id: string; status: string }>(
       await transaction.collection("matches").where({ activityId: id }).limit(100).get(),
     );
     for (const match of matchSnapshot) {
+      if (match.status === "LOCKED") continue;
       await transaction
         .collection("matchPlayers")
         .where({ matchId: match._id })
         .update({ data: { result: "VOID", updatedAt: now } });
-      if (match.status !== "LOCKED") {
-        await transaction
-          .collection("matches")
-          .doc(match._id)
-          .update({ data: { status: "VOID", updatedAt: now } });
-      }
+      await transaction
+        .collection("matches")
+        .doc(match._id)
+        .update({ data: { status: "VOID", updatedAt: now } });
     }
     await transaction
       .collection("rounds")

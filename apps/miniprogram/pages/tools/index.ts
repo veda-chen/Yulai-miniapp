@@ -8,6 +8,7 @@ Page({
     const state = loadAppearanceState();
     cleanupExpiredToolDrafts();
     applyNativeAppearance(state.preferences);
+    (this.getTabBar?.() as { refresh?: () => void } | null)?.refresh?.();
     this.setData({
       ...appearanceView(state.preferences),
       tools: visibleToolIds(state.preferences.toolOrder).map((id) => TOOL_DEFINITIONS[id]),

@@ -15,9 +15,14 @@ describe("resolveRoute", () => {
   });
 
   it("requires authentication for activity writes", () => {
+    expect(resolveRoute("invitation.get")).toMatchObject({ requiresAuth: false });
+    expect(resolveRoute("invitation.create")).toMatchObject({ requiresAuth: true });
+    expect(resolveRoute("invitation.reply")).toMatchObject({ requiresAuth: true });
     expect(resolveRoute("activity.list")).toMatchObject({ requiresAuth: false });
+    expect(resolveRoute("activity.latestCreated")).toMatchObject({ requiresAuth: true });
     expect(resolveRoute("activity.history")).toMatchObject({ requiresAuth: true });
     expect(resolveRoute("activity.mine")).toMatchObject({ requiresAuth: true });
+    expect(resolveRoute("activity.mySummary")).toMatchObject({ requiresAuth: true });
     expect(resolveRoute("activity.get")).toMatchObject({ requiresAuth: false });
     expect(resolveRoute("activity.create")).toMatchObject({ requiresAuth: true });
     expect(resolveRoute("activity.update")).toMatchObject({ requiresAuth: true });

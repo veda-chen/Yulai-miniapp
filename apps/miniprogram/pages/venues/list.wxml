@@ -4,7 +4,7 @@
     <view class="venue-banner-shade"></view>
     <view class="venue-banner-content"><text class="venue-kicker">场馆指南</text><text class="venue-title">先找到馆，再找到场</text><text class="venue-subtitle">大学城羽毛球馆资料与场地信息</text></view>
   </view>
-  <view class="venue-section-head"><section-header title="附近场馆" description="首个试点 · 广东工业大学大学城校区" action-text="{{venues.length + ' 家'}}" index="01" readonly="{{true}}" /></view>
+  <view class="venue-section-head"><section-header title="附近场馆" description="广州大学城 · 场馆资料持续更新" action-text="{{venues.length + ' 家'}}" index="01" readonly="{{true}}" /></view>
   <empty-state wx:if="{{loading}}" title="正在加载场馆" description="请稍候" />
   <empty-state wx:elif="{{message}}" title="暂时无法加载场馆" description="{{message}}" action-text="重新加载" bind:action="retry" />
   <empty-state wx:elif="{{venues.length === 0}}" title="暂无场馆资料" description="核验完成后会在这里展示" />

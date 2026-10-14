@@ -235,6 +235,9 @@ export const finishActivity: Handler = async (payload, context) => {
         now,
       );
     }
+    await registrations
+      .where({ activityId: id, status: "WAITLISTED" })
+      .update({ data: { status: "CANCELLED", statusChangedAt: now, updatedAt: now } });
     const matchSnapshot = documentList<{ _id: string; status: string }>(
       await transaction.collection("matches").where({ activityId: id }).limit(100).get(),
     );

@@ -10,6 +10,11 @@
     "Command": "{\"find\":\"venues\",\"filter\":{\"seedKey\":\"gdut-university-town-gymnasium\"},\"limit\":2}"
   },
   {
+    "TableName": "venues",
+    "CommandType": "QUERY",
+    "Command": "{\"find\":\"venues\",\"filter\":{\"seedKey\":\"scut-university-town-gymnasium\"},\"limit\":2}"
+  },
+  {
     "TableName": "users",
     "CommandType": "COMMAND",
     "Command": "{\"listIndexes\":\"users\"}"

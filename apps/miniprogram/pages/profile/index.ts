@@ -16,9 +16,9 @@ type Profile = {
   role: string;
 };
 
-type Activity = { isOrganizer: boolean; currentRegistrationStatus: string | null };
-
 Page({
+  requestVersion: 0,
+  isVisible: false,
   data: {
     loading: true,
     nickname: "羽来球友",
@@ -26,43 +26,70 @@ Page({
     avatarFileId: "",
     schoolName: "学校未填写",
     levelText: "不清楚",
-    upcomingCount: 0,
-    organizingCount: 0,
-    gameCount: 0,
+    upcomingCount: "—" as number | string,
+    organizingCount: "—" as number | string,
+    gameCount: "—" as number | string,
+    profileError: "",
+    summaryError: "",
+    scoreError: "",
     isAdmin: false,
     deleting: false,
     ...appearanceView(),
   },
 
   async onShow() {
+    this.isVisible = true;
     const appearance = loadAppearanceState();
     applyNativeAppearance(appearance.preferences);
+    (this.getTabBar?.() as { refresh?: () => void } | null)?.refresh?.();
     this.setData(appearanceView(appearance.preferences));
+    await this.load();
+  },
+
+  onHide() {
+    this.isVisible = false;
+    this.requestVersion += 1;
+  },
+
+  onUnload() {
+    this.isVisible = false;
+    this.requestVersion += 1;
+  },
+
+  async load() {
+    const requestVersion = ++this.requestVersion;
+    this.setData({ loading: true, profileError: "", summaryError: "", scoreError: "" });
     try {
       await callCloud("auth.session");
-      const [profileResult, activityResult, scoreResult] = await Promise.all([
+      const [profileResult, summaryResult, scoreResult] = await Promise.allSettled([
         callCloud<{ user: Profile }>("user.getMe"),
-        callCloud<{ activities: Activity[] }>("activity.list"),
+        callCloud<{ upcomingCount: number; organizingCount: number }>("activity.mySummary"),
         callCloud<{ stats: { games: number } }>("score.stats"),
       ]);
-      const profile = profileResult.user;
-      const nickname = profile.nickname ?? "羽来球友";
-      this.setData({
-        loading: false,
-        nickname,
-        initial: nickname.slice(0, 1),
-        avatarFileId: profile.avatarFileId ?? "",
-        schoolName: profile.school?.name ?? "学校未填写",
-        levelText: levelLabel(profile.level),
-        upcomingCount: activityResult.activities.filter(
-          (item) => item.currentRegistrationStatus === "CONFIRMED",
-        ).length,
-        organizingCount: activityResult.activities.filter((item) => item.isOrganizer).length,
-        gameCount: scoreResult.stats.games,
-        isAdmin: profile.role === "ADMIN",
-      });
+      if (!this.isVisible || requestVersion !== this.requestVersion) return;
+      if (profileResult.status === "fulfilled") {
+        const profile = profileResult.value.user;
+        const nickname = profile.nickname ?? "羽来球友";
+        this.setData({
+          nickname,
+          initial: nickname.slice(0, 1),
+          avatarFileId: profile.avatarFileId ?? "",
+          schoolName: profile.school?.name ?? "学校未填写",
+          levelText: levelLabel(profile.level),
+          isAdmin: profile.role === "ADMIN",
+        });
+      } else this.setData({ profileError: "资料加载失败" });
+      if (summaryResult.status === "fulfilled") this.setData(summaryResult.value);
+      else this.setData({ summaryError: "球局统计暂不可用" });
+      if (scoreResult.status === "fulfilled")
+        this.setData({ gameCount: scoreResult.value.stats.games });
+      else this.setData({ scoreError: "战绩暂不可用" });
     } catch {
-      this.setData({ loading: false });
+      if (!this.isVisible || requestVersion !== this.requestVersion) return;
+      this.setData({ profileError: "资料加载失败，请重试" });
+    } finally {
+      if (this.isVisible && requestVersion === this.requestVersion)
+        this.setData({ loading: false });
     }
   },
 

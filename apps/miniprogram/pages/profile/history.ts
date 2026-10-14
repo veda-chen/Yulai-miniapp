@@ -25,6 +25,8 @@ const REGISTRATION_STATUS: Record<string, string> = {
 };
 
 Page({
+  requestVersion: 0,
+  isVisible: false,
   data: {
     loading: true,
     loadingMore: false,
@@ -37,10 +39,21 @@ Page({
   },
 
   async onShow() {
+    this.isVisible = true;
     const state = loadAppearanceState();
     applyNativeAppearance(state.preferences);
     this.setData(appearanceView(state.preferences));
     await this.load(true);
+  },
+
+  onHide() {
+    this.isVisible = false;
+    this.requestVersion += 1;
+  },
+
+  onUnload() {
+    this.isVisible = false;
+    this.requestVersion += 1;
   },
 
   async onPullDownRefresh() {
@@ -57,6 +70,7 @@ Page({
   },
 
   async load(reset: boolean) {
+    const requestVersion = ++this.requestVersion;
     const offset = reset ? 0 : this.data.nextOffset;
     if (offset === null) return;
     try {
@@ -65,6 +79,7 @@ Page({
         "activity.history",
         { offset, limit: 20 },
       );
+      if (!this.isVisible || requestVersion !== this.requestVersion) return;
       const page = result.activities.map((activity) => ({
         ...activity,
         timeText: formatChinaDateTime(activity.startAt),
@@ -82,6 +97,7 @@ Page({
         nextOffset: result.nextOffset,
       });
     } catch (error) {
+      if (!this.isVisible || requestVersion !== this.requestVersion) return;
       this.setData({
         loading: false,
         loadingMore: false,

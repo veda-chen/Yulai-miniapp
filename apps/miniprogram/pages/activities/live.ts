@@ -41,6 +41,9 @@ const STATUS_LABELS: Record<string, string> = {
 
 Page({
   activityId: "",
+  requestVersion: 0,
+  isVisible: false,
+  scoreDrafts: {} as Record<string, { inputScoreA: string; inputScoreB: string }>,
   data: {
     loading: true,
     ...appearanceView(),
@@ -75,10 +78,19 @@ Page({
     this.activityId = options.id ?? "";
   },
   async onShow() {
+    this.isVisible = true;
     const appearance = loadAppearanceState();
     applyNativeAppearance(appearance.preferences);
     this.setData(appearanceView(appearance.preferences));
     if (this.activityId) await this.load();
+  },
+  onHide() {
+    this.isVisible = false;
+    this.requestVersion += 1;
+  },
+  onUnload() {
+    this.isVisible = false;
+    this.requestVersion += 1;
   },
   async onPullDownRefresh() {
     await this.load();
@@ -86,14 +98,18 @@ Page({
   },
 
   async load() {
+    const requestVersion = ++this.requestVersion;
     try {
       this.setData({ loading: true, message: "" });
-      const [result, stats] = await Promise.all([
+      const [liveResult, statsResult] = await Promise.allSettled([
         callCloud<LiveData>("live.get", { activityId: this.activityId }),
         callCloud<{
           stats: { games: number; wins: number; losses: number; winRate: number | null };
         }>("score.stats"),
       ]);
+      if (!this.isVisible || requestVersion !== this.requestVersion) return;
+      if (liveResult.status !== "fulfilled") throw liveResult.reason;
+      const result = liveResult.value;
       this.setData({
         loading: false,
         activity: result.activity,
@@ -104,19 +120,27 @@ Page({
           teamAText: match.teamA.map((item) => item.nickname).join(" / "),
           teamBText: match.teamB.map((item) => item.nickname).join(" / "),
           statusText: STATUS_LABELS[match.status] ?? match.status,
-          inputScoreA: match.scoreA === null ? "" : String(match.scoreA),
-          inputScoreB: match.scoreB === null ? "" : String(match.scoreB),
+          inputScoreA:
+            this.scoreDrafts[match.id]?.inputScoreA ??
+            (match.scoreA === null ? "" : String(match.scoreA)),
+          inputScoreB:
+            this.scoreDrafts[match.id]?.inputScoreB ??
+            (match.scoreB === null ? "" : String(match.scoreB)),
           isPlayer: [...match.teamA, ...match.teamB].some(
             (item) => item.userId === result.currentUserId,
           ),
           confirmationText: match.confirmations.join("、"),
         })),
-        statsText: stats.stats.games
-          ? `${stats.stats.games} 场 · ${stats.stats.wins} 胜 · 胜率 ${stats.stats.winRate}%`
-          : "暂无锁定战绩",
+        statsText:
+          statsResult.status === "rejected"
+            ? "战绩暂不可用"
+            : statsResult.value.stats.games
+              ? `${statsResult.value.stats.games} 场 · ${statsResult.value.stats.wins} 胜 · 胜率 ${statsResult.value.stats.winRate}%`
+              : "暂无锁定战绩",
       });
       wx.setNavigationBarTitle({ title: result.activity.title });
     } catch (error) {
+      if (!this.isVisible || requestVersion !== this.requestVersion) return;
       this.setData({
         loading: false,
         message: error instanceof Error ? error.message : "现场信息加载失败",
@@ -136,7 +160,36 @@ Page({
   onScoreInput(event: WechatMiniprogram.CustomEvent<{ value: string }>) {
     const index = Number(event.currentTarget.dataset.index);
     const field = event.currentTarget.dataset.side === "A" ? "inputScoreA" : "inputScoreB";
+    const match = this.data.matches[index];
+    if (!match) return;
+    this.scoreDrafts[match.id] = {
+      inputScoreA: match.inputScoreA,
+      inputScoreB: match.inputScoreB,
+      [field]: event.detail.value,
+    };
     this.setData({ [`matches[${index}].${field}`]: event.detail.value });
+  },
+
+  scoreForSubmit(match: { inputScoreA: string; inputScoreB: string }) {
+    const left = match.inputScoreA.trim();
+    const right = match.inputScoreB.trim();
+    const scoreA = Number(left);
+    const scoreB = Number(right);
+    const winner = Math.max(scoreA, scoreB);
+    const loser = Math.min(scoreA, scoreB);
+    if (
+      !/^\d+$/.test(left) ||
+      !/^\d+$/.test(right) ||
+      scoreA > 30 ||
+      scoreB > 30 ||
+      scoreA === scoreB ||
+      winner < 21 ||
+      (winner < 30 && winner - loser < 2)
+    ) {
+      wx.showToast({ title: "请输入有效的单局比分", icon: "none" });
+      return null;
+    }
+    return { scoreA, scoreB };
   },
 
   async generateRound() {
@@ -195,14 +248,14 @@ Page({
   },
   async submitScore(event: WechatMiniprogram.BaseEvent) {
     const match = this.data.matches[Number(event.currentTarget.dataset.index)];
-    if (match)
+    const score = match ? this.scoreForSubmit(match) : null;
+    if (match && score)
       await this.run(
         "score.submit",
         {
           matchId: match.id,
           version: match.version,
-          scoreA: Number(match.inputScoreA),
-          scoreB: Number(match.inputScoreB),
+          ...score,
         },
         "比分已提交",
       );
@@ -214,14 +267,14 @@ Page({
   },
   async lockScore(event: WechatMiniprogram.BaseEvent) {
     const match = this.data.matches[Number(event.currentTarget.dataset.index)];
-    if (match)
+    const score = match ? this.scoreForSubmit(match) : null;
+    if (match && score)
       await this.run(
         "score.lock",
         {
           matchId: match.id,
           version: match.version,
-          scoreA: Number(match.inputScoreA),
-          scoreB: Number(match.inputScoreB),
+          ...score,
         },
         "比分已锁定",
       );
@@ -247,6 +300,13 @@ Page({
     this.setData({ submitting: true });
     try {
       await callCloud(action, payload);
+      if (
+        (action === "score.submit" || action === "score.lock") &&
+        typeof payload === "object" &&
+        payload !== null &&
+        "matchId" in payload
+      )
+        delete this.scoreDrafts[String(payload.matchId)];
       wx.showToast({ title: success, icon: "success" });
       await this.load();
     } catch (error) {

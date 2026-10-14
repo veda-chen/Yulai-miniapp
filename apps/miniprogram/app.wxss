@@ -23,6 +23,7 @@ page {
   --section-number-display: none;
   --icon-radius: 18rpx;
   --motion-duration: 160ms;
+  --press-scale: .98;
   --court-line: rgba(0, 122, 255, 0.12);
   background: var(--page-bg);
   color: var(--text);
@@ -80,7 +81,7 @@ button {
 }
 
 .primary-button:active {
-  transform: scale(0.98);
+  transform: scale(var(--press-scale));
 }
 
 .theme-green { --primary:#11866f; --primary-soft:#e1f5ef; --hero-end:#173e37; --court-line:rgba(17,134,111,.12); }

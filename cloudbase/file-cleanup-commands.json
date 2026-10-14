@@ -1,0 +1,12 @@
+[
+  {
+    "TableName": "fileCleanupJobs",
+    "CommandType": "COMMAND",
+    "Command": "{\"create\":\"fileCleanupJobs\"}"
+  },
+  {
+    "TableName": "fileCleanupJobs",
+    "CommandType": "COMMAND",
+    "Command": "{\"createIndexes\":\"fileCleanupJobs\",\"indexes\":[{\"name\":\"status_nextAttemptAt\",\"key\":{\"status\":1,\"nextAttemptAt\":1}}]}"
+  }
+]

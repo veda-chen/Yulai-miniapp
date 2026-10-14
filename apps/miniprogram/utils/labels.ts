@@ -4,6 +4,8 @@ const LEVEL_LABELS: Record<string, string> = {
   BEGINNER: "新手",
   IMPROVING: "进阶",
   COMPETITIVE: "对抗",
+  LIN_DAN: "林丹",
+  DOUYIN_AVERAGE: "抖音人均水平",
 };
 
 export function levelLabel(level: string): string {

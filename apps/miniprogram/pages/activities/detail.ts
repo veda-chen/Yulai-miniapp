@@ -118,6 +118,8 @@ Page({
   activityId: "",
   deadlineTimer: null as number | null,
   createdSuccessPending: false,
+  requestVersion: 0,
+  isVisible: false,
 
   data: {
     loading: true,
@@ -145,6 +147,7 @@ Page({
   },
 
   async onShow() {
+    this.isVisible = true;
     const appearance = loadAppearanceState();
     applyNativeAppearance(appearance.preferences);
     this.setData(appearanceView(appearance.preferences));
@@ -157,10 +160,14 @@ Page({
   },
 
   onHide() {
+    this.isVisible = false;
+    this.requestVersion += 1;
     this.clearDeadlineTimer();
   },
 
   onUnload() {
+    this.isVisible = false;
+    this.requestVersion += 1;
     this.clearDeadlineTimer();
   },
 
@@ -196,6 +203,7 @@ Page({
   },
 
   async loadActivity(options: { preserve?: boolean; failureMessage?: string } = {}) {
+    const requestVersion = ++this.requestVersion;
     try {
       if (!options.preserve) this.setData({ loading: true, message: "", refreshFailed: false });
       const result = await callCloud<{
@@ -205,6 +213,7 @@ Page({
         changes: ActivityChange[];
         changeConfirmation: { acknowledged: number; pending: number } | null;
       }>("activity.get", { id: this.activityId });
+      if (!this.isVisible || requestVersion !== this.requestVersion) return false;
       const activity = activityView(result.activity, result.currentRegistration?.status ?? null);
       this.setData({
         loading: false,
@@ -239,6 +248,7 @@ Page({
       this.scheduleDeadlineRefresh();
       return true;
     } catch (error) {
+      if (!this.isVisible || requestVersion !== this.requestVersion) return false;
       if (options.preserve && this.data.activity) {
         this.setData({
           refreshFailed: true,

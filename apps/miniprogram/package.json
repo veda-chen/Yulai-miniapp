@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "typecheck": "node ../../scripts/generate-cloud-env.mjs && tsc --noEmit"
   },
   "devDependencies": {
     "miniprogram-api-typings": "^4.0.8",

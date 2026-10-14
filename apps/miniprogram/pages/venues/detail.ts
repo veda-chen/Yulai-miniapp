@@ -38,6 +38,8 @@ type DisplayVenueDetail = VenueDetail & {
 
 Page({
   venueId: "",
+  requestVersion: 0,
+  isVisible: true,
   data: {
     loading: true,
     detail: null as DisplayVenueDetail | null,
@@ -45,12 +47,26 @@ Page({
     ...appearanceView(),
   },
 
-  async onLoad(options: Record<string, string | undefined>) {
+  onLoad(options: Record<string, string | undefined>) {
     const appearance = loadAppearanceState();
     applyNativeAppearance(appearance.preferences);
     this.setData(appearanceView(appearance.preferences));
     this.venueId = options.id ?? "";
-    await this.loadVenue();
+  },
+
+  onShow() {
+    this.isVisible = true;
+    if (this.venueId && !this.data.detail) void this.loadVenue();
+  },
+
+  onHide() {
+    this.isVisible = false;
+    this.requestVersion += 1;
+  },
+
+  onUnload() {
+    this.isVisible = false;
+    this.requestVersion += 1;
   },
 
   async retry() {
@@ -62,6 +78,7 @@ Page({
   },
 
   async loadVenue() {
+    const requestVersion = ++this.requestVersion;
     if (!this.venueId) {
       this.setData({ loading: false, message: "场馆链接无效" });
       return;
@@ -69,6 +86,7 @@ Page({
     this.setData({ loading: true, message: "" });
     try {
       const detail = await callCloud<VenueDetail>("venue.get", { id: this.venueId });
+      if (!this.isVisible || requestVersion !== this.requestVersion) return;
       const hasVisitInfo = Boolean(
         detail.venue.entranceGuide ||
           detail.venue.openingHours ||
@@ -92,6 +110,7 @@ Page({
       });
       wx.setNavigationBarTitle({ title: detail.venue.name });
     } catch (error) {
+      if (!this.isVisible || requestVersion !== this.requestVersion) return;
       this.setData({
         loading: false,
         message: error instanceof Error ? error.message : "场馆加载失败",

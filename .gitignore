@@ -9,7 +9,9 @@ coverage/
 .DS_Store
 apps/miniprogram/miniprogram_npm/
 apps/miniprogram/.eslintrc.js
+apps/miniprogram/config/cloud-env.generated.ts
 docs/architecture_render/
 docs/*_a11y.json
 .cloudbase/
 .backups/
+.release-manifests/

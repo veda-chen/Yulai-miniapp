@@ -49,6 +49,8 @@ function subscriptionStatus(
 }
 
 Page({
+  listRequestVersion: 0,
+  isVisible: false,
   data: {
     loading: true,
     loadingMore: false,
@@ -64,10 +66,19 @@ Page({
   },
 
   async onShow() {
+    this.isVisible = true;
     const appearance = loadAppearanceState();
     applyNativeAppearance(appearance.preferences);
     this.setData(appearanceView(appearance.preferences));
     await Promise.allSettled([this.loadNotifications(true), this.loadSubscriptionState()]);
+  },
+  onHide() {
+    this.isVisible = false;
+    this.listRequestVersion += 1;
+  },
+  onUnload() {
+    this.isVisible = false;
+    this.listRequestVersion += 1;
   },
 
   async onReachBottom() {
@@ -78,23 +89,38 @@ Page({
   async loadNotifications(reset: boolean) {
     const offset = reset ? 0 : this.data.nextOffset;
     if (offset === null) return;
-    this.setData(reset ? { loading: true, message: "" } : { loadingMore: true, message: "" });
+    const requestVersion = reset ? ++this.listRequestVersion : this.listRequestVersion;
+    this.setData(
+      reset
+        ? { loading: true, loadingMore: false, message: "" }
+        : { loadingMore: true, message: "" },
+    );
     try {
       const result = await callCloud<{ notifications: Notification[]; nextOffset: number | null }>(
         "notification.list",
         { offset, limit: 20 },
       );
+      if (!this.isVisible || requestVersion !== this.listRequestVersion) return;
       const page = result.notifications.map((item) => ({
         ...item,
         timeText: formatChinaDateTime(item.createdAt),
       }));
-      this.setData({
+      const existing = reset ? [] : this.data.notifications;
+      const seen = new Set(existing.map((item) => item.id));
+      const additions = page.filter((item) => !seen.has(item.id));
+      const update: Record<string, unknown> = {
         loading: false,
         loadingMore: false,
-        notifications: reset ? page : [...this.data.notifications, ...page],
         nextOffset: result.nextOffset,
-      });
+      };
+      if (reset) update.notifications = additions;
+      else
+        additions.forEach((item, index) => {
+          update[`notifications[${existing.length + index}]`] = item;
+        });
+      this.setData(update);
     } catch {
+      if (!this.isVisible || requestVersion !== this.listRequestVersion) return;
       this.setData({
         loading: false,
         loadingMore: false,
@@ -185,16 +211,14 @@ Page({
 
   async openNotification(event: WechatMiniprogram.TouchEvent) {
     const { id, activityId } = event.currentTarget.dataset as { id: string; activityId?: string };
-    try {
-      await callCloud("notification.markRead", { id });
-      this.setData({
-        notifications: this.data.notifications.map((item) =>
-          item.id === id ? { ...item, isRead: true } : item,
-        ),
-      });
-    } catch {
-      wx.showToast({ title: "已打开消息，已读状态稍后重试", icon: "none" });
-    }
+    this.setData({
+      notifications: this.data.notifications.map((item) =>
+        item.id === id ? { ...item, isRead: true } : item,
+      ),
+    });
     if (activityId) wx.navigateTo({ url: `/pages/activities/detail?id=${activityId}` });
+    void callCloud("notification.markRead", { id }).catch(() => {
+      // The next onShow reloads the authoritative read state.
+    });
   },
 });

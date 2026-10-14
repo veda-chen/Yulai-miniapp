@@ -60,8 +60,8 @@ if (
 }
 
 const appSource = await readFile("apps/miniprogram/app.ts", "utf8");
-if (!appSource.includes('env: "cloud1-d1g8z3590d3768cbb"')) {
-  throw new Error("小程序没有绑定 M1 开发云环境");
+if (!appSource.includes("CLOUD_ENV_IDS[environment]")) {
+  throw new Error("小程序没有按版本选择云开发环境");
 }
 
 console.log("M1 baseline verified");

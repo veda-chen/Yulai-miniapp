@@ -20,6 +20,8 @@ const LEVELS = [
   { value: "BEGINNER", label: "新手" },
   { value: "IMPROVING", label: "进阶" },
   { value: "COMPETITIVE", label: "对抗" },
+  { value: "LIN_DAN", label: "林丹" },
+  { value: "DOUYIN_AVERAGE", label: "抖音人均水平" },
 ];
 
 Page({

@@ -10,9 +10,8 @@
 .label { color:#6e6e73; }
 .value, .link { text-align:right; }
 .link { color:#007aff; }
-.item { display:flex; flex-direction:column; padding:22rpx 0; border-top:1rpx solid #e5e5ea; }
-.item:first-of-type { padding-top:0; border-top:0; }
-.item:last-child { padding-bottom:0; }
+.item { display:flex; flex-direction:column; padding:22rpx 24rpx; border-top:1rpx solid #e5e5ea; }
+.item:first-of-type { border-top:0; }
 .item-title { font-size:27rpx; font-weight:650; }
 .item-body, .paragraph { margin-top:10rpx; color:#636366; font-size:25rpx; line-height:1.75; }
 .paragraph { display:block; }

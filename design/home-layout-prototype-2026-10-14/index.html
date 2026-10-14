@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>羽来 · 首页布局原型</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; width: 100%; min-height: 100%; }
+    body { display: grid; place-items: start; background: #dce8ef; font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; color: #142536; }
+    .phone { position: relative; width: 390px; height: 844px; overflow: hidden; background: #f5f8fb; }
+    .status { height: 35px; display: flex; align-items: center; justify-content: space-between; padding: 0 23px; background: #fff; color: #17283a; font-size: 14px; font-weight: 650; }
+    .status-right { display: flex; align-items: center; gap: 5px; font-size: 12px; }
+    .battery { width: 19px; height: 9px; border: 1.5px solid #17283a; border-radius: 2px; position: relative; }
+    .battery::after { content: ""; position: absolute; right: -4px; top: 2px; width: 2px; height: 3px; border-radius: 1px; background: #17283a; }
+    .battery span { display: block; width: 12px; height: 5px; margin: 1px; border-radius: 1px; background: #17283a; }
+    .navbar { height: 49px; position: relative; display: flex; align-items: center; justify-content: center; background: #fff; font-size: 16px; font-weight: 750; border-bottom: 1px solid #edf1f3; }
+    .menu { position: absolute; right: 13px; top: 8px; width: 84px; height: 32px; border: 1px solid #dfe5e9; border-radius: 18px; display: flex; align-items: center; justify-content: space-around; color: #1f2f3b; font-size: 20px; line-height: 1; }
+    .menu i { display: block; width: 1px; height: 17px; background: #dfe5e9; }
+    .menu b { font-size: 21px; font-weight: 700; line-height: 1; }
+    main { height: 686px; overflow: hidden; padding: 17px 18px 30px; }
+    .greeting { display: flex; align-items: center; justify-content: space-between; margin: 0 2px 16px; }
+    .greeting small { display: block; color: #738397; font-size: 11px; letter-spacing: .4px; }
+    .greeting strong { display: block; margin-top: 4px; font-size: 22px; letter-spacing: -.5px; line-height: 1.2; }
+    .bell { width: 36px; height: 36px; display: grid; place-items: center; border: 1px solid #e7edf1; border-radius: 13px; background: #fff; box-shadow: 0 5px 15px #213d5310; position: relative; }
+    .bell svg { width: 19px; height: 19px; stroke: #233d51; }
+    .bell::after { content: ""; position: absolute; right: 8px; top: 7px; width: 6px; height: 6px; border: 2px solid #fff; border-radius: 50%; background: #f16967; }
+    .hero { position: relative; height: 155px; overflow: hidden; border-radius: 23px; background: #1168cf; box-shadow: 0 13px 25px #276bac2a; }
+    .hero::before { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, #1262c4 0%, #1262c4ec 35%, #1262c4a8 66%, #1e77c45e 100%), url("../../apps/miniprogram/assets/activity-header-v2.jpg") center/cover; }
+    .hero::after { content: ""; position: absolute; width: 210px; height: 210px; right: -68px; top: -56px; border: 1px solid #ffffff3a; border-radius: 50%; box-shadow: 0 0 0 23px #ffffff0a, 0 0 0 53px #ffffff08; }
+    .hero-content { position: absolute; inset: 0; z-index: 1; padding: 23px 23px; color: #fff; }
+    .hero-tag { display: inline-block; padding: 4px 8px; border: 1px solid #ffffff70; border-radius: 99px; color: #e7f5ff; font-size: 10px; font-weight: 700; letter-spacing: .7px; }
+    .hero h2 { margin: 9px 0 3px; font-size: 26px; font-weight: 800; letter-spacing: -.6px; line-height: 1.15; }
+    .hero p { margin: 0; font-size: 12px; color: #d6e9fb; }
+    .hero-action { position: absolute; left: 23px; bottom: 19px; display: flex; align-items: center; gap: 7px; font-size: 11px; font-weight: 700; }
+    .hero-action b { display: grid; place-items: center; width: 21px; height: 21px; border-radius: 7px; background: #fff; color: #1472d4; font-size: 17px; font-weight: 500; }
+    .quick-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 11px; }
+    .quick { height: 98px; position: relative; overflow: hidden; border-radius: 20px; padding: 17px 16px; }
+    .quick h3 { position: relative; z-index: 1; margin: 0 0 5px; font-size: 18px; line-height: 1.15; font-weight: 800; }
+    .quick p { position: relative; z-index: 1; margin: 0; font-size: 10.5px; font-weight: 550; }
+    .quick .arrow { position: absolute; z-index: 1; left: 16px; bottom: 13px; font-size: 15px; font-weight: 800; }
+    .create { background: linear-gradient(135deg, #c7f2df, #9de0bd); color: #174835; }
+    .create::after { content: ""; position: absolute; right: -8px; bottom: -25px; width: 90px; height: 120px; border: 7px solid #55b88e4b; border-radius: 12px; transform: rotate(-27deg); }
+    .create .court-line { position: absolute; right: 17px; bottom: 13px; width: 72px; height: 6px; border-radius: 10px; background: #ffffff8c; transform: rotate(-27deg); }
+    .duck { background: linear-gradient(135deg, #fff1b1, #ffdd7b); color: #5a3d18; }
+    .duck::after { content: ""; position: absolute; right: -11px; bottom: -5px; width: 98px; height: 98px; background: url("../../apps/miniprogram/assets/home-duck.png") center/contain no-repeat; }
+    .section-title { display: flex; align-items: center; justify-content: space-between; margin: 21px 1px 11px; }
+    .section-title h3 { margin: 0; font-size: 17px; font-weight: 800; letter-spacing: -.3px; }
+    .section-title .more { color: #2678ca; font-size: 11px; font-weight: 650; }
+    .next-card { display: flex; align-items: center; gap: 13px; height: 78px; border: 1px solid #e5edf3; border-radius: 18px; background: #fff; padding: 12px 13px; box-shadow: 0 7px 20px #1f4d7510; }
+    .date-box { width: 48px; height: 51px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 13px; background: #e8f4ff; color: #1673c9; }
+    .date-box b { font-size: 20px; line-height: 1; }.date-box span { margin-top: 3px; font-size: 10px; font-weight: 700; }
+    .next-copy { flex: 1; min-width: 0; }.next-copy strong { display: block; font-size: 13px; }.next-copy small { display: block; margin-top: 6px; color: #8290a0; font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .status-pill { align-self: flex-start; padding: 5px 7px; border-radius: 7px; background: #dff6eb; color: #168456; font-size: 9px; font-weight: 750; }
+    .recommend-title { margin-top: 20px; }
+    .game-card { display: flex; gap: 12px; border: 1px solid #e5edf3; border-radius: 17px; background: #fff; padding: 13px; min-height: 90px; }
+    .game-visual { display: grid; place-items: center; width: 64px; height: 64px; flex: none; border-radius: 12px; background: linear-gradient(145deg, #e4f7f1, #d2eaf9); font-size: 31px; }
+    .game-text { flex: 1; min-width: 0; }.game-text strong { display: block; margin: 1px 0 7px; font-size: 12px; }.game-text small { display: block; margin-top: 4px; color: #8290a0; font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }.spots { margin-top: 8px; color: #17815c; font-size: 10px; font-weight: 750; }
+    .tabbar { position: absolute; bottom: 0; left: 0; right: 0; height: 73px; display: flex; align-items: flex-start; justify-content: space-around; padding: 9px 11px 0; border-top: 1px solid #e4ebf0; background: #fffffff0; box-shadow: 0 -9px 25px #214a6410; }
+    .tab { width: 74px; display: flex; flex-direction: column; align-items: center; gap: 5px; color: #90a0ad; font-size: 10px; font-weight: 650; }
+    .tab b { display: grid; place-items: center; width: 28px; height: 26px; font-size: 22px; font-weight: 400; line-height: 1; }
+    .tab.active { color: #1974d2; }.tab.active b { color: #1974d2; }
+    .home-indicator { position: absolute; bottom: 6px; left: 130px; width: 130px; height: 4px; border-radius: 99px; background: #1b2a36; }
+  </style>
+</head>
+<body>
+  <div class="phone">
+    <div class="status"><span>9:41</span><span class="status-right">●●● ▰ <span class="battery"><span></span></span></span></div>
+    <div class="navbar">羽来 <div class="menu"><span>•••</span><i></i><b>◎</b></div></div>
+    <main>
+      <div class="greeting"><div><small>10月14日 · 星期三</small><strong>嗨，球友 👋</strong></div><div class="bell"><svg fill="none" stroke-width="1.7" viewBox="0 0 24 24" role="img" aria-label="消息"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9ZM10 21h4"/></svg></div></div>
+      <div class="hero"><div class="hero-content"><span class="hero-tag">羽来 · 一起上场</span><h2>找球局，马上开打</h2><p>看看附近谁在约球</p><div class="hero-action"><b>›</b><span>去找球局</span></div></div></div>
+      <div class="quick-grid"><div class="quick create"><h3>发起球局</h3><p>喊上球友，一起开场</p><span class="arrow">↗</span><span class="court-line"></span></div><div class="quick duck"><h3>打球鸭</h3><p>发到群里，问问谁来</p><span class="arrow">↗</span></div></div>
+      <div class="section-title"><h3>我的下一场</h3><span class="more">全部球局 ›</span></div>
+      <div class="next-card"><div class="date-box"><b>16</b><span>周五</span></div><div class="next-copy"><strong>周五晚羽毛球局</strong><small>19:00 · 大学城体育馆 7 号场</small></div><span class="status-pill">已报名</span></div>
+      <div class="section-title recommend-title"><h3>附近可加入</h3><span class="more">查看更多 ›</span></div>
+      <div class="game-card"><div class="game-visual">🏸</div><div class="game-text"><strong>周末轻松双打局</strong><small>周六 15:00 · 大学城体育馆</small><div class="spots">还剩 2 个位置</div></div></div>
+    </main>
+    <div class="tabbar"><div class="tab active"><b>⌂</b><span>首页</span></div><div class="tab"><b>⚒</b><span>工具</span></div><div class="tab"><b>♧</b><span>场馆</span></div><div class="tab"><b>♙</b><span>我的</span></div></div>
+    <div class="home-indicator"></div>
+  </div>
+</body>
+</html>

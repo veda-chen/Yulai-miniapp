@@ -1,0 +1,22 @@
+[
+  {
+    "TableName": "playInvitations",
+    "CommandType": "COMMAND",
+    "Command": "{\"create\":\"playInvitations\"}"
+  },
+  {
+    "TableName": "playInvitations",
+    "CommandType": "COMMAND",
+    "Command": "{\"createIndexes\":\"playInvitations\",\"indexes\":[{\"name\":\"ownerId_createdAt\",\"key\":{\"ownerId\":1,\"createdAt\":-1},\"unique\":false}]}"
+  },
+  {
+    "TableName": "playInvitationReplies",
+    "CommandType": "COMMAND",
+    "Command": "{\"create\":\"playInvitationReplies\"}"
+  },
+  {
+    "TableName": "playInvitationReplies",
+    "CommandType": "COMMAND",
+    "Command": "{\"createIndexes\":\"playInvitationReplies\",\"indexes\":[{\"name\":\"invitationId_uniqueUser\",\"key\":{\"invitationId\":1,\"userId\":1},\"unique\":true}]}"
+  }
+]

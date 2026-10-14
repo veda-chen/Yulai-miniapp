@@ -8,6 +8,16 @@ import {
   normalizeActivitySearchKeyword,
   RequestVersion,
 } from "../apps/miniprogram/utils/activity-search.ts";
+import { chinaDayRange } from "../apps/miniprogram/utils/date.ts";
+
+assert.deepEqual(chinaDayRange(0, new Date("2026-10-08T16:30:00.000Z")), {
+  startAtFrom: "2026-10-08T16:00:00.000Z",
+  startAtBefore: "2026-10-09T16:00:00.000Z",
+});
+assert.deepEqual(chinaDayRange(1, new Date("2026-12-31T15:59:00.000Z")), {
+  startAtFrom: "2026-12-31T16:00:00.000Z",
+  startAtBefore: "2027-01-01T16:00:00.000Z",
+});
 
 const future = "2099-01-01T10:00:00.000Z";
 assert.equal(

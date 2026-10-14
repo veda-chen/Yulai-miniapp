@@ -19,6 +19,7 @@ Page({
   onShow() {
     const state = loadAppearanceState();
     applyNativeAppearance(state.preferences);
+    (this.getTabBar?.() as { refresh?: () => void } | null)?.refresh?.();
     this.setData(appearanceView(state.preferences));
   },
 

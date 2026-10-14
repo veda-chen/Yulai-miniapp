@@ -18,7 +18,7 @@
     </label>
     <label class="field">
       <text class="label">学校（可选）</text>
-      <input maxlength="40" value="{{schoolName}}" placeholder="例如：广东工业大学" confirm-type="done" bindinput="onSchoolInput" />
+      <input maxlength="40" value="{{schoolName}}" placeholder="例如：广东打羽毛球大学" confirm-type="done" bindinput="onSchoolInput" />
     </label>
     <label class="field">
       <text class="label">水平</text>

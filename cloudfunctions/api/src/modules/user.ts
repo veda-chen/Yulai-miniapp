@@ -1,9 +1,18 @@
+import { createHash } from "node:crypto";
 import { cloud, db } from "../db.js";
 import { AppError } from "../errors.js";
 import { hashOpenId } from "../identity.js";
 import type { Handler, RequestContext } from "../types.js";
 
-const USER_LEVELS = new Set(["UNKNOWN", "CASUAL", "BEGINNER", "IMPROVING", "COMPETITIVE"]);
+const USER_LEVELS = new Set([
+  "UNKNOWN",
+  "CASUAL",
+  "BEGINNER",
+  "IMPROVING",
+  "COMPETITIVE",
+  "LIN_DAN",
+  "DOUYIN_AVERAGE",
+]);
 const UPDATE_FIELDS = new Set(["nickname", "schoolId", "schoolName", "level"]);
 
 export type UserDocument = {
@@ -116,12 +125,44 @@ export function parseAvatarUpdate(payload: unknown, userId: string): AvatarUpdat
   return { avatarFileId: payload.avatarFileId };
 }
 
-async function deleteAvatarFile(fileId: string | null) {
+function avatarCleanupId(fileId: string): string {
+  return createHash("sha256").update(fileId).digest("hex").slice(0, 32);
+}
+
+async function queueAvatarCleanup(store: CloudTransaction, fileId: string) {
+  await store
+    .collection("fileCleanupJobs")
+    .doc(avatarCleanupId(fileId))
+    .set({
+      data: {
+        fileId,
+        status: "PENDING",
+        attempts: 0,
+        nextAttemptAt: db.serverDate(),
+        createdAt: db.serverDate(),
+        updatedAt: db.serverDate(),
+      },
+    });
+}
+
+async function deleteAvatarFile(fileId: string | null, queued = false) {
   if (!fileId) return;
   try {
-    await cloud.deleteFile({ fileList: [fileId] });
+    const result = (await cloud.deleteFile({ fileList: [fileId] })) as {
+      fileList?: Array<{ status?: number }>;
+    };
+    if (result.fileList?.some((item) => typeof item.status === "number" && item.status !== 0))
+      throw new Error("云存储文件删除失败");
+    if (queued) await db.collection("fileCleanupJobs").doc(avatarCleanupId(fileId)).remove();
   } catch {
-    console.error(JSON.stringify({ code: "AVATAR_DELETE_FAILED" }));
+    if (!queued) {
+      try {
+        await queueAvatarCleanup(db, fileId);
+      } catch {
+        console.error(JSON.stringify({ code: "AVATAR_CLEANUP_QUEUE_FAILED" }));
+      }
+    }
+    console.error(JSON.stringify({ code: "AVATAR_DELETE_FAILED", queued }));
   }
 }
 
@@ -222,30 +263,58 @@ export function parseAccountDeletion(payload: unknown): void {
   }
 }
 
+async function assertNoActiveCommitments(store: CloudTransaction, userId: string) {
+  const organized = (await store
+    .collection("activities")
+    .where({ organizerId: userId, status: db.command.in(["OPEN", "IN_PROGRESS"]) })
+    .limit(1)
+    .get()) as unknown as { data: unknown[] };
+  if (organized.data[0])
+    throw new AppError("ACTIVE_ACTIVITIES_EXIST", "请先取消或结束正在组织的球局");
+
+  let registrationOffset = 0;
+  while (true) {
+    const registrations = (await store
+      .collection("registrations")
+      .where({
+        userId,
+        status: db.command.in(["CONFIRMED", "WAITLISTED", "PROMOTED"]),
+      })
+      .skip(registrationOffset)
+      .limit(100)
+      .get()) as unknown as { data: Array<{ activityId: string }> };
+    const activityIds = [...new Set(registrations.data.map((item) => item.activityId))];
+    if (activityIds.length > 0) {
+      const active = (await store
+        .collection("activities")
+        .where({ _id: db.command.in(activityIds), status: db.command.in(["OPEN", "IN_PROGRESS"]) })
+        .limit(1)
+        .get()) as unknown as { data: unknown[] };
+      if (active.data[0])
+        throw new AppError("ACTIVE_REGISTRATIONS_EXIST", "请先退出已报名或候补的球局");
+    }
+    if (registrations.data.length < 100) break;
+    registrationOffset += 100;
+  }
+}
+
 export const deleteMe: Handler = async (payload, context) => {
   parseAccountDeletion(payload);
   const user = await findCurrentUser(context);
-  if (user.status !== "ACTIVE") throw new AppError("ACCOUNT_NOT_ACTIVE", "当前账号无法注销");
+  if (user.status === "DELETED") throw new AppError("ACCOUNT_NOT_ACTIVE", "当前账号已经注销");
   if (user.role === "ADMIN") throw new AppError("ADMIN_ACCOUNT", "管理员账号不能在小程序内注销");
 
-  const [organized, registrations] = (await Promise.all([
-    db.collection("activities").where({ organizerId: user._id, status: "OPEN" }).limit(1).get(),
-    db
-      .collection("registrations")
-      .where({
-        userId: user._id,
-        status: db.command.in(["CONFIRMED", "WAITLISTED", "PROMOTED"]),
-      })
-      .limit(1)
-      .get(),
-  ])) as unknown as [{ data: unknown[] }, { data: unknown[] }];
-  if (organized.data[0])
-    throw new AppError("ACTIVE_ACTIVITIES_EXIST", "请先取消或结束正在组织的球局");
-  if (registrations.data[0])
-    throw new AppError("ACTIVE_REGISTRATIONS_EXIST", "请先退出已报名或候补的球局");
-
   await db.runTransaction(async (transaction: CloudTransaction) => {
+    const freshUser = (await transaction
+      .collection("users")
+      .where({ _id: user._id })
+      .limit(1)
+      .get()) as unknown as { data: UserDocument[] };
+    if (freshUser.data[0]?.status === "DELETED")
+      throw new AppError("ACCOUNT_NOT_ACTIVE", "当前账号已经注销");
+    await assertNoActiveCommitments(transaction, user._id);
     const deletedAt = db.serverDate();
+    if (user.avatarFileId) await queueAvatarCleanup(transaction, user.avatarFileId);
     await transaction
       .collection("users")
       .doc(user._id)
@@ -263,10 +332,15 @@ export const deleteMe: Handler = async (payload, context) => {
       });
     await transaction.collection("subscriptionPreferences").where({ userId: user._id }).remove();
     await transaction.collection("appearancePreferences").where({ userId: user._id }).remove();
+    await transaction.collection("playInvitationReplies").where({ userId: user._id }).remove();
+    await transaction
+      .collection("playInvitations")
+      .where({ ownerId: user._id })
+      .update({ data: { ownerName: "已注销球友" } });
     await transaction
       .collection("activities")
       .where({ organizerId: user._id })
-      .update({ data: { organizerName: "已注销球友" } });
+      .update({ data: { organizerName: "已注销球友", contact: null } });
     await transaction
       .collection("registrations")
       .where({ userId: user._id })
@@ -282,6 +356,6 @@ export const deleteMe: Handler = async (payload, context) => {
       },
     });
   });
-  await deleteAvatarFile(user.avatarFileId);
+  await deleteAvatarFile(user.avatarFileId, true);
   return { deleted: true };
 };

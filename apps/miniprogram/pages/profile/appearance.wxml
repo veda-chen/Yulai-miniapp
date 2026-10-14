@@ -3,11 +3,15 @@
 
   <view class="section surface"><view class="section-heading"><view class="section-mark"></view><view><text class="section-title">风格方案</text><text class="section-copy">一键应用常用组合，不影响首页模块和同步设置</text></view></view>
     <view class="preset-grid">
-      <button class="preset blue" data-id="blue-active" bindtap="applyPreset"><view class="preset-art"><view class="preset-ball"></view><view class="preset-line"></view></view><text class="preset-name">蓝色活力</text><text class="preset-copy">照片封面 · 舒适卡片</text></button>
-      <button class="preset green" data-id="green-court" bindtap="applyPreset"><view class="preset-art court"><view class="preset-ball"></view><view class="preset-line"></view></view><text class="preset-name">绿色球场</text><text class="preset-copy">渐变封面 · 球场计分</text></button>
-      <button class="preset orange" data-id="orange-light" bindtap="applyPreset"><view class="preset-art"><view class="preset-ball"></view><view class="preset-line"></view></view><text class="preset-name">橙色轻快</text><text class="preset-copy">紧凑卡片 · 简洁圆角</text></button>
+      <button class="preset blue {{presetId === 'blue-active' ? 'selected' : ''}}" data-id="blue-active" bindtap="applyPreset"><view class="preset-art"><view class="preset-ball"></view><view class="preset-line"></view></view><text class="preset-name">蓝色活力</text><text class="preset-copy">照片封面 · 舒适卡片</text></button>
+      <button class="preset green {{presetId === 'green-court' ? 'selected' : ''}}" data-id="green-court" bindtap="applyPreset"><view class="preset-art court"><view class="preset-ball"></view><view class="preset-line"></view></view><text class="preset-name">绿色球场</text><text class="preset-copy">渐变封面 · 球场计分</text></button>
+      <button class="preset orange {{presetId === 'orange-light' ? 'selected' : ''}}" data-id="orange-light" bindtap="applyPreset"><view class="preset-art"><view class="preset-ball"></view><view class="preset-line"></view></view><text class="preset-name">橙色轻快</text><text class="preset-copy">紧凑卡片 · 简洁圆角</text></button>
     </view>
   </view>
+
+  <view class="section surface quick-preview"><view class="section-heading"><view class="section-mark"></view><view><text class="section-title">当前方案 · {{presetName}}</text><text class="section-copy">先看效果，再决定是否细调</text></view></view><view class="quick-preview-row"><status-chip label="报名中" tone="success" /><status-chip label="候补" tone="warning" /><ui-button label="创建球局" variant="primary" readonly="{{true}}" /></view><text class="label">明暗模式</text><view class="choice-row three"><button class="choice {{draft.colorMode === 'light' ? 'selected' : ''}}" data-field="colorMode" data-value="light" bindtap="choose">浅色</button><button class="choice {{draft.colorMode === 'dark' ? 'selected' : ''}}" data-field="colorMode" data-value="dark" bindtap="choose">深色</button><button class="choice {{draft.colorMode === 'system' ? 'selected' : ''}}" data-field="colorMode" data-value="system" bindtap="choose">跟随系统</button></view><text class="label">文字大小</text><view class="choice-row"><button class="choice {{draft.textSize === 'standard' ? 'selected' : ''}}" data-field="textSize" data-value="standard" bindtap="choose">标准</button><button class="choice {{draft.textSize === 'large' ? 'selected' : ''}}" data-field="textSize" data-value="large" bindtap="choose">大号</button></view><button class="advanced-toggle" bindtap="toggleAdvanced" aria-expanded="{{showAdvanced}}">{{showAdvanced ? '收起高级设置' : '展开高级设置'}} {{showAdvanced ? '⌃' : '⌄'}}</button></view>
+
+  <block wx:if="{{showAdvanced}}">
 
   <view class="section surface"><view class="section-heading"><view class="section-mark"></view><view><text class="section-title">外观细调</text><text class="section-copy">在方案基础上继续调整</text></view></view>
     <text class="label">品牌配色</text><view class="choice-row three"><button class="choice {{draft.brand === 'blue' ? 'selected' : ''}}" data-field="brand" data-value="blue" bindtap="choose"><view class="swatch blue"></view><text>羽来蓝</text></button><button class="choice {{draft.brand === 'green' ? 'selected' : ''}}" data-field="brand" data-value="green" bindtap="choose"><view class="swatch green"></view><text>球场绿</text></button><button class="choice {{draft.brand === 'orange' ? 'selected' : ''}}" data-field="brand" data-value="orange" bindtap="choose"><view class="swatch orange"></view><text>暖阳橙</text></button></view>
@@ -30,7 +34,7 @@
 
   <view class="section preview-section surface"><view class="section-heading"><view class="section-mark"></view><view><text class="section-title">实时预览</text><text class="section-copy">以下均为示例，不会报名或修改比分</text></view></view>
     <view class="preview-block"><text class="preview-label">组件画廊</text><section-header title="本周推荐" description="真实组件的只读预览" action-text="查看更多" index="01" readonly="{{true}}" /><view class="gallery-row"><ui-icon text="羽" tone="primary" /><ui-icon text="场" tone="green" /><status-chip label="报名中" tone="success" /><status-chip label="候补" tone="warning" /></view><view class="gallery-actions"><ui-button label="主要操作" variant="primary" bind:action="previewPrimaryAction" /><ui-button label="次要操作" variant="secondary" bind:action="previewSecondaryAction" /></view></view>
-    <view wx:if="{{draft.showHero}}" class="preview-block"><text class="preview-label">首页封面</text><hero-banner hero-style="{{draft.heroStyle}}" readonly="{{true}}" /></view>
+    <view wx:if="{{draft.showHero}}" class="preview-block"><text class="preview-label">首页封面</text><hero-banner hero-style="{{draft.heroStyle}}" title="想打球，羽来就来" description="找球友、开球局，下一场就在附近" readonly="{{true}}" /></view>
     <view class="preview-block"><text class="preview-label">球局卡片</text><activity-card title="周五晚羽毛球局" time="周五 19:00" date="9月18日" venue="广东工业大学大学城校区体育馆 7 号场" organizer="羽仔" level="进阶局" count-text="4/6 人" status="已报名" density="{{draft.activityDensity}}" readonly="{{true}}" /></view>
     <view class="preview-block"><text class="preview-label">计分板</text><score-board name-a="A方" name-b="B方" score-a="18" score-b="16" score-theme="{{draft.scoreTheme}}" readonly="{{true}}" /></view>
   </view>
@@ -44,5 +48,6 @@
 
   <view class="section surface"><view class="section-heading"><view class="section-mark"></view><view><text class="section-title">同步设置</text><text class="section-copy">决定是否在其他设备使用相同外观</text></view></view><view class="setting-row"><view><text>云同步</text><text class="hint">{{syncMessage}}</text></view><switch checked="{{draft.syncEnabled}}" disabled="{{syncing}}" color="{{primaryColor}}" bindchange="toggleSync" /></view></view>
 
+  </block>
   <view class="save-dock"><view class="save-status"><view class="status-dot {{hasUnsavedChanges ? 'dirty' : ''}}"></view><text>{{hasUnsavedChanges ? '有未保存修改' : '已保存'}}</text></view><view class="actions"><ui-button label="恢复默认" variant="secondary" bind:action="resetDraft" /><ui-button label="保存设置" variant="primary" loading="{{saving}}" disabled="{{saving || !hasUnsavedChanges}}" bind:action="save" /></view></view>
 </view>

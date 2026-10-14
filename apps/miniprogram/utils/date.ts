@@ -33,3 +33,13 @@ export function getDefaultActivityTimes(now = new Date()) {
 export function chinaFormToIso(date: string, time: string): string {
   return new Date(`${date}T${time}:00+08:00`).toISOString();
 }
+
+export function chinaDayRange(dayOffset: number, now = new Date()) {
+  const local = new Date(now.getTime() + SHANGHAI_OFFSET);
+  local.setUTCDate(local.getUTCDate() + dayOffset);
+  const day = `${local.getUTCFullYear()}-${pad(local.getUTCMonth() + 1)}-${pad(local.getUTCDate())}`;
+  const from = chinaFormToIso(day, "00:00");
+  local.setUTCDate(local.getUTCDate() + 1);
+  const nextDay = `${local.getUTCFullYear()}-${pad(local.getUTCMonth() + 1)}-${pad(local.getUTCDate())}`;
+  return { startAtFrom: from, startAtBefore: chinaFormToIso(nextDay, "00:00") };
+}

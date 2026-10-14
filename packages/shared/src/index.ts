@@ -1,8 +1,19 @@
-export const USER_LEVELS = ["UNKNOWN", "CASUAL", "BEGINNER", "IMPROVING", "COMPETITIVE"] as const;
+export const USER_LEVELS = [
+  "UNKNOWN",
+  "CASUAL",
+  "BEGINNER",
+  "IMPROVING",
+  "COMPETITIVE",
+  "LIN_DAN",
+  "DOUYIN_AVERAGE",
+] as const;
 export type UserLevel = (typeof USER_LEVELS)[number];
 
 export const ACTIVITY_VISIBILITIES = ["PUBLIC", "LINK_ONLY"] as const;
 export type ActivityVisibility = (typeof ACTIVITY_VISIBILITIES)[number];
+export const CONTACT_VISIBILITIES = ["NONE", "PARTICIPANTS", "PUBLIC"] as const;
+export type ContactVisibility = (typeof CONTACT_VISIBILITIES)[number];
+export type MyActivitySummary = { upcomingCount: number; organizingCount: number };
 
 export type ApiError = {
   code: string;
@@ -94,7 +105,7 @@ export type ActivitySummary = {
   registrationDeadline: string;
   capacity: number;
   registeredCount: number;
-  level: "ANY" | Exclude<UserLevel, "UNKNOWN">;
+  level: "ANY" | Exclude<UserLevel, "UNKNOWN" | "LIN_DAN" | "DOUYIN_AVERAGE">;
   locationHint: string | null;
   visibility: ActivityVisibility;
   groupingEnabled: boolean;

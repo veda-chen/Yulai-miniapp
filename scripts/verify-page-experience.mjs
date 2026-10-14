@@ -3,6 +3,8 @@ import { readFileSync } from "node:fs";
 import vm from "node:vm";
 import ts from "typescript";
 import * as search from "../apps/miniprogram/utils/activity-search.ts";
+import * as dates from "../apps/miniprogram/utils/date.ts";
+import * as activityExperience from "../apps/miniprogram/utils/activity-experience.ts";
 
 function page(path, overrides = {}) {
   let definition;
@@ -12,6 +14,8 @@ function page(path, overrides = {}) {
     appearanceView: () => ({}),
     getDefaultActivityTimes: () => ({ startDate: "2099-01-01" }),
     ...search,
+    ...dates,
+    ...activityExperience,
     ...overrides,
   };
   const source = ts.transpileModule(readFileSync(path, "utf8"), {
@@ -96,6 +100,105 @@ form.data.activityId = "saved";
 form.viewPublishedActivity();
 assert.equal(target, "/pages/activities/detail?id=saved");
 assert.match(form.data.message, /已保存/);
+
+const listRequests = [];
+const { instance: list, timers: listTimers } = page("apps/miniprogram/pages/activities/list.ts", {
+  callCloud: (_action, payload) =>
+    new Promise((resolve) => listRequests.push({ payload, resolve })),
+});
+list.data.venues = [
+  { id: "", name: "不限场馆" },
+  { id: "real-venue-id", name: "试点场馆" },
+];
+list.data.venueIndex = 1;
+list.data.levelIndex = 3;
+list.data.hasSpots = true;
+list.data.keyword = "进阶";
+const oldList = list.load(true);
+assert.equal(listRequests[0].payload.venueId, "real-venue-id");
+assert.equal(listRequests[0].payload.level, "IMPROVING");
+assert.equal(listRequests[0].payload.hasSpots, true);
+list.onDayTap({ currentTarget: { dataset: { key: "today" } } });
+assert.ok(listRequests[1].payload.startAtFrom);
+listRequests[1].resolve({ activities: [], nextOffset: null });
+await new Promise(setImmediate);
+listRequests[0].resolve({ activities: [], nextOffset: 20 });
+await oldList;
+assert.equal(list.data.nextOffset, null);
+list.resetFilters();
+assert.equal(listRequests[2].payload.venueId, undefined);
+assert.equal(listRequests[2].payload.level, undefined);
+listRequests[2].resolve({ activities: [], nextOffset: null });
+await new Promise(setImmediate);
+list.data.activities = [{ id: "old-result" }];
+list.data.displayedKeyword = "";
+list.onSearchInput({ detail: { value: "新球局" } });
+assert.equal(list.data.activities.length, 0);
+assert.equal(listTimers.size, 1);
+list.confirmSearch();
+assert.equal(listTimers.size, 0);
+listRequests[3].resolve({ activities: [], nextOffset: null });
+await new Promise(setImmediate);
+
+let copiedDraft;
+let createCalls = 0;
+let allowReplace = true;
+const { instance: copyForm } = page("apps/miniprogram/pages/activities/form.ts", {
+  callCloud: async (action) => {
+    if (action === "activity.latestCreated")
+      return {
+        activity: {
+          title: "上次球局",
+          venue: { id: "old-venue", name: "旧场馆" },
+          capacity: 8,
+          level: "IMPROVING",
+          locationHint: "7号场",
+          feeNote: "线下均摊",
+          contact: null,
+          contactVisibility: "NONE",
+          details: "带球",
+          visibility: "PUBLIC",
+          groupingEnabled: false,
+          scoringEnabled: false,
+        },
+      };
+    if (action === "activity.create") {
+      createCalls += 1;
+      return { activity: { id: "new-game" } };
+    }
+    throw Error(`Unexpected action: ${action}`);
+  },
+  wx: {
+    getStorageSync: () => null,
+    removeStorageSync: () => {},
+    setStorageSync: (_key, value) => {
+      copiedDraft = value;
+    },
+    showModal: async () => ({ confirm: allowReplace }),
+    redirectTo: () => {},
+    pageScrollTo: () => {},
+  },
+});
+copyForm.data.loading = false;
+copyForm.data.title = "尚未发布的草稿";
+copyForm.data.venues = [{ id: "active-venue", name: "新场馆" }];
+await copyForm.copyLatestActivity();
+assert.equal(copyForm.data.title, "上次球局");
+assert.equal(copyForm.data.locationHint, "");
+assert.equal(copyForm.data.venueUnavailable, true);
+assert.notEqual(copyForm.data.idempotencyKey, "");
+assert.equal(copiedDraft.data.title, "上次球局");
+allowReplace = false;
+copyForm.data.title = "继续填写的草稿";
+await copyForm.copyLatestActivity();
+assert.equal(copyForm.data.title, "继续填写的草稿");
+allowReplace = true;
+copyForm.data.title = "上次球局";
+copyForm.onVenueChange({ detail: { value: "0" } });
+const publishing = copyForm.onSave();
+await copyForm.onSave();
+await publishing;
+assert.equal(createCalls, 1);
 console.log(
-  "Page experience verified: search scheduling, stale responses, retained retry, published draft protection",
+  "Page experience verified: stale search, combined filters, draft copy and duplicate publish protection",
 );

@@ -14,12 +14,15 @@ import {
   cancelActivity,
   createActivity,
   getActivity,
+  getLatestCreatedActivity,
+  getMyActivitySummary,
   listActivityHistory,
   listActivities,
   listMyActivities,
   updateActivity,
 } from "./modules/activity.js";
 import { getHealth } from "./modules/health.js";
+import { createInvitation, getInvitation, replyInvitation } from "./modules/invitation.js";
 import { getAppearance, saveAppearance } from "./modules/appearance.js";
 import {
   confirmScore,
@@ -71,9 +74,14 @@ const routes: Readonly<Record<string, Route>> = {
   "venue.list": { handler: listVenues, requiresAuth: false },
   "venue.get": { handler: getVenue, requiresAuth: false },
   "activity.list": { handler: listActivities, requiresAuth: false },
+  "activity.latestCreated": { handler: getLatestCreatedActivity, requiresAuth: true },
   "activity.mine": { handler: listMyActivities, requiresAuth: true },
+  "activity.mySummary": { handler: getMyActivitySummary, requiresAuth: true },
   "activity.history": { handler: listActivityHistory, requiresAuth: true },
   "activity.get": { handler: getActivity, requiresAuth: false },
+  "invitation.create": { handler: createInvitation, requiresAuth: true },
+  "invitation.get": { handler: getInvitation, requiresAuth: false },
+  "invitation.reply": { handler: replyInvitation, requiresAuth: true },
   "activity.create": { handler: createActivity, requiresAuth: true },
   "activity.update": { handler: updateActivity, requiresAuth: true },
   "activity.cancel": { handler: cancelActivity, requiresAuth: true },

@@ -17,5 +17,24 @@
     "status": "PENDING_VERIFICATION",
     "createdAt": "SERVER_DATE",
     "updatedAt": "SERVER_DATE"
+  },
+  {
+    "seedKey": "scut-university-town-gymnasium",
+    "name": "华南理工大学大学城校区体育馆",
+    "address": null,
+    "description": null,
+    "entranceGuide": null,
+    "openingHours": null,
+    "accessPolicy": null,
+    "bookingInstructions": null,
+    "contactPhone": null,
+    "facilities": [],
+    "coverFileId": null,
+    "floorPlanFileId": null,
+    "verifiedAt": null,
+    "verificationSource": null,
+    "status": "PENDING_VERIFICATION",
+    "createdAt": "SERVER_DATE",
+    "updatedAt": "SERVER_DATE"
   }
 ]

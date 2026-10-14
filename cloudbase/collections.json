@@ -155,6 +155,20 @@
               "order": "asc"
             }
           ]
+        },
+        {
+          "name": "organizerId_status_endAt",
+          "unique": false,
+          "fields": [
+            { "field": "organizerId", "order": "asc" },
+            { "field": "status", "order": "asc" },
+            { "field": "endAt", "order": "asc" }
+          ]
+        },
+        {
+          "name": "status_startAt",
+          "unique": false,
+          "fields": [{ "field": "status", "order": "asc" }, { "field": "startAt", "order": "asc" }]
         }
       ]
     },
@@ -193,6 +207,15 @@
               "field": "queueNo",
               "order": "asc"
             }
+          ]
+        },
+        {
+          "name": "userId_status_activityId",
+          "unique": false,
+          "fields": [
+            { "field": "userId", "order": "asc" },
+            { "field": "status", "order": "asc" },
+            { "field": "activityId", "order": "asc" }
           ]
         }
       ]
@@ -327,6 +350,22 @@
               "field": "createdAt",
               "order": "asc"
             }
+          ]
+        },
+        {
+          "name": "subscriptionStatus_nextAttemptAt",
+          "unique": false,
+          "fields": [
+            { "field": "subscriptionStatus", "order": "asc" },
+            { "field": "nextAttemptAt", "order": "asc" }
+          ]
+        },
+        {
+          "name": "subscriptionStatus_leaseUntil",
+          "unique": false,
+          "fields": [
+            { "field": "subscriptionStatus", "order": "asc" },
+            { "field": "leaseUntil", "order": "asc" }
           ]
         }
       ]
@@ -565,6 +604,51 @@
               "field": "status",
               "order": "asc"
             }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "fileCleanupJobs",
+      "description": "头像文件删除失败后的重试任务",
+      "clientPermission": "ADMINONLY",
+      "indexes": [
+        {
+          "name": "status_nextAttemptAt",
+          "unique": false,
+          "fields": [
+            { "field": "status", "order": "asc" },
+            { "field": "nextAttemptAt", "order": "asc" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "playInvitations",
+      "description": "打球鸭分享邀请卡",
+      "clientPermission": "ADMINONLY",
+      "indexes": [
+        {
+          "name": "ownerId_createdAt",
+          "unique": false,
+          "fields": [
+            { "field": "ownerId", "order": "asc" },
+            { "field": "createdAt", "order": "desc" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "playInvitationReplies",
+      "description": "打球鸭邀请回应，一人对同一邀请一条",
+      "clientPermission": "ADMINONLY",
+      "indexes": [
+        {
+          "name": "invitationId_uniqueUser",
+          "unique": true,
+          "fields": [
+            { "field": "invitationId", "order": "asc" },
+            { "field": "userId", "order": "asc" }
           ]
         }
       ]

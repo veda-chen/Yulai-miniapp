@@ -5,15 +5,19 @@
     <view class="banner-content"><text class="banner-kicker">YULAI · 羽来</text><text class="page-title">找到今晚的球局</text><text class="banner-copy">和附近球友，一起上场</text></view>
     <navigator class="create-round" url="/pages/activities/form">＋</navigator>
   </view>
-  <view class="search-wrap"><view class="search-icon"></view><input value="{{keyword}}" maxlength="50" confirm-type="search" placeholder="搜索球局、场馆、学校" bindinput="onSearchInput" bindconfirm="confirmSearch" /><button wx:if="{{keyword}}" class="search-clear" aria-label="清空搜索" bindtap="clearSearch">×</button></view>
-  <scroll-view class="chips" scroll-x show-scrollbar="{{false}}"><view class="chip-track"><text wx:for="{{filters}}" wx:key="key" class="chip {{activeFilter === item.key ? 'active' : ''}}" data-key="{{item.key}}" bindtap="onFilterTap">{{item.label}}</text></view></scroll-view>
-  <view class="result-summary"><text>{{loading ? '正在更新' : ('已展示 ' + viewActivities.length + ' 场')}}{{keyword ? (' · 搜索“' + keyword + '”') : ''}}{{activeFilter !== 'all' ? (' · ' + activeFilterLabel) : ''}}</text><button wx:if="{{keyword || activeFilter !== 'all'}}" bindtap="resetFilters">重置</button></view>
+  <view class="search-wrap"><view class="search-icon"></view><input value="{{keyword}}" maxlength="50" confirm-type="search" placeholder="搜索球局、场馆或水平" bindinput="onSearchInput" bindconfirm="confirmSearch" /><button wx:if="{{keyword}}" class="search-clear" aria-label="清空搜索" bindtap="clearSearch">×</button></view>
+  <view class="filter-panel surface">
+    <view class="filter-label">日期</view><view class="chip-track"><text wx:for="{{dayFilters}}" wx:key="key" class="chip {{dayFilter === item.key ? 'active' : ''}}" data-key="{{item.key}}" bindtap="onDayTap">{{item.label}}</text></view>
+    <view class="filter-controls"><picker range="{{venues}}" range-key="name" value="{{venueIndex}}" bindchange="onVenueChange"><view class="filter-picker">{{venues[venueIndex].name}} ›</view></picker><picker range="{{levels}}" range-key="label" value="{{levelIndex}}" bindchange="onLevelChange"><view class="filter-picker">{{levels[levelIndex].label}} ›</view></picker></view>
+    <view class="spots-row"><text>仅看有名额</text><switch checked="{{hasSpots}}" color="{{primaryColor}}" bindchange="onSpotsChange" /></view>
+  </view>
+  <view class="result-summary"><text>{{filterSummary}} · {{loading ? '正在更新' : ('已展示 ' + activities.length + ' 场')}}</text><button wx:if="{{keyword || dayFilter !== 'all' || venueIndex !== 0 || levelIndex !== 0 || hasSpots}}" bindtap="resetFilters">重置筛选</button></view>
   <view wx:if="{{loading && activities.length === 0}}" class="empty surface">正在加载球局</view>
   <view wx:elif="{{message && activities.length === 0}}" class="empty surface"><text>{{message}}</text><button class="retry-button" bindtap="retry">重新加载</button></view>
-  <view wx:elif="{{viewActivities.length === 0 && nextOffset !== null}}" class="empty surface"><text>当前批次暂无匹配，可继续查看</text><button class="retry-button" bindtap="onReachBottom">继续查看</button></view>
-  <view wx:elif="{{viewActivities.length === 0}}" class="empty surface">没有找到符合条件的公开球局</view>
+  <view wx:elif="{{activities.length === 0 && nextOffset !== null}}" class="empty surface"><text>当前批次暂无匹配，后面可能还有球局</text><button class="retry-button" bindtap="onReachBottom">继续查看</button></view>
+  <view wx:elif="{{activities.length === 0}}" class="empty surface">没有找到符合条件的公开球局</view>
   <view wx:else class="activity-list">
-    <navigator wx:for="{{viewActivities}}" wx:key="id" class="activity-row surface" url="/pages/activities/detail?id={{item.id}}">
+    <navigator wx:for="{{activities}}" wx:key="id" class="activity-row surface" url="/pages/activities/detail?id={{item.id}}">
       <view class="time-col"><text class="day">{{item.shortDay}}</text><text class="clock">{{item.shortClock}}</text></view>
       <view class="info-col"><text class="row-title">{{item.title}}</text><text class="venue">⌖ {{item.venue.name}}</text><view class="organizer-row"><view class="organizer-mark">发</view><text>{{item.organizer.nickname}} 发起</text></view>
         <view class="row-footer"><view><status-chip label="{{item.levelText}}" tone="primary" /><status-chip wx:if="{{item.registrationText}}" label="{{item.registrationText}}" tone="success" /></view><text class="count">{{item.registeredCount}}/{{item.capacity}} 人 ›</text></view>

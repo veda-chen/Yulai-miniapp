@@ -12,3 +12,20 @@
 .load-failed { margin-top:28rpx; padding:48rpx 30rpx; text-align:center; }.retry-initialize { width:280rpx; margin:26rpx auto 0; }.save-bar { background:var(--surface); }
 @media (max-width:430px) { .field { align-items:stretch; flex-direction:column; justify-content:center; gap:14rpx; padding:22rpx 0; }.label { margin-right:0; }.control,.control input { width:100%; text-align:left; }.picker-value { white-space:normal; }.date-control { width:100%; flex-wrap:wrap; }.date-control picker { flex:1; min-width:210rpx; text-align:center; }.number-control { align-self:flex-start; } }
 @media (max-width:360px) { .form-page { padding-right:24rpx; padding-left:24rpx; }.profile-alert { align-items:flex-start; flex-wrap:wrap; }.profile-alert button { width:100%; }.date-control picker { min-width:0; }.retry-initialize { width:100%; }.clear-draft { width:100%; } }
+
+.form-page { padding-bottom:calc(230rpx + env(safe-area-inset-bottom)); }
+.form-page .save-bar { right:20rpx; bottom:calc(12rpx + env(safe-area-inset-bottom)); left:20rpx; min-height:112rpx; padding:14rpx 20rpx; border:1rpx solid rgba(255,255,255,.86); border-radius:30rpx; background:rgba(245,249,253,.94); box-shadow:0 14rpx 38rpx rgba(20,43,69,.16); backdrop-filter:blur(18px) saturate(130%); -webkit-backdrop-filter:blur(18px) saturate(130%); }
+.form-page.mode-dark .save-bar { border-color:rgba(255,255,255,.18); background:rgba(27,35,46,.94); box-shadow:0 14rpx 38rpx rgba(0,0,0,.28); }
+.form-page .save { display:flex; align-items:center; justify-content:center; box-sizing:border-box; min-width:0; }
+.form-hero { min-height:220rpx; box-shadow:none; }
+.form-hero-content { padding:30rpx 34rpx; }
+.form-hero .hero-title { font-size:38rpx; }
+.form-hero .hero-copy { margin-top:8rpx; font-size:21rpx; }
+.form-hero .hero-tags { display:none; }
+.group-heading { margin-top:28rpx; }
+.form-card::before { height:0; }
+.copy-latest,.more-toggle { display:flex; align-items:center; justify-content:center; box-sizing:border-box; width:100%; min-height:80rpx; margin:20rpx 0 0; border:1rpx solid var(--border); border-radius:var(--control-radius); background:var(--surface); color:var(--primary); font-size:24rpx; font-weight:650; }
+.copy-latest::after,.more-toggle::after { border:0; }
+.more-toggle { justify-content:space-between; padding:0 26rpx; color:var(--text); }
+.more-toggle text:last-child { color:var(--muted); font-size:21rpx; }
+.more-card { margin-top:14rpx; }

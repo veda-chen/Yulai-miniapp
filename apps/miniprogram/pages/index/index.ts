@@ -42,6 +42,8 @@ type Venue = { id: string; name: string; address: string | null; verificationSta
 type ActivityView = Activity & {
   shortTime: string;
   shortDate: string;
+  day: string;
+  weekday: string;
   levelText: string;
   registrationText: string;
 };
@@ -60,6 +62,8 @@ function dateParts(value: string) {
   return {
     shortTime: `${weekdays[date.getDay()]} ${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`,
     shortDate: `${date.getMonth() + 1}月${date.getDate()}日`,
+    day: String(date.getDate()),
+    weekday: weekdays[date.getDay()] ?? "周日",
   };
 }
 
@@ -98,6 +102,7 @@ Page({
     myActivitiesMessage: "",
     recommendedActivities: [] as ActivityView[],
     searchKeyword: "",
+    searchExpanded: false,
     displayedSearchKeyword: "",
     recommendationsNextOffset: null as number | null,
     recommendationsLoading: true,
@@ -136,6 +141,15 @@ Page({
       this.searchTimer = null;
       void this.loadRecommendations();
     }, 300) as unknown as number;
+  },
+
+  toggleSearch() {
+    if (this.data.searchExpanded && this.data.searchKeyword) {
+      this.setData({ searchExpanded: false });
+      this.clearSearch();
+      return;
+    }
+    this.setData({ searchExpanded: !this.data.searchExpanded });
   },
 
   clearSearch() {
@@ -242,6 +256,7 @@ Page({
     const state = loadAppearanceState();
     const preferences = state.preferences;
     applyNativeAppearance(preferences);
+    (this.getTabBar?.() as { refresh?: () => void } | null)?.refresh?.();
     this.applyPreferences(preferences);
     const recommendations = this.loadRecommendations();
     const venues = this.loadFavoriteVenues(preferences);

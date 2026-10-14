@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>羽来 · UI 升级对比原型</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <script defer src="./app.js"></script>
+  </head>
+  <body>
+    <div class="studio" id="studio">
+      <header class="studio-header">
+        <div class="studio-brand"><span class="studio-brand-mark">羽</span><div><strong>羽来 · UI 升级对比</strong><span class="studio-brand-subtitle">四个核心页面的浏览器高保真原型</span></div></div>
+        <div class="studio-badges"><span class="studio-badge live-dot">设计原型</span><span class="studio-badge">示例数据</span></div>
+      </header>
+
+      <main class="workspace">
+        <aside class="studio-sidebar" aria-label="原型控制台">
+          <p class="side-kicker">YULAI DESIGN STUDY / 01</p>
+          <h1>清晰一点，<br /><em>更想上场。</em></h1>
+          <p class="side-copy">用清楚的信息顺序和轻盈的控件呈现球局，保留羽来的球场照片、蓝绿配色和羽仔。</p>
+
+          <fieldset class="control-group"><legend>查看页面</legend><div class="page-select" id="page-select"></div></fieldset>
+          <fieldset class="control-group"><legend>屏幕宽度</legend><div class="segmented" id="width-select"></div></fieldset>
+          <fieldset class="control-group"><legend>品牌配色</legend><div class="color-options" id="color-select"></div></fieldset>
+          <fieldset class="control-group"><legend>外观</legend><div class="segmented" id="mode-select"></div></fieldset>
+          <fieldset class="control-group"><legend>控件材质</legend><div class="segmented" id="material-select"></div></fieldset>
+          <fieldset class="control-group"><legend>文字</legend><div class="segmented" id="text-select"></div></fieldset>
+          <div class="study-note"><strong>交互演示</strong><span id="page-hint">点击新方案里的搜索、球局和创建按钮查看流程。</span></div>
+          <div class="source-note">左侧画面按当前 WXML 页面结构复现，用于比较信息布局，<b>不是现有小程序真机截图</b>。右侧是独立浏览器原型，不连接业务接口。</div>
+        </aside>
+
+        <section class="comparison" aria-label="页面对比">
+          <div class="comparison-heading"><div><p class="comparison-eyebrow">SIDE BY SIDE</p><h2 id="comparison-title">首页 · 第一眼看到下一场球</h2></div><span>同一组示例数据</span></div>
+          <div class="device-row">
+            <article class="device-column"><div class="device-label"><span class="label-dot current"></span><div><strong>当前结构示意</strong><span class="device-label-subtitle">根据仓库页面代码复现</span></div></div><div class="device current-device" id="current-device"></div></article>
+            <article class="device-column"><div class="device-label"><span class="label-dot proposal"></span><div><strong>升级设计原型</strong><span class="device-label-subtitle">可点击体验关键路径</span></div></div><div class="device proposed-device" id="proposed-device"></div></article>
+          </div>
+          <p class="comparison-footnote">视觉对比采用相同的名称、时间、场馆和人数。示例中的点击只改变本页演示状态，不会创建真实球局或发送消息。</p>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

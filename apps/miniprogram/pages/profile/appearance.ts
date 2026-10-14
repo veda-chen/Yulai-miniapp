@@ -8,6 +8,7 @@ import {
   DEFAULT_APPEARANCE,
   type HomeModuleId,
   loadAppearanceState,
+  matchingAppearancePreset,
   normalizeAppearance,
   saveAppearanceState,
   type ToolId,
@@ -17,6 +18,11 @@ import { canonicalToolId, expandVisibleToolOrder, visibleToolIds } from "../../u
 type Venue = { id: string; name: string; verificationStatus: string };
 type CloudAppearance = { preferences: AppearancePreferences | null; version: number };
 const MODULE_LABELS: Record<HomeModuleId, string> = { tools: "快捷工具", venues: "常用场馆" };
+const PRESET_LABELS: Record<AppearancePresetId, string> = {
+  "blue-active": "蓝色活力",
+  "green-court": "绿色球场",
+  "orange-light": "橙色轻快",
+};
 const TOOL_LABELS: Record<ToolId, string> = {
   grouping: "公平组队",
   scoring: "临时计分",
@@ -43,6 +49,9 @@ Page({
     pendingSync: false,
     syncMessage: "仅在本机生效",
     hasUnsavedChanges: false,
+    showAdvanced: false,
+    presetId: "blue-active" as AppearancePresetId | null,
+    presetName: "蓝色活力",
   },
 
   async onLoad() {
@@ -77,8 +86,11 @@ Page({
   refreshDerived() {
     const draft = normalizeAppearance(this.data.draft);
     const view = appearanceView(draft);
+    const presetId = matchingAppearancePreset(draft);
     this.setData({
       draft,
+      presetId,
+      presetName: presetId ? PRESET_LABELS[presetId] : "自定义",
       ...view,
       modules: draft.moduleOrder.map((id) => ({
         id,
@@ -108,6 +120,10 @@ Page({
     const presetId = event.currentTarget.dataset.id as AppearancePresetId;
     this.setData({ draft: applyAppearancePreset(this.data.draft, presetId) });
     this.refreshDerived();
+  },
+
+  toggleAdvanced() {
+    this.setData({ showAdvanced: !this.data.showAdvanced });
   },
 
   choose(event: WechatMiniprogram.TouchEvent) {

@@ -7,13 +7,17 @@ import {
 } from "./utils/appearance";
 import { callCloud } from "./services/cloud-api";
 import { saveAppearanceState } from "./utils/appearance";
+import { CLOUD_ENV_IDS } from "./config/cloud-env.generated";
 
 if (!wx.cloud) {
   throw new Error("当前微信基础库不支持云开发");
 }
 
+const environment = wx.getAccountInfoSync().miniProgram.envVersion;
+const cloudEnvironment = CLOUD_ENV_IDS[environment];
+if (!cloudEnvironment) throw new Error(`未配置${environment}版本的云开发环境`);
 wx.cloud.init({
-  env: "cloud1-d1g8z3590d3768cbb",
+  env: cloudEnvironment,
   traceUser: true,
 });
 

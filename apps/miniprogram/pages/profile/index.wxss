@@ -4,3 +4,5 @@
 
 .delete-account { margin-top:36rpx; border:0; background:transparent; color:#d93025; font-size:24rpx; } .delete-account::after { border:0; }
 .delete-account { box-sizing:border-box; height:64rpx; padding:0 24rpx; }
+.profile-page { padding-bottom:calc(170rpx + env(safe-area-inset-bottom)); }
+.profile-load-error { display:flex; align-items:center; justify-content:space-between; gap:16rpx; margin-top:20rpx; padding:14rpx 20rpx; color:var(--muted); font-size:var(--font-small); }.profile-load-error button { width:auto; min-height:88rpx; margin:0; padding:0 20rpx; border:0; background:transparent; color:var(--primary); font-size:var(--font-body); }.profile-load-error button::after { border:0; }

@@ -8,7 +8,8 @@
       "!**/node_modules",
       "!**/dist",
       "!**/.backups",
-      "!**/coverage"
+      "!**/coverage",
+      "!apps/miniprogram/config/cloud-env.generated.ts"
     ]
   },
   "formatter": {

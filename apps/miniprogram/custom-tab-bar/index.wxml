@@ -1,0 +1,8 @@
+<view class="tab-dock {{isDark ? 'tab-dock-dark' : ''}}">
+  <view class="tab-dock-inner">
+    <view wx:for="{{tabs}}" wx:key="pagePath" class="tab-item {{selected === index ? 'tab-item-active' : ''}}" style="color:{{selected === index ? primaryColor : ''}};background:{{selected === index ? activeBackground : 'transparent'}}" data-path="{{item.pagePath}}" bindtap="switchTab" role="button" aria-label="{{item.text}}">
+      <image class="tab-icon" src="{{selected === index ? item.selectedIcon : item.icon}}" mode="aspectFit" />
+      <text class="tab-label">{{item.text}}</text>
+    </view>
+  </view>
+</view>

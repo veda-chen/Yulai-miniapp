@@ -22,6 +22,7 @@ type ActivityDocument = {
   groupingEnabled: boolean;
   scoringEnabled: boolean;
   confirmedUserIds?: string[];
+  changeVersion?: number;
 };
 type MatchDocument = {
   _id: string;
@@ -256,6 +257,18 @@ export const generateGrouping: Handler = async (payload, context) => {
   const participantIds = queryData<ParticipantDocument>(participantResult).map(
     (item) => item.userId,
   );
+  const acknowledgedResult = participantIds.length
+    ? await db
+        .collection("registrations")
+        .where({ activityId, userId: db.command.in(participantIds), status: "CONFIRMED" })
+        .limit(100)
+        .get()
+    : null;
+  const acknowledgedIds = new Set(
+    queryData<{ userId: string; acknowledgedChangeVersion?: number }>(acknowledgedResult)
+      .filter((item) => (item.acknowledgedChangeVersion ?? 0) >= (activity.changeVersion ?? 0))
+      .map((item) => item.userId),
+  );
   const userResult = participantIds.length
     ? await db
         .collection("users")
@@ -269,11 +282,13 @@ export const generateGrouping: Handler = async (payload, context) => {
     if (player.result !== "VOID")
       playCounts.set(player.userId, (playCounts.get(player.userId) ?? 0) + 1);
   }
-  const candidates: GroupingCandidate[] = users.map((item) => ({
-    userId: item._id,
-    level: item.level,
-    gamesPlayed: playCounts.get(item._id) ?? 0,
-  }));
+  const candidates: GroupingCandidate[] = users
+    .filter((item) => acknowledgedIds.has(item._id))
+    .map((item) => ({
+      userId: item._id,
+      level: item.level,
+      gamesPlayed: playCounts.get(item._id) ?? 0,
+    }));
   const roundNo = (queryData<RoundDocument>(lastRoundResult)[0]?.roundNo ?? 0) + 1;
   const generated = generateBalancedMatches(candidates, courtCount, `${activityId}:${roundNo}`);
   const courts = queryData<{ name: string; status?: string }>(courtResult).filter(
@@ -373,33 +388,52 @@ export const updateDraftMatch: Handler = async (payload, context) => {
   if (activity.organizerId !== user._id) throw new AppError("FORBIDDEN", "只有组织者可以调整分组");
   const selected = [...players.teamAUserIds, ...players.teamBUserIds];
   await assertActivePlayers(activity, selected);
-  const attendance = await db
-    .collection("participants")
-    .where({
-      activityId: activity._id,
-      userId: db.command.in(selected),
-      status: "ACTIVE",
-      attendanceStatus: "CHECKED_IN",
-    })
-    .limit(4)
-    .get();
-  if (queryData<ParticipantDocument>(attendance).length !== 4)
-    throw new AppError("INVALID_PARTICIPANT", "分组只能使用已到场球友");
-  const roundMatches = await db
-    .collection("matches")
-    .where({ roundId: match.roundId })
-    .limit(20)
-    .get();
-  const occupied = queryData<MatchDocument>(roundMatches)
-    .filter((item) => item._id !== matchId)
-    .flatMap((item) => [...item.teamAUserIds, ...item.teamBUserIds]);
-  if (selected.some((id) => occupied.includes(id)))
-    throw new AppError("PLAYER_CONFLICT", "同一轮中有球友已被安排到其他场地");
   const now = db.serverDate();
   await db.runTransaction(async (transaction: Store) => {
     const fresh = await getMatch(transaction, matchId);
     if (fresh.version !== expectedVersion)
       throw new AppError("VERSION_CONFLICT", "分组已更新，请刷新后重试");
+    if (fresh.status !== "DRAFT" || fresh.roundId !== match.roundId)
+      throw new AppError("INVALID_STATE", "只有待发布分组可以调整");
+    const freshActivity = await getActivity(transaction, fresh.activityId);
+    assertLiveActivity(freshActivity);
+    const attendance = await transaction
+      .collection("participants")
+      .where({
+        activityId: freshActivity._id,
+        userId: db.command.in(selected),
+        status: "ACTIVE",
+        attendanceStatus: "CHECKED_IN",
+      })
+      .limit(4)
+      .get();
+    if (queryData<ParticipantDocument>(attendance).length !== 4)
+      throw new AppError("INVALID_PARTICIPANT", "分组只能使用已到场球友");
+    const registrations = await transaction
+      .collection("registrations")
+      .where({
+        activityId: freshActivity._id,
+        userId: db.command.in(selected),
+        status: "CONFIRMED",
+      })
+      .limit(4)
+      .get();
+    if (
+      queryData<{ acknowledgedChangeVersion?: number }>(registrations).filter(
+        (item) => (item.acknowledgedChangeVersion ?? 0) >= (freshActivity.changeVersion ?? 0),
+      ).length !== 4
+    )
+      throw new AppError("CHANGE_NOT_ACKNOWLEDGED", "请先确认球局最新变更");
+    const roundMatches = await transaction
+      .collection("matches")
+      .where({ roundId: fresh.roundId })
+      .limit(20)
+      .get();
+    const occupied = queryData<MatchDocument>(roundMatches)
+      .filter((item) => item._id !== matchId)
+      .flatMap((item) => [...item.teamAUserIds, ...item.teamBUserIds]);
+    if (selected.some((id) => occupied.includes(id)))
+      throw new AppError("PLAYER_CONFLICT", "同一轮中有球友已被安排到其他场地");
     await transaction.collection("matchPlayers").where({ matchId }).remove();
     await transaction
       .collection("matches")
@@ -721,17 +755,19 @@ export const unlockScore: Handler = async (payload, context) => {
 
 export const getPlayerStats: Handler = async (_payload, context) => {
   const user = await findCurrentUser(context);
-  const result = await db.collection("matchPlayers").where({ userId: user._id }).limit(500).get();
-  const completed = queryData<{ result: string }>(result).filter(
-    (item) => item.result === "WIN" || item.result === "LOSS",
-  );
-  const wins = completed.filter((item) => item.result === "WIN").length;
+  const [winCount, lossCount] = (await Promise.all([
+    db.collection("matchPlayers").where({ userId: user._id, result: "WIN" }).count(),
+    db.collection("matchPlayers").where({ userId: user._id, result: "LOSS" }).count(),
+  ])) as unknown as [{ total: number }, { total: number }];
+  const wins = winCount.total;
+  const losses = lossCount.total;
+  const games = wins + losses;
   return {
     stats: {
-      games: completed.length,
+      games,
       wins,
-      losses: completed.length - wins,
-      winRate: completed.length ? Math.round((wins / completed.length) * 1000) / 10 : null,
+      losses,
+      winRate: games ? Math.round((wins / games) * 1000) / 10 : null,
     },
   };
 };

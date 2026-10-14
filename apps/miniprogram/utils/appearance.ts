@@ -216,6 +216,21 @@ export function applyAppearancePreset(
   return normalizeAppearance({ ...current, ...APPEARANCE_PRESETS[presetId] });
 }
 
+export function matchingAppearancePreset(
+  preferences: AppearancePreferences,
+): AppearancePresetId | null {
+  for (const presetId of Object.keys(APPEARANCE_PRESETS) as AppearancePresetId[]) {
+    const preset = APPEARANCE_PRESETS[presetId];
+    if (
+      Object.entries(preset).every(
+        ([field, value]) => preferences[field as keyof AppearancePreferences] === value,
+      )
+    )
+      return presetId;
+  }
+  return null;
+}
+
 export function loadAppearanceState(): AppearanceLocalState {
   try {
     const stored = wx.getStorageSync(STORAGE_KEY) as unknown;

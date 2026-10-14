@@ -67,7 +67,7 @@
   {
     "TableName": "activities",
     "CommandType": "COMMAND",
-    "Command": "{\"createIndexes\":\"activities\",\"indexes\":[{\"name\":\"public_startAt\",\"key\":{\"status\":1,\"visibility\":1,\"startAt\":1}},{\"name\":\"venueId_startAt\",\"key\":{\"venueId\":1,\"startAt\":1}},{\"name\":\"organizerId_idempotencyKey_unique\",\"key\":{\"organizerId\":1,\"idempotencyKey\":1},\"unique\":true}]}"
+    "Command": "{\"createIndexes\":\"activities\",\"indexes\":[{\"name\":\"public_startAt\",\"key\":{\"status\":1,\"visibility\":1,\"startAt\":1}},{\"name\":\"venueId_startAt\",\"key\":{\"venueId\":1,\"startAt\":1}},{\"name\":\"organizerId_idempotencyKey_unique\",\"key\":{\"organizerId\":1,\"idempotencyKey\":1},\"unique\":true},{\"name\":\"organizerId_createdAt\",\"key\":{\"organizerId\":1,\"createdAt\":-1}},{\"name\":\"public_venue_startAt\",\"key\":{\"status\":1,\"visibility\":1,\"venueId\":1,\"startAt\":1}},{\"name\":\"public_level_startAt\",\"key\":{\"status\":1,\"visibility\":1,\"level\":1,\"startAt\":1}},{\"name\":\"public_venue_level_startAt\",\"key\":{\"status\":1,\"visibility\":1,\"venueId\":1,\"level\":1,\"startAt\":1}}]}"
   },
   {
     "TableName": "registrations",

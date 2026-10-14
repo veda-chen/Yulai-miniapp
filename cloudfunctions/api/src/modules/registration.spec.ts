@@ -12,6 +12,23 @@ const fixture = vi.hoisted(() => {
   let transactionTail: Promise<void> = Promise.resolve();
 
   function collection(name: string) {
+    if (name === "users") {
+      return {
+        doc: () => ({ update: async () => ({ stats: { updated: 1 } }) }),
+        where: (query: { _id: string }) => ({
+          limit: () => ({
+            get: async () => ({
+              data: [
+                {
+                  _id: query._id,
+                  status: query._id === currentUser._id ? currentUser.status : "ACTIVE",
+                },
+              ],
+            }),
+          }),
+        }),
+      };
+    }
     const values = documents[name];
     if (!values) throw new Error(`Unexpected collection: ${name}`);
     return {
@@ -79,6 +96,7 @@ const fixture = vi.hoisted(() => {
 vi.mock("../db.js", () => ({
   db: {
     collection: fixture.collection,
+    command: { inc: (value: number) => ({ inc: value }) },
     serverDate: () => new Date("2026-09-09T05:00:00.000Z"),
     runTransaction: fixture.runTransaction,
   },

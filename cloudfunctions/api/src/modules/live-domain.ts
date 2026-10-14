@@ -13,6 +13,8 @@ const LEVEL_WEIGHT: Record<string, number> = {
   BEGINNER: 2,
   IMPROVING: 3,
   COMPETITIVE: 4,
+  LIN_DAN: 5,
+  DOUYIN_AVERAGE: 6,
 };
 
 function seededValue(seed: string): number {

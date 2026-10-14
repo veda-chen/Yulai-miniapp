@@ -1,6 +1,7 @@
 <view class="profile-page {{appearanceClass}}">
   <view class="profile-header"><view class="profile-avatar"><user-avatar src="{{avatarFileId}}" name="{{nickname}}" size="180" /></view><text class="nickname">{{nickname}}</text><view class="meta-line"><text>{{schoolName}}</text><text class="dot">·</text><text class="level">{{levelText}}</text></view></view>
   <view class="stats surface"><view class="stat"><text class="num">{{upcomingCount}}</text><text class="stat-label">即将参加</text></view><view class="stat"><text class="num">{{organizingCount}}</text><text class="stat-label">正在组织</text></view><view class="stat"><text class="num">{{gameCount}}</text><text class="stat-label">锁定对局</text></view></view>
+  <view wx:if="{{profileError || summaryError || scoreError}}" class="profile-load-error surface"><text>{{profileError || summaryError || scoreError}}</text><button bindtap="load">重试</button></view>
   <view class="menu surface">
     <navigator class="menu-item" url="/pages/profile/history"><view><ui-icon src="/assets/icons/menu/calendar.svg" tone="neutral" /><text>参加记录</text></view><image class="chevron-icon" src="/assets/icons/menu/chevron-right.svg" /></navigator>
     <navigator class="menu-item" url="/pages/profile/edit"><view><ui-icon src="/assets/icons/menu/edit.svg" tone="neutral" /><text>编辑个人资料</text></view><image class="chevron-icon" src="/assets/icons/menu/chevron-right.svg" /></navigator>

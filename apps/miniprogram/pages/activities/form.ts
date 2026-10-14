@@ -130,11 +130,15 @@ const CONTACT_VISIBILITIES = [
 ];
 
 Page({
+  draftTimer: null as ReturnType<typeof setTimeout> | null,
   initialActivityTimes: getDefaultActivityTimes(),
   requestedActivityId: "",
   data: {
     loading: true,
     saving: false,
+    copying: false,
+    confirmingPublish: false,
+    moreOpen: false,
     profileRequired: false,
     activityId: "",
     version: 0,
@@ -214,9 +218,107 @@ Page({
       this.setData({ profileRequired: profile.user.needsProfile });
     } catch {}
   },
+  onHide() {
+    this.flushDraft();
+  },
+  onUnload() {
+    this.flushDraft();
+  },
 
   goToProfile() {
     wx.navigateTo({ url: "/pages/profile/edit" });
+  },
+
+  toggleMore() {
+    this.setData({ moreOpen: !this.data.moreOpen });
+  },
+
+  async copyLatestActivity() {
+    if (
+      this.data.activityId ||
+      this.data.saving ||
+      this.data.copying ||
+      this.data.confirmingPublish
+    )
+      return;
+    this.setData({ copying: true, message: "" });
+    try {
+      const result = await callCloud<{ activity: Activity | null }>("activity.latestCreated");
+      const activity = result.activity;
+      if (!activity) {
+        this.setData({ message: "你还没有创建过球局" });
+        return;
+      }
+      if (
+        this.data.title.trim() ||
+        this.data.details.trim() ||
+        this.data.locationHint.trim() ||
+        loadFormDraft()
+      ) {
+        const confirmation = await wx.showModal({
+          title: "用上次球局替换当前内容？",
+          content: "当前填写的内容和本机草稿将被替换，已发布的球局不受影响。",
+          confirmText: "替换内容",
+        });
+        if (!confirmation.confirm) return;
+      }
+      const availableVenues = this.data.venues.filter((venue) => !venue.unavailable);
+      let venues = availableVenues;
+      let venueIndex = venues.findIndex((venue) => venue.id === activity.venue.id);
+      const venueUnavailable = venueIndex < 0;
+      if (venueUnavailable) {
+        venues = [
+          ...venues,
+          {
+            id: activity.venue.id,
+            name: `${activity.venue.name}（当前不可用）`,
+            unavailable: true,
+          },
+        ];
+        venueIndex = venues.length - 1;
+      }
+      this.setData(
+        {
+          title: activity.title,
+          venues,
+          venueIndex,
+          venueUnavailable,
+          ...getDefaultActivityTimes(),
+          capacity: String(activity.capacity),
+          levelIndex: Math.max(
+            0,
+            LEVELS.findIndex((item) => item.value === activity.level),
+          ),
+          locationHint: "",
+          feeNote: activity.feeNote ?? "",
+          contact: activity.contact ?? "",
+          contactVisibilityIndex: Math.max(
+            0,
+            CONTACT_VISIBILITIES.findIndex((item) => item.value === activity.contactVisibility),
+          ),
+          details: activity.details ?? "",
+          visibilityIndex: Math.max(
+            0,
+            VISIBILITIES.findIndex((item) => item.value === activity.visibility),
+          ),
+          groupingEnabled: activity.groupingEnabled,
+          scoringEnabled: activity.scoringEnabled,
+          idempotencyKey: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`,
+          fieldErrors: {},
+          moreOpen: false,
+          message: venueUnavailable
+            ? "已复制；原场馆不可用，请重新选择场馆"
+            : "已复制上次球局，请确认新时间和场馆",
+        },
+        () => this.saveDraft(),
+      );
+    } catch (error) {
+      this.setData({
+        message: error instanceof Error ? error.message : "复制上次球局失败，请重试",
+      });
+    } finally {
+      this.setData({ copying: false });
+    }
   },
 
   clearErrors(keys: Array<keyof ActivityFormErrors>) {
@@ -295,7 +397,7 @@ Page({
                   ? ["deadline"]
                   : [];
       this.setData({ [field]: event.detail.value, fieldErrors: this.clearErrors(errorKeys) }, () =>
-        this.saveDraft(),
+        this.scheduleDraftSave(),
       );
     }
   },
@@ -326,7 +428,24 @@ Page({
     this.setData({ scoringEnabled: event.detail.value }, () => this.saveDraft());
   },
 
+  scheduleDraftSave() {
+    if (this.draftTimer !== null) clearTimeout(this.draftTimer);
+    this.draftTimer = setTimeout(() => {
+      this.draftTimer = null;
+      this.saveDraft();
+    }, 400);
+  },
+  flushDraft() {
+    if (this.draftTimer === null) return;
+    clearTimeout(this.draftTimer);
+    this.draftTimer = null;
+    this.saveDraft();
+  },
   saveDraft() {
+    if (this.draftTimer !== null) {
+      clearTimeout(this.draftTimer);
+      this.draftTimer = null;
+    }
     if (
       this.data.loading ||
       this.data.saving ||
@@ -456,7 +575,7 @@ Page({
   },
 
   async onSave() {
-    if (this.data.saving) return;
+    if (this.data.saving || this.data.confirmingPublish || this.data.copying) return;
     if (this.data.publishedActivityId) {
       this.viewPublishedActivity();
       return;
@@ -504,6 +623,22 @@ Page({
       groupingEnabled: this.data.groupingEnabled,
       scoringEnabled: this.data.scoringEnabled,
     };
+    if (!this.data.activityId) {
+      this.setData({ confirmingPublish: true });
+      try {
+        const confirmation = await wx.showModal({
+          title: "确认发布球局",
+          content: `${payload.title}\n${this.data.startDate} ${this.data.startTime}–${this.data.endTime}\n${venue.name}\n${payload.capacity} 人 · ${visibility.label}`,
+          confirmText: "确认发布",
+        });
+        if (!confirmation.confirm) return;
+      } catch {
+        this.setData({ message: "无法确认发布，请重试" });
+        return;
+      } finally {
+        this.setData({ confirmingPublish: false });
+      }
+    }
     this.setData({ saving: true, message: "正在保存" });
     try {
       const result = this.data.activityId

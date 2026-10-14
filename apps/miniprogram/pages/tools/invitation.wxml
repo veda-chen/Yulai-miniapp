@@ -1,0 +1,26 @@
+<view class="invite-page {{appearanceClass}}">
+  <view wx:if="{{!invitation && !viewingId && !lastId}}" class="create-view">
+    <text class="eyebrow">羽来 · 喊球搭子</text><text class="page-title">把“想打球”发给朋友</text>
+    <text class="page-copy">挑一只鸭，改一句话，就能做成可互动的邀请卡。</text>
+    <view class="preset-list"><button wx:for="{{presets}}" wx:key="id" class="preset preset-{{item.id}} {{presetIndex === index ? 'selected' : ''}}" data-index="{{index}}" bindtap="choosePreset"><view class="preset-copy"><view class="preset-top"><text class="preset-name">{{item.name}}</text><text wx:if="{{presetIndex === index}}" class="preset-selected">✓ 已选</text></view><view class="preset-line">{{item.title}}</view></view><view class="preset-art">{{item.symbol}}</view></button></view>
+    <text class="field-label">邀请标题</text><input class="title-input" maxlength="32" value="{{title}}" bindinput="onTitleInput" placeholder="写一句话喊朋友打球" />
+    <view class="preview"><text class="preview-duck">🐥</text><text class="preview-title">{{title}}</text><text class="preview-line">{{presets[presetIndex].line}}</text></view>
+    <button class="main-button" disabled="{{busy}}" bindtap="createInvitation">{{busy ? '正在制作…' : '做好邀请卡'}}</button>
+  </view>
+  <view wx:elif="{{!invitation && !viewingId && lastId}}" class="resume"><text class="resume-duck">🐥</text><text>上次做的打球鸭还在等你</text><navigator class="main-button" url="/pages/tools/invitation?id={{lastId}}">打开上次的邀请卡</navigator><button class="plain-button" bindtap="newInvitation">再做一张</button></view>
+  <view wx:elif="{{!invitation && busy}}" class="loading">小鸭正在赶来…</view>
+  <view wx:if="{{invitation}}" class="play-view"><text class="eyebrow">{{invitation.ownerName}} 的打球鸭</text><view class="duck-stage"><text class="stage-sparkle sparkle-left">✦</text><text class="stage-sparkle sparkle-right">✧</text><button class="duck" bindtap="pokeDuck" aria-label="戳一戳小鸭">{{duck}}</button></view><text class="invite-title">{{invitation.title}}</text><text class="invite-line">{{invitation.line}}</text><text class="tap-hint">轻点小鸭，听听它的悄悄话</text>
+    <view class="choice-list">
+      <button class="choice yes {{mine === 'YES' ? 'chosen' : ''}}" data-choice="YES" disabled="{{busy}}" bindtap="respond"><view class="choice-icon">🏸</view><view class="choice-copy"><text class="choice-title">打！现在就想打</text><text class="choice-hint">球拍已就位</text></view><text class="choice-end">{{mine === 'YES' ? '✓' : '›'}}</text></button>
+      <button class="choice maybe {{mine === 'MAYBE' ? 'chosen' : ''}}" data-choice="MAYBE" disabled="{{busy}}" bindtap="respond"><view class="choice-icon">👀</view><view class="choice-copy"><text class="choice-title">有空就来</text><text class="choice-hint">先看看时间</text></view><text class="choice-end">{{mine === 'MAYBE' ? '✓' : '›'}}</text></button>
+      <button class="choice no {{mine === 'NO' ? 'chosen' : ''}}" data-choice="NO" disabled="{{busy}}" bindtap="respond"><view class="choice-icon">🛋️</view><view class="choice-copy"><text class="choice-title">这周先躺</text><text class="choice-hint">下次再约鸭</text></view><text class="choice-end">{{mine === 'NO' ? '✓' : '›'}}</text></button>
+    </view>
+    <view class="response-summary"><text>{{counts.YES}} 人想打 · {{counts.MAYBE}} 人看时间</text><text class="fine-print">这只是意向回应，正式打球请到球局报名。</text></view>
+    <view wx:if="{{isOwner && people.length}}" class="people"><text class="people-title">有兴趣的球友</text><view wx:for="{{people}}" wx:key="nickname" class="person"><text>{{item.nickname}}</text><text>{{item.label}}</text></view></view>
+    <button class="share-button" open-type="share">转发给球搭子 ↗</button>
+    <navigator wx:if="{{isOwner}}" class="create-activity" url="/pages/activities/form">人凑齐了？创建正式球局 ›</navigator>
+    <button class="plain-button" bindtap="newInvitation">再做一张</button>
+  </view>
+  <text wx:if="{{message}}" class="error-message">{{message}}</text><button wx:if="{{message && invitationId && !invitation}}" class="plain-button" bindtap="loadInvitation">重新加载</button>
+  <view wx:if="{{resultOpen}}" class="result-overlay" bindtap="closeResult"><view class="result-dialog" catchtap="stopResultTap"><view class="result-icon">{{resultIcon}}</view><text class="result-kicker">{{resultKicker}}</text><text class="result-text">{{resultText}}</text><text class="result-note">{{resultNote}}</text><button class="result-close" bindtap="closeResult">知道啦</button></view></view>
+</view>

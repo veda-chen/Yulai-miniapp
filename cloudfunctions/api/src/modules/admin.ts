@@ -153,7 +153,8 @@ function auditSummary(metadata: unknown): string {
 
 async function requireAdmin(context: Parameters<Handler>[1]): Promise<UserDocument> {
   const user = await findCurrentUser(context);
-  if (user.role !== "ADMIN") throw new AppError("FORBIDDEN", "需要管理员权限");
+  if (user.role !== "ADMIN" || user.status !== "ACTIVE")
+    throw new AppError("FORBIDDEN", "需要管理员权限");
   return user;
 }
 

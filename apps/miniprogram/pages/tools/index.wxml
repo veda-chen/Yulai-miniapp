@@ -1,8 +1,9 @@
 <view class="tools-page {{appearanceClass}}">
-  <view class="tools-hero"><text class="hero-kicker">YULAI LAB</text><text class="hero-title">随开随用的球场工具</text><text class="hero-copy">无需创建球局，临时名单、赛程与比分保存在本机7天。</text></view>
-  <view class="section-head"><section-header title="快捷工具" description="无需发布球局" index="01" /></view>
+  <view class="tools-hero"><text class="hero-kicker">羽来 · 工具箱</text><text class="hero-title">随手开打，轻松记分</text><text class="hero-copy">无需创建球局，现场工具直接使用。</text></view>
+  <navigator class="invite-entry" url="/pages/tools/invitation"><view><text class="invite-entry-title">🐥 这周有没有球打鸭？</text><text class="invite-entry-copy">做一张有趣的邀请卡，喊朋友一起打球</text></view><text class="invite-entry-arrow">›</text></navigator>
+  <view class="section-head"><section-header title="球场工具" description="选择一项开始" index="01" /></view>
   <view class="tool-list">
-    <tool-card wx:for="{{tools}}" wx:key="id" title="{{item.title}}" description="{{item.description}}" icon="{{item.icon}}" tone="{{item.tone}}" badge="可用" url="{{item.url}}" />
+    <tool-card wx:for="{{tools}}" wx:key="id" title="{{item.title}}" description="{{item.description}}" icon="{{item.icon}}" tone="{{item.tone}}" url="{{item.url}}" />
   </view>
   <view class="ideas"><text class="ideas-title">本机临时数据</text><text class="draft-copy">公平组队、计分和费用草稿保留7天，不会上传云端。</text><button class="clear-drafts" bindtap="clearDrafts">清空全部临时数据</button></view>
 </view>

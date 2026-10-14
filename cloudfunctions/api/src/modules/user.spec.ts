@@ -61,6 +61,14 @@ describe("parseProfileUpdate", () => {
     });
   });
 
+  it("accepts the Lin Dan profile level", () => {
+    expect(parseProfileUpdate({ level: "LIN_DAN" })).toEqual({ level: "LIN_DAN" });
+  });
+
+  it("accepts the Douyin average profile level", () => {
+    expect(parseProfileUpdate({ level: "DOUYIN_AVERAGE" })).toEqual({ level: "DOUYIN_AVERAGE" });
+  });
+
   it("rejects unsupported fields", () => {
     expect(() => parseProfileUpdate({ role: "ADMIN" })).toThrow("不支持修改字段");
   });
