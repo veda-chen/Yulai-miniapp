@@ -29,5 +29,5 @@
 .detail-page .info-row:first-child .info-title { font-size:33rpx; font-weight:760; }
 .detail-page .info-row:nth-child(3) .info-title { font-size:31rpx; font-weight:740; }
 .detail-page .info-icon { width:52rpx; height:52rpx; margin-right:18rpx; border-radius:16rpx; }
-.detail-page .headline-top { position:relative; min-height:56rpx; }
-.detail-page .share { position:absolute; top:0; right:0; margin:0; }
+.detail-page .headline-top { box-sizing:border-box; width:100%; min-height:56rpx; }
+.detail-page .share { margin-left:auto; }
