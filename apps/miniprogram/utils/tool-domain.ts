@@ -350,6 +350,18 @@ function minimumTransfers(entries: Array<{ name: string; balance: number }>): Ex
     const cached = memo.get(key);
     if (cached !== undefined) return cached;
     const first = values[0] as number;
+    const exactMatch = values.findIndex((value, index) => index > 0 && value === -first);
+    if (exactMatch > 0) {
+      const next = values.slice(1);
+      next[exactMatch - 1] = 0;
+      const result = 1 + minimumCount(next);
+      memo.set(key, result);
+      return result;
+    }
+    const lowerBound = Math.max(
+      values.filter((value) => value < 0).length,
+      values.filter((value) => value > 0).length,
+    );
     let best = values.length - 1;
     const tried = new Set<number>();
     for (let index = 1; index < values.length; index += 1) {
@@ -359,7 +371,7 @@ function minimumTransfers(entries: Array<{ name: string; balance: number }>): Ex
       const next = values.slice(1);
       next[index - 1] = other + first;
       best = Math.min(best, 1 + minimumCount(next));
-      if (other + first === 0) break;
+      if (best === lowerBound) break;
     }
     memo.set(key, best);
     return best;
@@ -370,7 +382,14 @@ function minimumTransfers(entries: Array<{ name: string; balance: number }>): Ex
     const target = minimumCount(active.map((entry) => entry.balance));
     const first = active[0] as { name: string; balance: number };
     const tried = new Set<number>();
-    for (let index = 1; index < active.length; index += 1) {
+    const exactMatch = active.findIndex(
+      (entry, index) => index > 0 && entry.balance === -first.balance,
+    );
+    const indices =
+      exactMatch > 0
+        ? [exactMatch]
+        : Array.from({ length: active.length - 1 }, (_, index) => index + 1);
+    for (const index of indices) {
       const other = active[index] as { name: string; balance: number };
       if (first.balance * other.balance >= 0 || tried.has(other.balance)) continue;
       tried.add(other.balance);

@@ -179,7 +179,7 @@ for (let count = 3; count <= 7; count += 1) {
 }
 const twenty = Array.from({ length: 20 }, (_, index) => `U${index + 1}`);
 const startedAt = Date.now();
-settleExpenses(
+const twentyResult = settleExpenses(
   twenty,
   twenty.map((payer, index) => ({
     label: `费用${index + 1}`,
@@ -187,6 +187,7 @@ settleExpenses(
     payer,
   })),
 );
+assert.equal(twentyResult.transfers.length, 10);
 assert.ok(Date.now() - startedAt < 1000, "20人结算应在1秒内完成");
 const now = Date.now();
 assert.equal(isFreshToolDraft({ schemaVersion: 1, updatedAt: now, data: {} }, now), true);
