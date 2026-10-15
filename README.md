@@ -91,7 +91,7 @@ WECHAT_MINIPROGRAM_STATE=developer
 RELEASE_VERSION=
 ```
 
-本地开发可沿用 `.env.example` 的开发环境 ID；体验版必须显式填写 `TRIAL_CLOUDBASE_ENV_ID`，试点联调时可指向开发云环境，正式版则必须使用独立的生产环境。`WECHAT_MINIPROGRAM_STATE` 可设为 `developer`、`trial` 或 `formal`；体验版云函数发送订阅消息前应设为 `trial` 并重新部署。`RELEASE_VERSION` 仅在正式部署时填写，并须与 `package.json` 一致。安装依赖或构建时会生成被 Git 忽略的客户端环境配置。`.env` 包含本地部署密钥，不应提交到 Git。
+本地开发可沿用 `.env.example` 的开发环境 ID；体验版必须显式填写 `TRIAL_CLOUDBASE_ENV_ID`，试点联调时可指向开发云环境，正式版必须显式配置生产环境 ID；已有正式版数据时须指向存放这些数据的现有环境，切换到独立环境前应先完成迁移。`WECHAT_MINIPROGRAM_STATE` 可设为 `developer`、`trial` 或 `formal`；体验版云函数发送订阅消息前应设为 `trial` 并重新部署。`RELEASE_VERSION` 仅在正式部署时填写，并须与 `package.json` 一致。安装依赖或构建时会生成被 Git 忽略的客户端环境配置。`.env` 包含本地部署密钥，不应提交到 Git。
 
 检查配置并构建：
 
@@ -192,3 +192,9 @@ M5 的人工门槛和证据记录在 [`release/m5-gates.json`](release/m5-gates.
 ## 许可证
 
 本项目采用 [MIT License](LICENSE)。
+
+### 上传前云环境检查
+
+每次使用微信开发者工具上传前，先运行 `pnpm upload:prepare`。同一个上传包会从体验版进入正式版，因此 `TRIAL_CLOUDBASE_ENV_ID` 和 `PRODUCTION_CLOUDBASE_ENV_ID` 都必须填写；缺少任何一个都会阻止准备上传。环境配置仅在本地生成，不包含在 Git 中。普通 CI 检查通过不能代替这一步。
+
+2026-10-15 修复：正式版环境 ID 为空会导致启动时未执行云初始化，表现为个人资料、场馆和球局同时加载失败。0.2.11 修复上传配置，并将云初始化放入 `App.onLaunch`，增加三种版本的启动回归检查。已发布的旧包需要发布修复版本，重部署云函数不能修复客户端配置。

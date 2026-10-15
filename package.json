@@ -1,6 +1,6 @@
 {
   "name": "yulai",
-  "version": "0.2.10",
+  "version": "0.2.11",
   "private": true,
   "packageManager": "pnpm@11.19.0",
   "engines": {
@@ -9,6 +9,7 @@
   "scripts": {
     "postinstall": "node scripts/generate-cloud-env.mjs",
     "build": "node scripts/generate-cloud-env.mjs && pnpm -r --if-present build",
+    "upload:prepare": "node scripts/generate-cloud-env.mjs --for-upload && pnpm check && pnpm build",
     "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm ui:verify && pnpm m1:verify && pnpm m2:verify && pnpm m3:verify && pnpm m4:verify && pnpm m5:verify",
     "cloud:check": "node scripts/check-cloud-env.mjs",
     "cloud:deploy": "pnpm build && tcb fn deploy api --force",
@@ -22,7 +23,7 @@
     "m4:verify": "node scripts/verify-m4.mjs",
     "test": "pnpm -r --if-present test",
     "typecheck": "pnpm -r --if-present typecheck",
-    "ui:verify": "node --experimental-strip-types scripts/verify-ui-customization.mjs && node --experimental-strip-types scripts/verify-tools.mjs && node --experimental-strip-types scripts/verify-core-experience.mjs",
+    "ui:verify": "node scripts/verify-cloud-startup.mjs && node --experimental-strip-types scripts/verify-ui-customization.mjs && node --experimental-strip-types scripts/verify-tools.mjs && node --experimental-strip-types scripts/verify-core-experience.mjs",
     "backup:cloud": "node scripts/backup-cloudbase.mjs",
     "restore:plan": "node scripts/prepare-restore-plan.mjs",
     "restore:json-plan": "node scripts/prepare-json-restore.mjs",
