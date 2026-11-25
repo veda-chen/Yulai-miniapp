@@ -31,6 +31,22 @@ type LiveData = {
   currentUserId: string;
 };
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function actionLockKey(action: string, payload: unknown): string {
+  if (!isRecord(payload)) return action;
+  if (typeof payload.roundId === "string") return `round:${payload.roundId}`;
+  if (typeof payload.matchId === "string") return `match:${payload.matchId}`;
+  if (action === "match.create") return "match:create";
+  return action;
+}
+
+function errorMessage(error: unknown, fallback: string): string {
+  return error instanceof Error ? error.message : fallback;
+}
+
 const STATUS_LABELS: Record<string, string> = {
   DRAFT: "待发布",
   SCHEDULED: "待开打",
@@ -43,11 +59,15 @@ Page({
   activityId: "",
   requestVersion: 0,
   isVisible: false,
+  pendingActionKeys: new Set<string>(),
+  unlockPromptOpen: false,
   scoreDrafts: {} as Record<string, { inputScoreA: string; inputScoreB: string }>,
   data: {
     loading: true,
+    refreshing: false,
+    refreshError: "",
     ...appearanceView(),
-    submitting: false,
+    pendingActions: {} as Record<string, boolean>,
     message: "",
     activity: null as LiveData["activity"] | null,
     participants: [] as Participant[],
@@ -93,14 +113,22 @@ Page({
     this.requestVersion += 1;
   },
   async onPullDownRefresh() {
-    await this.load();
-    wx.stopPullDownRefresh();
+    try {
+      await this.load();
+    } finally {
+      wx.stopPullDownRefresh();
+    }
   },
 
   async load() {
     const requestVersion = ++this.requestVersion;
+    const preserveContent = this.data.activity !== null;
     try {
-      this.setData({ loading: true, message: "" });
+      this.setData(
+        preserveContent
+          ? { loading: false, refreshing: true, refreshError: "" }
+          : { loading: true, message: "", refreshError: "" },
+      );
       const [liveResult, statsResult] = await Promise.allSettled([
         callCloud<LiveData>("live.get", { activityId: this.activityId }),
         callCloud<{
@@ -112,6 +140,8 @@ Page({
       const result = liveResult.value;
       this.setData({
         loading: false,
+        refreshing: false,
+        refreshError: "",
         activity: result.activity,
         participants: result.participants,
         rounds: result.rounds,
@@ -141,11 +171,21 @@ Page({
       wx.setNavigationBarTitle({ title: result.activity.title });
     } catch (error) {
       if (!this.isVisible || requestVersion !== this.requestVersion) return;
-      this.setData({
-        loading: false,
-        message: error instanceof Error ? error.message : "现场信息加载失败",
-      });
+      const message = errorMessage(error, "现场信息加载失败");
+      this.setData(
+        preserveContent
+          ? { refreshing: false, refreshError: message }
+          : { loading: false, message },
+      );
     }
+  },
+
+  async retry() {
+    await this.load();
+  },
+
+  setActionPending(key: string, pending: boolean) {
+    this.setData({ pendingActions: { ...this.data.pendingActions, [key]: pending } });
   },
 
   onCourtChange(event: WechatMiniprogram.CustomEvent<{ value: string }>) {
@@ -233,7 +273,7 @@ Page({
       return;
     }
     const teamSize = matchType.playerCount / 2;
-    await this.run(
+    const succeeded = await this.run(
       "match.create",
       {
         activityId: this.activityId,
@@ -244,7 +284,7 @@ Page({
       },
       "对局已创建",
     );
-    this.setData({ selectedPlayers: [] });
+    if (succeeded) this.setData({ selectedPlayers: [] });
   },
   async submitScore(event: WechatMiniprogram.BaseEvent) {
     const match = this.data.matches[Number(event.currentTarget.dataset.index)];
@@ -281,13 +321,21 @@ Page({
   },
   async unlockScore(event: WechatMiniprogram.BaseEvent) {
     const match = this.data.matches[Number(event.currentTarget.dataset.index)];
-    if (!match) return;
-    const prompt = await wx.showModal({
-      title: "解锁比分",
-      content: "请填写更正原因",
-      editable: true,
-      placeholderText: "原因将写入修订记录",
-    });
+    if (!match || this.unlockPromptOpen) return;
+    this.unlockPromptOpen = true;
+    let prompt: Awaited<ReturnType<typeof wx.showModal>>;
+    try {
+      prompt = await wx.showModal({
+        title: "解锁比分",
+        content: "请填写更正原因",
+        editable: true,
+        placeholderText: "原因将写入修订记录",
+      });
+    } catch {
+      return;
+    } finally {
+      this.unlockPromptOpen = false;
+    }
     if (prompt.confirm && prompt.content?.trim())
       await this.run(
         "score.unlock",
@@ -295,25 +343,32 @@ Page({
         "比分已解锁",
       );
   },
-  async run(action: string, payload: unknown, success: string) {
-    if (this.data.submitting) return;
-    this.setData({ submitting: true });
+  async run(action: string, payload: unknown, success: string): Promise<boolean> {
+    const key = actionLockKey(action, payload);
+    if (this.pendingActionKeys.has(key)) return false;
+    this.pendingActionKeys.add(key);
+    this.setActionPending(key, true);
     try {
       await callCloud(action, payload);
+      if (!this.isVisible) return false;
       if (
         (action === "score.submit" || action === "score.lock") &&
-        typeof payload === "object" &&
-        payload !== null &&
-        "matchId" in payload
+        isRecord(payload) &&
+        typeof payload.matchId === "string"
       )
-        delete this.scoreDrafts[String(payload.matchId)];
+        delete this.scoreDrafts[payload.matchId];
       wx.showToast({ title: success, icon: "success" });
       await this.load();
+      return true;
     } catch (error) {
-      wx.showToast({ title: error instanceof Error ? error.message : "操作失败", icon: "none" });
-      if (error instanceof Error && error.message.includes("刷新")) await this.load();
+      if (!this.isVisible) return false;
+      const message = errorMessage(error, "操作失败");
+      wx.showToast({ title: message, icon: "none" });
+      if (message.includes("刷新")) await this.load();
+      return false;
     } finally {
-      this.setData({ submitting: false });
+      this.pendingActionKeys.delete(key);
+      this.setActionPending(key, false);
     }
   },
 });

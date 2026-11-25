@@ -35,7 +35,20 @@ function page(path, overrides = {}) {
     clearTimeout: (id) => timers.delete(id),
   });
   definition.setData = function (update, callback) {
-    Object.assign(this.data, update);
+    for (const [path, value] of Object.entries(update)) {
+      if (!path.includes(".") && !path.includes("[")) {
+        this.data[path] = value;
+        continue;
+      }
+      const keys = path.replace(/\[(\d+)\]/g, ".$1").split(".");
+      let target = this.data;
+      for (let index = 0; index < keys.length - 1; index += 1) {
+        const key = keys[index];
+        target[key] ??= /^\d+$/.test(keys[index + 1]) ? [] : {};
+        target = target[key];
+      }
+      target[keys.at(-1)] = value;
+    }
     callback?.();
   };
   return { instance: definition, timers };
@@ -199,6 +212,210 @@ const publishing = copyForm.onSave();
 await copyForm.onSave();
 await publishing;
 assert.equal(createCalls, 1);
+
+const liveRequests = [];
+const liveToasts = [];
+const { instance: live } = page("apps/miniprogram/pages/activities/live.ts", {
+  callCloud: (action, payload) =>
+    new Promise((resolve, reject) => liveRequests.push({ action, payload, resolve, reject })),
+  wx: {
+    showToast: (options) => liveToasts.push(options.title),
+    setNavigationBarTitle: () => {},
+    stopPullDownRefresh: () => {},
+  },
+});
+live.activityId = "activity-1";
+live.isVisible = true;
+live.data.activity = {
+  id: "activity-1",
+  title: "旧现场",
+  status: "IN_PROGRESS",
+  groupingEnabled: true,
+  scoringEnabled: true,
+  canManage: true,
+};
+live.data.matches = [
+  {
+    id: "match-1",
+    roundId: "round-1",
+    courtLabel: "一号场",
+    teamA: [],
+    teamB: [],
+    matchType: "DOUBLES",
+    status: "SCHEDULED",
+    scoreA: null,
+    scoreB: null,
+    confirmations: [],
+    version: 1,
+    teamAText: "旧 A",
+    teamBText: "旧 B",
+    statusText: "待开打",
+    inputScoreA: "21",
+    inputScoreB: "18",
+    isPlayer: false,
+    confirmationText: "",
+  },
+];
+const liveResult = (title) => ({
+  activity: { ...live.data.activity, title },
+  participants: [],
+  rounds: [],
+  matches: [],
+  currentUserId: "organizer",
+});
+const statsResult = { stats: { games: 0, wins: 0, losses: 0, winRate: null } };
+
+assert.notEqual(live.data.activity, null);
+const liveRefresh = live.load();
+assert.equal(live.data.loading, false);
+assert.equal(live.data.refreshing, true);
+assert.equal(live.data.matches[0].id, "match-1");
+liveRequests[0].resolve(liveResult("新现场"));
+liveRequests[1].resolve(statsResult);
+await liveRefresh;
+assert.equal(live.data.activity.title, "新现场");
+assert.equal(live.data.refreshing, false);
+
+const failedRefresh = live.load();
+liveRequests[2].reject(new Error("network"));
+liveRequests[3].resolve(statsResult);
+await failedRefresh;
+assert.equal(live.data.activity.title, "新现场");
+assert.equal(live.data.message, "");
+assert.ok(live.data.refreshError);
+
+const olderRefresh = live.load();
+const newerRefresh = live.load();
+liveRequests[6].resolve(liveResult("最新现场"));
+liveRequests[7].resolve(statsResult);
+await newerRefresh;
+liveRequests[4].resolve(liveResult("过期现场"));
+liveRequests[5].resolve(statsResult);
+await olderRefresh;
+assert.equal(live.data.activity.title, "最新现场");
+
+live.load = async () => {};
+const firstMatchAction = live.run("score.submit", { matchId: "match-1" }, "ok");
+assert.equal(live.data.pendingActions["match:match-1"], true);
+assert.equal(await live.run("score.confirm", { matchId: "match-1" }, "ok"), false);
+const secondMatchAction = live.run("score.submit", { matchId: "match-2" }, "ok");
+assert.equal(liveRequests.length, 10);
+liveRequests[8].resolve({});
+liveRequests[9].resolve({});
+assert.deepEqual(await Promise.all([firstMatchAction, secondMatchAction]), [true, true]);
+assert.equal(live.data.pendingActions["match:match-1"], false);
+assert.equal(live.data.pendingActions["match:match-2"], false);
+
+const failedAction = live.run("score.lock", { matchId: "match-1" }, "ok");
+liveRequests[10].reject(new Error("network"));
+assert.equal(await failedAction, false);
+assert.equal(live.data.pendingActions["match:match-1"], false);
+assert.equal(liveToasts.at(-1), "操作失败");
+
+const roundAction = live.run("grouping.publish", { roundId: "round-1" }, "ok");
+assert.equal(live.data.pendingActions["round:round-1"], true);
+assert.equal(await live.run("grouping.publish", { roundId: "round-1" }, "ok"), false);
+liveRequests[11].resolve({});
+assert.equal(await roundAction, true);
+assert.equal(live.data.pendingActions["round:round-1"], false);
+
+const initialRequests = [];
+const { instance: initialLive } = page("apps/miniprogram/pages/activities/live.ts", {
+  callCloud: (_action, payload) =>
+    new Promise((resolve, reject) => initialRequests.push({ payload, resolve, reject })),
+  wx: {
+    showToast: () => {},
+    setNavigationBarTitle: () => {},
+  },
+});
+initialLive.activityId = "activity-1";
+initialLive.isVisible = true;
+const initialLoad = initialLive.load();
+assert.equal(initialLive.data.loading, true);
+initialRequests[0].reject(new Error("network"));
+initialRequests[1].resolve(statsResult);
+await initialLoad;
+assert.equal(initialLive.data.loading, false);
+assert.ok(initialLive.data.message);
+assert.equal(initialLive.data.refreshError, "");
+
+const retriedLoad = initialLive.retry();
+initialRequests[2].resolve(liveResult("重试成功"));
+initialRequests[3].resolve(statsResult);
+await retriedLoad;
+assert.equal(initialLive.data.activity.title, "重试成功");
+assert.equal(initialLive.data.message, "");
+
+const draftRequests = [];
+const { instance: draftLive } = page("apps/miniprogram/pages/activities/live.ts", {
+  callCloud: (_action, payload) =>
+    new Promise((resolve, reject) => draftRequests.push({ payload, resolve, reject })),
+  wx: {
+    showToast: () => {},
+    setNavigationBarTitle: () => {},
+  },
+});
+draftLive.activityId = "activity-1";
+draftLive.isVisible = true;
+draftLive.data.loading = false;
+draftLive.data.activity = { ...live.data.activity };
+draftLive.data.matches = [
+  {
+    id: "match-1",
+    roundId: "round-1",
+    courtLabel: "一号场",
+    teamA: [],
+    teamB: [],
+    matchType: "DOUBLES",
+    status: "SCHEDULED",
+    scoreA: 21,
+    scoreB: 18,
+    confirmations: [],
+    version: 1,
+    teamAText: "A",
+    teamBText: "B",
+    statusText: "待开打",
+    inputScoreA: "21",
+    inputScoreB: "18",
+    isPlayer: false,
+    confirmationText: "",
+  },
+];
+draftLive.onScoreInput({
+  currentTarget: { dataset: { index: "0", side: "A" } },
+  detail: { value: "30" },
+});
+assert.equal(draftLive.data.matches[0].inputScoreA, "30");
+const draftRefresh = draftLive.load();
+draftRequests[0].resolve({
+  ...liveResult("草稿刷新"),
+  matches: [
+    {
+      id: "match-1",
+      roundId: "round-1",
+      courtLabel: "一号场",
+      teamA: [],
+      teamB: [],
+      matchType: "DOUBLES",
+      status: "SCHEDULED",
+      scoreA: 21,
+      scoreB: 18,
+      confirmations: [],
+      version: 1,
+    },
+  ],
+});
+draftRequests[1].resolve(statsResult);
+await draftRefresh;
+assert.equal(draftLive.data.matches[0].inputScoreA, "30");
+assert.equal(draftLive.data.matches[0].inputScoreB, "18");
+
+const liveTemplate = readFileSync("apps/miniprogram/pages/activities/live.wxml", "utf8");
+assert.ok(!liveTemplate.includes("submitting"));
+assert.ok(liveTemplate.includes("refreshError"));
+assert.ok(liveTemplate.includes("disabled=\"{{pendingActions['match:' + item.id]}}\""));
+assert.ok(liveTemplate.includes("disabled=\"{{pendingActions['round:' + item.id]}}\""));
+
 console.log(
-  "Page experience verified: stale search, combined filters, draft copy and duplicate publish protection",
+  "Page experience verified: stale search, combined filters, draft copy, duplicate publish protection, silent live refresh and per-match action locking",
 );
